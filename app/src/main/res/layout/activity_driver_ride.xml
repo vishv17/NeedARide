@@ -264,6 +264,26 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/radioGrpLuggage" />
 
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnDelete"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_20sdp"
+                android:background="@color/purple_700"
+                android:gravity="center"
+                android:paddingStart="@dimen/_50sdp"
+                android:paddingTop="@dimen/_8sdp"
+                android:paddingEnd="@dimen/_50sdp"
+                android:paddingBottom="@dimen/_8sdp"
+                android:text="@string/text_delete"
+                android:textAllCaps="false"
+                android:textColor="@color/white"
+                android:textSize="@dimen/_15ssp"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/btnSubmit" />
+
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

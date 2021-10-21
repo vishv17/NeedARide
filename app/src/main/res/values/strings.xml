@@ -16,17 +16,25 @@
     <string name="text_police_noc">Upload police NOC</string>
     <string name="text_noc">police NOC</string>
     <string name="text_date">Select date of journey</string>
+    <string name="text_dis_date">Date of journey</string>
     <string name="text_start_place">Select start place</string>
+    <string name="text_start__dis_place">Start place</string>
     <string name="text_end_place">Select end place</string>
+    <string name="text_end_dis_place">End place</string>
     <string name="text_vehicle_number">Enter vehicle number</string>
     <string name="text_number_of_seat_available">Enter number of seat available</string>
+    <string name="text_number_of_seat_available_dis">Number of seat available</string>
     <string name="text_cost_per_seat">Enter cost per seat</string>
+    <string name="text_cost_per_seat_dis">Cost per seat</string>
     <string name="text_pets_allow">Pets are allow?</string>
     <string name="text_pets_carry">Any Pets carry?</string>
     <string name="text_luggage_carry">Any luggage carry?</string>
     <string name="text_luggage_allow">luggage are allow?</string>
     <string name="text_yes">Yes</string>
     <string name="text_no">No</string>
+    <string name="text_edit">Edit</string>
+    <string name="text_update">Update</string>
+    <string name="text_delete">Delete</string>
 
     <!--permission text-->
     <string name="on_denied_permission">If you reject permission,you can not use this service

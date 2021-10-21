@@ -2,6 +2,7 @@ package com.app.ride.authentication.fragment;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +15,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.app.ride.R;
+import com.app.ride.authentication.activity.DriverRideActivity;
+import com.app.ride.authentication.activity.PassengerActivity;
 import com.app.ride.authentication.adapter.DriverRideListAdapter;
 import com.app.ride.authentication.adapter.PassengerRideListAdapter;
 import com.app.ride.authentication.model.DriverRequestModel;
@@ -54,18 +57,13 @@ public class PassengerFragment extends Fragment {
 
         rvPassengerList = view.findViewById(R.id.rvDriverList);
         getDataFromDatabase();
-
-
-
     }
+
     private void getDataFromDatabase() {
         globals.showHideProgress((Activity) context,true);
-
         FirebaseFirestore.getInstance().collection(Constant.RIDE_passenger_request).addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
-
-
                 if(value.isEmpty()){
                     globals.showHideProgress((Activity) context,false);
                     return;
@@ -76,9 +74,14 @@ public class PassengerFragment extends Fragment {
                     for (int i = 0 ;i<downloadInfoList.size();i++){
                         dataList.add(downloadInfoList.get(i));
                     }
-
-//                    dataList.addAll(downloadInfoList);
-                    PassengerRideListAdapter adapter = new PassengerRideListAdapter(dataList);
+                    PassengerRideListAdapter adapter = new PassengerRideListAdapter(context, dataList, new PassengerRideListAdapter.OnViewClick() {
+                        @Override
+                        public void onEditClick(PassengerRequestModel model) {
+                            Intent intent = new Intent(context, PassengerActivity.class);
+                            intent.putExtra("DATA",model);
+                            startActivity(intent);
+                        }
+                    });
                     rvPassengerList.setHasFixedSize(true);
                     rvPassengerList.setLayoutManager(new LinearLayoutManager(context));
                     rvPassengerList.setAdapter(adapter);

@@ -3,9 +3,9 @@ package com.app.ride.authentication.model;
 import java.io.Serializable;
 
 public class DriverRequestModel implements Serializable {
-    String LuggageAllow,PetsAllow,Uid,costPerSeat,dateOfJourney,endPlace,seatAvailable,startPlace,vehicleNumber;
+    String LuggageAllow,PetsAllow,Uid,costPerSeat,dateOfJourney,endPlace,seatAvailable,startPlace,vehicleNumber,driverId;
 
-    public DriverRequestModel(String luggageAllow, String petsAllow, String uid, String costPerSeat, String dateOfJourney, String endPlace, String seatAvailable, String startPlace, String vehicleNumber) {
+    public DriverRequestModel(String luggageAllow, String petsAllow, String uid, String costPerSeat, String dateOfJourney, String endPlace, String seatAvailable, String startPlace, String vehicleNumber, String driverId) {
         LuggageAllow = luggageAllow;
         PetsAllow = petsAllow;
         Uid = uid;
@@ -15,9 +15,16 @@ public class DriverRequestModel implements Serializable {
         this.seatAvailable = seatAvailable;
         this.startPlace = startPlace;
         this.vehicleNumber = vehicleNumber;
+        this.driverId = driverId;
     }
 
+    public String getDriverId() {
+        return driverId;
+    }
 
+    public void setDriverId(String driverId) {
+        this.driverId = driverId;
+    }
 
     //Add this
     public DriverRequestModel() {

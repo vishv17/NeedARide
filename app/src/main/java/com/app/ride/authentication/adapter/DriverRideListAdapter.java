@@ -1,5 +1,6 @@
 package com.app.ride.authentication.adapter;
 
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,23 +11,35 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.app.ride.R;
 import com.app.ride.authentication.model.DriverRequestModel;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 
 public class DriverRideListAdapter extends RecyclerView.Adapter<DriverRideListAdapter.ViewHolder> {
     private ArrayList<DriverRequestModel> dataList;
+    private Context context;
+    private OnViewClick listener;
 
 
-    public  DriverRideListAdapter(ArrayList<DriverRequestModel> listData) {
+    public  DriverRideListAdapter(Context context, ArrayList<DriverRequestModel> listData, OnViewClick listener) {
         this.dataList = listData;
+        this.context = context;
+        this.listener = listener;
     }
 
+
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        AppCompatTextView tvName;
+        AppCompatTextView tvDateOfJourney,tvStartPlace,tvEndPlace,tvSeatAvailable,tvCostPerSeat,tvEdit;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            tvName = itemView.findViewById(R.id.tvName);
+            tvDateOfJourney = itemView.findViewById(R.id.tvDateOfJourney);
+            tvStartPlace= itemView.findViewById(R.id.tvStartPlace);
+            tvEndPlace= itemView.findViewById(R.id.tvEndPlace);
+            tvSeatAvailable= itemView.findViewById(R.id.tvSeatAvailable);
+            tvCostPerSeat= itemView.findViewById(R.id.tvCostPerSeat);
+            tvEdit= itemView.findViewById(R.id.tvEdit);
         }
     }
 
@@ -37,9 +50,25 @@ public class DriverRideListAdapter extends RecyclerView.Adapter<DriverRideListAd
         return new ViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_driver_ride, parent, false));
     }
 
+    public interface OnViewClick{
+        void onEditClick(DriverRequestModel model);
+    }
+
     @Override
     public void onBindViewHolder(@NonNull DriverRideListAdapter.ViewHolder holder, int position) {
-        holder.tvName.setText(dataList.get(position).getStartPlace()+" "+dataList.get(position).getEndPlace());
+        DriverRequestModel model = dataList.get(position);
+        holder.tvDateOfJourney.setText(context.getString(R.string.text_dis_date)+" - "+model.getDateOfJourney());
+        holder.tvStartPlace.setText(context.getString(R.string.text_start__dis_place)+" - "+model.getStartPlace());
+        holder.tvEndPlace.setText(context.getString(R.string.text_end_dis_place)+" - "+model.getEndPlace());
+        holder.tvSeatAvailable.setText(context.getString(R.string.text_number_of_seat_available_dis)+" - "+model.getSeatAvailable());
+        holder.tvCostPerSeat.setText(context.getString(R.string.text_cost_per_seat_dis)+" - "+model.getCostPerSeat());
+
+        holder.tvEdit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                listener.onEditClick(model);
+            }
+        });
     }
 
     @Override

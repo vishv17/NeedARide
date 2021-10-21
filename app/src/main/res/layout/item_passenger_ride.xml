@@ -43,34 +43,10 @@
         android:textStyle="bold"
         app:layout_constraintTop_toBottomOf="@+id/tvStartPlace" />
 
-    <!--Seat available-->
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/tvSeatAvailable"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="start"
-        android:padding="@dimen/_5sdp"
-        android:text="@string/app_name"
-        android:textColor="@color/black"
-        android:textSize="@dimen/_15ssp"
-        android:textStyle="bold"
-        app:layout_constraintTop_toBottomOf="@+id/tvEndPlace" />
-
-   <!--Cost per Seat-->
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/tvCostPerSeat"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="start"
-        android:padding="@dimen/_5sdp"
-        android:text="@string/app_name"
-        android:textColor="@color/black"
-        android:textSize="@dimen/_15ssp"
-        android:textStyle="bold"
-        app:layout_constraintTop_toBottomOf="@+id/tvSeatAvailable" />
 
 
- <!--Edit-->
+
+    <!--Edit-->
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/tvEdit"
         android:layout_width="match_parent"
@@ -81,8 +57,7 @@
         android:textColor="@color/black"
         android:textSize="@dimen/_20ssp"
         android:textStyle="bold"
-        app:layout_constraintTop_toBottomOf="@+id/tvCostPerSeat" />
-
+        app:layout_constraintTop_toBottomOf="@+id/tvEndPlace" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

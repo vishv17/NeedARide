@@ -5,6 +5,8 @@ public class Constant {
     public static String RIDE_USERS = "Users";
     public static String RIDE_PROFILE_IMAGE = "Profile_images";
     public static String RIDE_Firebase_Uid = "Uid";
+    public static String RIDE_driver_Uid = "driverId";
+    public static String RIDE_passenger_Uid = "passengerId";
     public static String RIDE_USER_DATA = "Data";
     public static String RIDE_Firebase_FirstName = "FirstName";
     public static String RIDE_Firebase_LastName = "LastName";

@@ -14,7 +14,8 @@
         <entry key="..\:/Project/Ride/Ride_13_0/app/src/main/res/layout/fragment_driver.xml" value="0.19427710843373494" />
         <entry key="..\:/Project/Ride/Ride_13_0/app/src/main/res/layout/fragment_passenger.xml" value="0.10778985507246377" />
         <entry key="..\:/Project/Ride/Ride_13_0/app/src/main/res/layout/header_layout.xml" value="0.13134057971014493" />
-        <entry key="..\:/Project/Ride/Ride_13_0/app/src/main/res/layout/item_driver_ride.xml" value="0.10778985507246377" />
+        <entry key="..\:/Project/Ride/Ride_13_0/app/src/main/res/layout/item_driver_ride.xml" value="0.17" />
+        <entry key="..\:/Project/Ride/Ride_13_0/app/src/main/res/layout/item_passenger_ride.xml" value="0.1852355072463768" />
         <entry key="..\:/Project/Ride/Ride_13_0/app/src/main/res/layout/layout_dialoge.xml" value="0.11458333333333333" />
       </map>
     </option>

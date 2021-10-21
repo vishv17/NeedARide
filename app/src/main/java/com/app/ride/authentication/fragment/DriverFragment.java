@@ -2,8 +2,8 @@ package com.app.ride.authentication.fragment;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,12 +15,12 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.app.ride.R;
+import com.app.ride.authentication.activity.DashboardActivity;
 import com.app.ride.authentication.activity.DriverRideActivity;
 import com.app.ride.authentication.adapter.DriverRideListAdapter;
 import com.app.ride.authentication.model.DriverRequestModel;
 import com.app.ride.authentication.utility.Constant;
 import com.app.ride.authentication.utility.Globals;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
@@ -77,7 +77,14 @@ public class DriverFragment extends Fragment {
                     }
 
 //                    dataList.addAll(downloadInfoList);
-                    DriverRideListAdapter adapter = new DriverRideListAdapter(dataList);
+                    DriverRideListAdapter adapter = new DriverRideListAdapter(context, dataList, new DriverRideListAdapter.OnViewClick() {
+                        @Override
+                        public void onEditClick(DriverRequestModel model) {
+                            Intent intent = new Intent(context, DriverRideActivity.class);
+                            intent.putExtra("DATA",model);
+                            startActivity(intent);
+                        }
+                    });
                     rvDriverList.setHasFixedSize(true);
                     rvDriverList.setLayoutManager(new LinearLayoutManager(context));
                     rvDriverList.setAdapter(adapter);
@@ -87,4 +94,6 @@ public class DriverFragment extends Fragment {
             }
         });
     }
+
+
 }

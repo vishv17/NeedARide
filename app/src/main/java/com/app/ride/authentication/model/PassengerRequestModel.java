@@ -3,15 +3,24 @@ package com.app.ride.authentication.model;
 import java.io.Serializable;
 
 public class PassengerRequestModel implements Serializable {
-    String LuggageAllow,PetsAllow,Uid,dateOfJourney,endPlace,startPlace;
+    String LuggageAllow,PetsAllow,Uid,dateOfJourney,endPlace,startPlace,passengerId;
 
-    public PassengerRequestModel(String luggageAllow, String petsAllow, String uid, String dateOfJourney, String endPlace, String startPlace) {
+    public PassengerRequestModel(String luggageAllow, String petsAllow, String uid, String dateOfJourney, String endPlace, String startPlace, String passengerId) {
         LuggageAllow = luggageAllow;
         PetsAllow = petsAllow;
         Uid = uid;
         this.dateOfJourney = dateOfJourney;
         this.endPlace = endPlace;
         this.startPlace = startPlace;
+        this.passengerId = passengerId;
+    }
+
+    public String getPassengerId() {
+        return passengerId;
+    }
+
+    public void setPassengerId(String passengerId) {
+        this.passengerId = passengerId;
     }
 
     public String getLuggageAllow() {

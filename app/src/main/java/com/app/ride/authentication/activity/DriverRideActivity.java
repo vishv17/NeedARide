@@ -1,6 +1,7 @@
 package com.app.ride.authentication.activity;
 
 import android.app.DatePickerDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -18,12 +19,16 @@ import androidx.appcompat.widget.AppCompatEditText;
 import androidx.appcompat.widget.AppCompatTextView;
 
 import com.app.ride.R;
+import com.app.ride.authentication.model.DriverRequestModel;
 import com.app.ride.authentication.utility.Constant;
 import com.app.ride.authentication.utility.Globals;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.SetOptions;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -36,11 +41,13 @@ public class DriverRideActivity extends AppCompatActivity implements View.OnClic
     AppCompatTextView tvDateOfJourney;
     AppCompatEditText etVehicleNumber, etNumberOfSeatAvailable, etCostPerSeat;
     RadioGroup radioGrpPets, radioGrpLuggage;
-    String selectedStartPlace, selectedEndPlace,selectedDate = "";
+    String selectedStartPlace, selectedEndPlace, selectedDate = "";
     RadioButton selectPet, selectLuggage;
-    AppCompatButton btnSubmit;
+    AppCompatButton btnSubmit,btnDelete;
+    Spinner spin, endSpin;
     String[] country = {"India", "USA", "China", "Japan", "Other"};
-Globals globals;
+    Globals globals;
+    DriverRequestModel model;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +61,7 @@ Globals globals;
 
     private void initView() {
         globals = new Globals();
+
         tvDateOfJourney = findViewById(R.id.tvDateOfJourney);
         etVehicleNumber = findViewById(R.id.etVehicleNumber);
         etNumberOfSeatAvailable = findViewById(R.id.etNumberOfSeatAvailable);
@@ -61,13 +69,54 @@ Globals globals;
         radioGrpPets = findViewById(R.id.radioGrpPets);
         radioGrpLuggage = findViewById(R.id.radioGrpLuggage);
         btnSubmit = findViewById(R.id.btnSubmit);
+        btnDelete = findViewById(R.id.btnDelete);
 
         tvDateOfJourney.setOnClickListener(this);
         btnSubmit.setOnClickListener(this);
+        btnDelete.setOnClickListener(this);
+    }
+
+    private void setDataIntoView(DriverRequestModel model) {
+        tvDateOfJourney.setText(model.getDateOfJourney());
+        selectedDate = model.getDateOfJourney();
+        etVehicleNumber.setText(model.getVehicleNumber());
+        etNumberOfSeatAvailable.setText(model.getSeatAvailable());
+        etCostPerSeat.setText(model.getCostPerSeat());
+        selectedStartPlace = model.getStartPlace();
+
+        for (int i = 0; i < spin.getCount(); i++) {
+            if (spin.getItemAtPosition(i).equals(selectedStartPlace)) {
+                spin.setSelection(i);
+                break;
+            }
+        }
+
+        selectedEndPlace = model.getEndPlace();
+        for (int i = 0; i < endSpin.getCount(); i++) {
+            if (endSpin.getItemAtPosition(i).equals(selectedEndPlace)) {
+                endSpin.setSelection(i);
+                break;
+            }
+        }
+
+
+        if (model.getLuggageAllow().equals(getResources().getString(R.string.text_yes))) {
+            radioGrpLuggage.check(R.id.radioYesLuggage);
+        } else {
+            radioGrpLuggage.check(R.id.radioNoLuggage);
+
+        }
+        if (model.getPetsAllow().equals(getResources().getString(R.string.text_yes))) {
+            radioGrpPets.check(R.id.radioYes);
+        } else {
+            radioGrpPets.check(R.id.radioNo);
+        }
+
+        btnSubmit.setText(getResources().getString(R.string.text_update));
     }
 
     private void setStatEndPlace() {
-        Spinner spin = (Spinner) findViewById(R.id.spStartPlace);
+        spin = (Spinner) findViewById(R.id.spStartPlace);
         spin.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
@@ -84,7 +133,7 @@ Globals globals;
         spin.setAdapter(aa);
 
 
-        Spinner endSpin = (Spinner) findViewById(R.id.spEndPlace);
+        endSpin = (Spinner) findViewById(R.id.spEndPlace);
         endSpin.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
@@ -99,6 +148,14 @@ Globals globals;
         ArrayAdapter<? extends String> endAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, country);
         endAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         endSpin.setAdapter(endAdapter);
+
+        Intent intent = getIntent();
+        if (intent.hasExtra("DATA")) {
+            model = (DriverRequestModel) intent.getSerializableExtra("DATA");
+            setDataIntoView(model);
+            btnDelete.setVisibility(View.VISIBLE);
+        }
+
     }
 
 
@@ -147,16 +204,37 @@ Globals globals;
                     selectLuggage = (RadioButton) findViewById(selectedIdLuggage);
                     data.put(Constant.RIDE_luggage_allow, selectLuggage.getText().toString());
 
-                    FirebaseFirestore.getInstance().collection(Constant.RIDE_Driver_request).add(data).addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
-                        @Override
-                        public void onComplete(@NonNull Task<DocumentReference> task) {
-                            if (task.isSuccessful()) {
-                                showMessage("data added!!!!");
-                                globals.showHideProgress(DriverRideActivity.this,false);
-                                finish();
+                    if(model!=null && btnSubmit.getText().toString().equals(getResources().getString(R.string.text_update))){
+                        FirebaseFirestore.getInstance().collection(Constant.RIDE_Driver_request).whereEqualTo(Constant.RIDE_driver_Uid,model.getDriverId()).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                if (task.isSuccessful()) {
+                                    for (QueryDocumentSnapshot document : task.getResult()) {
+                                        FirebaseFirestore.getInstance().collection(Constant.RIDE_Driver_request)
+                                                .document(document.getId()).set(data, SetOptions.merge());
+                                        showMessage("data updateed!!!!");
+                                        globals.showHideProgress(DriverRideActivity.this, false);
+                                        finish();
+                                    }
+                                }
+
                             }
-                        }
-                    });
+                        });
+                    }else {
+                        data.put(Constant.RIDE_driver_Uid, String.valueOf(System.currentTimeMillis()));
+
+                        FirebaseFirestore.getInstance().collection(Constant.RIDE_Driver_request).add(data).addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
+                            @Override
+                            public void onComplete(@NonNull Task<DocumentReference> task) {
+                                if (task.isSuccessful()) {
+                                    showMessage("data added!!!!");
+                                    globals.showHideProgress(DriverRideActivity.this, false);
+                                    finish();
+                                }
+                            }
+                        });
+                    }
+
                 }
                 break;
             }

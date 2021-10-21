@@ -1,6 +1,7 @@
 package com.app.ride.authentication.activity;
 
 import android.app.DatePickerDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -17,12 +18,17 @@ import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.AppCompatTextView;
 
 import com.app.ride.R;
+import com.app.ride.authentication.model.DriverRequestModel;
+import com.app.ride.authentication.model.PassengerRequestModel;
 import com.app.ride.authentication.utility.Constant;
 import com.app.ride.authentication.utility.Globals;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.SetOptions;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -38,6 +44,8 @@ public class PassengerActivity extends AppCompatActivity implements View.OnClick
     AppCompatButton btnSubmit;
     String[] country = {"India", "USA", "China", "Japan", "Other"};
     Globals globals;
+    PassengerRequestModel model;
+    Spinner spin, endSpin;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,7 +68,7 @@ public class PassengerActivity extends AppCompatActivity implements View.OnClick
     }
 
     private void setStatEndPlace() {
-        Spinner spin = (Spinner) findViewById(R.id.spStartPlace);
+        spin = (Spinner) findViewById(R.id.spStartPlace);
         spin.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
@@ -77,7 +85,7 @@ public class PassengerActivity extends AppCompatActivity implements View.OnClick
         spin.setAdapter(aa);
 
 
-        Spinner endSpin = (Spinner) findViewById(R.id.spEndPlace);
+        endSpin = (Spinner) findViewById(R.id.spEndPlace);
         endSpin.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
@@ -92,7 +100,51 @@ public class PassengerActivity extends AppCompatActivity implements View.OnClick
         ArrayAdapter<? extends String> endAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, country);
         endAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         endSpin.setAdapter(endAdapter);
+
+
+        Intent intent = getIntent();
+        if (intent.hasExtra("DATA")) {
+            model = (PassengerRequestModel) intent.getSerializableExtra("DATA");
+            setDataIntoView(model);
+        }
     }
+
+    private void setDataIntoView(PassengerRequestModel model) {
+        tvDateOfJourney.setText(model.getDateOfJourney());
+        selectedDate = model.getDateOfJourney();
+        selectedStartPlace = model.getStartPlace();
+
+        for (int i = 0; i < spin.getCount(); i++) {
+            if (spin.getItemAtPosition(i).equals(selectedStartPlace)) {
+                spin.setSelection(i);
+                break;
+            }
+        }
+
+        selectedEndPlace = model.getEndPlace();
+        for (int i = 0; i < endSpin.getCount(); i++) {
+            if (endSpin.getItemAtPosition(i).equals(selectedEndPlace)) {
+                endSpin.setSelection(i);
+                break;
+            }
+        }
+
+
+        if (model.getLuggageAllow().equals(getResources().getString(R.string.text_yes))) {
+            radioGrpLuggage.check(R.id.radioYesLuggage);
+        } else {
+            radioGrpLuggage.check(R.id.radioNoLuggage);
+
+        }
+        if (model.getPetsAllow().equals(getResources().getString(R.string.text_yes))) {
+            radioGrpPets.check(R.id.radioYes);
+        } else {
+            radioGrpPets.check(R.id.radioNo);
+        }
+
+        btnSubmit.setText(getResources().getString(R.string.text_update));
+    }
+
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
@@ -135,17 +187,36 @@ public class PassengerActivity extends AppCompatActivity implements View.OnClick
                     selectLuggage = (RadioButton) findViewById(selectedIdLuggage);
                     data.put(Constant.RIDE_luggage_allow, selectLuggage.getText().toString());
 
-                    FirebaseFirestore.getInstance().collection(Constant.RIDE_passenger_request).
-                            add(data).addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
-                        @Override
-                        public void onComplete(@NonNull Task<DocumentReference> task) {
-                            if (task.isSuccessful()) {
-                                showMessage("data added!!!!");
-                                globals.showHideProgress(PassengerActivity.this,false);
-                                finish();
+                    if(model!=null && btnSubmit.getText().toString().equals(getResources().getString(R.string.text_update))){
+                        FirebaseFirestore.getInstance().collection(Constant.RIDE_passenger_request).whereEqualTo(Constant.RIDE_passenger_Uid,model.getPassengerId()).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                if (task.isSuccessful()) {
+                                    for (QueryDocumentSnapshot document : task.getResult()) {
+                                        FirebaseFirestore.getInstance().collection(Constant.RIDE_passenger_request)
+                                                .document(document.getId()).set(data, SetOptions.merge());
+                                        showMessage("data updateed!!!!");
+                                        globals.showHideProgress(PassengerActivity.this, false);
+                                        finish();
+                                    }
+                                }
+
                             }
-                        }
-                    });
+                        });
+                    }else {
+                        data.put(Constant.RIDE_passenger_Uid, String.valueOf(System.currentTimeMillis()));
+                        FirebaseFirestore.getInstance().collection(Constant.RIDE_passenger_request).
+                                add(data).addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
+                            @Override
+                            public void onComplete(@NonNull Task<DocumentReference> task) {
+                                if (task.isSuccessful()) {
+                                    showMessage("data added!!!!");
+                                    globals.showHideProgress(PassengerActivity.this, false);
+                                    finish();
+                                }
+                            }
+                        });
+                    }
                 }
                 break;
             }
