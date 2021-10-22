@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:cardUseCompatPadding="true"
+    app:cardCornerRadius="@dimen/_3sdp"
+    android:layout_margin="@dimen/_5sdp"
+    app:cardElevation="@dimen/_3sdp"
+    android:id="@+id/cdDriver"
+    >
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/_5sdp"
+        >
+        <!--date of journey-->
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvDateOfJourney"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="start"
+            android:padding="@dimen/_5sdp"
+            android:text="@string/app_name"
+            android:textColor="@color/black"
+            android:textSize="@dimen/_15ssp"
+            android:textStyle="bold" />
+
+        <!--start place-->
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvStartPlace"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="start"
+            android:padding="@dimen/_5sdp"
+            android:text="@string/app_name"
+            android:textColor="@color/black"
+            android:textSize="@dimen/_15ssp"
+            android:textStyle="bold"
+            app:layout_constraintTop_toBottomOf="@+id/tvDateOfJourney" />
+
+        <!--end place-->
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvEndPlace"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="start"
+            android:padding="@dimen/_5sdp"
+            android:text="@string/app_name"
+            android:textColor="@color/black"
+            android:textSize="@dimen/_15ssp"
+            android:textStyle="bold"
+            app:layout_constraintTop_toBottomOf="@+id/tvStartPlace" />
+
+        <!--Seat available-->
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvSeatAvailable"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="start"
+            android:padding="@dimen/_5sdp"
+            android:text="@string/app_name"
+            android:textColor="@color/black"
+            android:textSize="@dimen/_15ssp"
+            android:textStyle="bold"
+            app:layout_constraintTop_toBottomOf="@+id/tvEndPlace" />
+
+        <!--Cost per Seat-->
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvCostPerSeat"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="start"
+            android:padding="@dimen/_5sdp"
+            android:text="@string/app_name"
+            android:textColor="@color/black"
+            android:textSize="@dimen/_15ssp"
+            android:textStyle="bold"
+            app:layout_constraintTop_toBottomOf="@+id/tvSeatAvailable" />
+
+        <!--Edit-->
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvEdit"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="start"
+            android:padding="@dimen/_5sdp"
+            android:text="@string/text_edit"
+            android:textColor="@color/black"
+            android:textSize="@dimen/_20ssp"
+            android:textStyle="bold"
+            app:layout_constraintTop_toBottomOf="@+id/tvCostPerSeat"
+            android:visibility="gone"
+            />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.cardview.widget.CardView>

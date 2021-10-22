@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".authentication.activity.SignUpActivity">
+
+    <include
+        android:id="@+id/toolbar"
+        layout="@layout/header_layout"/>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+    <androidx.appcompat.widget.AppCompatEditText
+        android:id="@+id/etPhoneNumber"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="number"
+        android:maxLength="10"
+        android:minHeight="@dimen/_35sdp"
+        android:paddingStart="@dimen/_15sdp"
+        android:paddingTop="@dimen/_10sdp"
+        android:paddingEnd="@dimen/_10sdp"
+        android:paddingBottom="@dimen/_10sdp"
+        android:background="@drawable/corner_12_2_light_black"
+        android:hint="@string/text_enter_phone_no"
+        android:layout_margin="@dimen/_20sdp"
+        app:layout_constraintBottom_toTopOf="@+id/btnSubmit"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btnSubmit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/text_submit"
+        android:layout_margin="@dimen/_20sdp"
+        android:textAllCaps="false"
+        android:textSize="@dimen/_15ssp"
+        android:background="@color/purple_700"
+        android:textColor="@color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/etPhoneNumber"
+        app:layout_constraintStart_toStartOf="@+id/etPhoneNumber"
+        app:layout_constraintEnd_toEndOf="@+id/etPhoneNumber" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

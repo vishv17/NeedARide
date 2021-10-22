@@ -1,0 +1,55 @@
+<resources>
+    <string name="app_name">Ride</string>
+    <string name="text_enter_phone_no">Enter phone no.</string>
+    <string name="text_firstname">Enter first name</string>
+    <string name="text_lastname">Enter last name</string>
+    <string name="text_complete">Complete</string>
+    <string name="text_code">Enter code</string>
+    <string name="text_submit">Submit</string>
+    <string name="text_gallery">Gallery</string>
+    <string name="text_camera">Camera</string>
+    <string name="text_cancel">Cancel</string>
+    <string name="text_driver">Driver</string>
+    <string name="text_passenger">Passenger</string>
+    <string name="text_upload_driving_license">Upload driving license</string>
+    <string name="text_driving_license">Driving license</string>
+    <string name="text_police_noc">Upload police NOC</string>
+    <string name="text_noc">police NOC</string>
+    <string name="text_date">Select date of journey</string>
+    <string name="text_dis_date">Date of journey</string>
+    <string name="text_start_place">Select start place</string>
+    <string name="text_start__dis_place">Start place</string>
+    <string name="text_end_place">Select end place</string>
+    <string name="text_end_dis_place">End place</string>
+    <string name="text_vehicle_number">Enter vehicle number</string>
+    <string name="text_number_of_seat_available">Enter number of seat available</string>
+    <string name="text_number_of_seat_available_dis">Number of seat available</string>
+    <string name="text_cost_per_seat">Enter cost per seat</string>
+    <string name="text_cost_per_seat_dis">Cost per seat</string>
+    <string name="text_pets_allow">Pets are allow?</string>
+    <string name="text_pets_carry">Any Pets carry?</string>
+    <string name="text_luggage_carry">Any luggage carry?</string>
+    <string name="text_luggage_allow">luggage are allow?</string>
+    <string name="text_yes">Yes</string>
+    <string name="text_no">No</string>
+    <string name="text_edit">Edit</string>
+    <string name="text_update">Update</string>
+    <string name="text_delete">Delete</string>
+
+    <!--permission text-->
+    <string name="on_denied_permission">If you reject permission,you can not use this service
+        <br />
+        Please turn on permissions at [Setting] > [Permission]
+    </string>
+
+
+    <!--validation message-->
+    <string name="err_phone_no">Please enter valid phone no.</string>
+    <string name="err_code">Please enter a valid code.</string>
+    <string name="err_driving_license">Please upload driving license.</string>
+    <string name="err_noc">Please upload police noc.</string>
+    <string name="err_date">Please select date.</string>
+    <string name="err_cost_per_seat">Please enter cost per seat.</string>
+    <string name="err_vehicle">Please enter vehicle number.</string>
+    <string name="err_number_seat">Please enter number of seat available.</string>
+</resources>
