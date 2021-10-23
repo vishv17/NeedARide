@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.AppCompatTextView;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.app.ride.R;
@@ -31,6 +32,8 @@ public class DriverRideListAdapter extends RecyclerView.Adapter<DriverRideListAd
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         AppCompatTextView tvDateOfJourney,tvStartPlace,tvEndPlace,tvSeatAvailable,tvCostPerSeat,tvEdit;
+        CardView cdDriver;
+
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -40,13 +43,14 @@ public class DriverRideListAdapter extends RecyclerView.Adapter<DriverRideListAd
             tvSeatAvailable= itemView.findViewById(R.id.tvSeatAvailable);
             tvCostPerSeat= itemView.findViewById(R.id.tvCostPerSeat);
             tvEdit= itemView.findViewById(R.id.tvEdit);
+            cdDriver = itemView.findViewById(R.id.cdDriver);
         }
     }
 
 
     @NonNull
     @Override
-    public DriverRideListAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         return new ViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_driver_ride, parent, false));
     }
 
@@ -55,7 +59,7 @@ public class DriverRideListAdapter extends RecyclerView.Adapter<DriverRideListAd
     }
 
     @Override
-    public void onBindViewHolder(@NonNull DriverRideListAdapter.ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         DriverRequestModel model = dataList.get(position);
         holder.tvDateOfJourney.setText(context.getString(R.string.text_dis_date)+" - "+model.getDateOfJourney());
         holder.tvStartPlace.setText(context.getString(R.string.text_start__dis_place)+" - "+model.getStartPlace());
@@ -63,7 +67,14 @@ public class DriverRideListAdapter extends RecyclerView.Adapter<DriverRideListAd
         holder.tvSeatAvailable.setText(context.getString(R.string.text_number_of_seat_available_dis)+" - "+model.getSeatAvailable());
         holder.tvCostPerSeat.setText(context.getString(R.string.text_cost_per_seat_dis)+" - "+model.getCostPerSeat());
 
-        holder.tvEdit.setOnClickListener(new View.OnClickListener() {
+        /*holder.tvEdit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                listener.onEditClick(model);
+            }
+        });*/
+
+        holder.cdDriver.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 listener.onEditClick(model);

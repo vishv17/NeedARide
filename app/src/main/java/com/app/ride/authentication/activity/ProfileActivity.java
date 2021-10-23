@@ -159,7 +159,13 @@ Globals globals;
     }
 
     private boolean Valid() {
-        if (photoUploadUrl.trim().length() <= 0) {
+        if(photoUploadUrl!=null) {
+            if (photoUploadUrl.trim().length() <= 0) {
+                return false;
+            }
+        }
+        else
+        {
             return false;
         }
         if (etName.getText().toString().trim().length() <= 0) {

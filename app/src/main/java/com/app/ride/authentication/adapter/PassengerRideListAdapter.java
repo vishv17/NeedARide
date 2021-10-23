@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.AppCompatTextView;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.app.ride.R;
@@ -30,6 +31,7 @@ public class PassengerRideListAdapter extends RecyclerView.Adapter<PassengerRide
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         AppCompatTextView tvDateOfJourney,tvStartPlace,tvEndPlace,tvEdit;
+        CardView cdPassenger;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -37,6 +39,7 @@ public class PassengerRideListAdapter extends RecyclerView.Adapter<PassengerRide
             tvStartPlace= itemView.findViewById(R.id.tvStartPlace);
             tvEndPlace= itemView.findViewById(R.id.tvEndPlace);
             tvEdit= itemView.findViewById(R.id.tvEdit);
+            cdPassenger = itemView.findViewById(R.id.cdPassenger);
         }
     }
 
@@ -45,23 +48,24 @@ public class PassengerRideListAdapter extends RecyclerView.Adapter<PassengerRide
     }
     @NonNull
     @Override
-    public PassengerRideListAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         return new ViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_passenger_ride, parent, false));
     }
 
     @Override
-    public void onBindViewHolder(@NonNull PassengerRideListAdapter.ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         PassengerRequestModel model = dataList.get(position);
         holder.tvDateOfJourney.setText(context.getString(R.string.text_dis_date)+" - "+model.getDateOfJourney());
         holder.tvStartPlace.setText(context.getString(R.string.text_start__dis_place)+" - "+model.getStartPlace());
         holder.tvEndPlace.setText(context.getString(R.string.text_end_dis_place)+" - "+model.getEndPlace());
-        holder.tvEdit.setOnClickListener(new View.OnClickListener() {
+        /*holder.tvEdit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 listener.onEditClick(model);
             }
-        });
+        });*/
 
+        holder.cdPassenger.setOnClickListener(view -> listener.onEditClick(model));
     }
 
     @Override

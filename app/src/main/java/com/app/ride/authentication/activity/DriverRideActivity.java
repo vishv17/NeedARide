@@ -3,6 +3,7 @@ package com.app.ride.authentication.activity;
 import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -16,6 +17,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.AppCompatEditText;
+import androidx.appcompat.widget.AppCompatImageView;
 import androidx.appcompat.widget.AppCompatTextView;
 
 import com.app.ride.R;
@@ -40,14 +42,16 @@ public class DriverRideActivity extends AppCompatActivity implements View.OnClic
 
     AppCompatTextView tvDateOfJourney;
     AppCompatEditText etVehicleNumber, etNumberOfSeatAvailable, etCostPerSeat;
+    private AppCompatImageView ivBack;
     RadioGroup radioGrpPets, radioGrpLuggage;
     String selectedStartPlace, selectedEndPlace, selectedDate = "";
     RadioButton selectPet, selectLuggage;
-    AppCompatButton btnSubmit,btnDelete;
+    AppCompatButton btnSubmit, btnDelete;
     Spinner spin, endSpin;
     String[] country = {"India", "USA", "China", "Japan", "Other"};
     Globals globals;
     DriverRequestModel model;
+    private static final String TAG = "DriverRideActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,13 +74,17 @@ public class DriverRideActivity extends AppCompatActivity implements View.OnClic
         radioGrpLuggage = findViewById(R.id.radioGrpLuggage);
         btnSubmit = findViewById(R.id.btnSubmit);
         btnDelete = findViewById(R.id.btnDelete);
+        ivBack = findViewById(R.id.ivBack);
+        ivBack.setVisibility(View.VISIBLE);
 
         tvDateOfJourney.setOnClickListener(this);
         btnSubmit.setOnClickListener(this);
         btnDelete.setOnClickListener(this);
+        ivBack.setOnClickListener(this);
     }
 
     private void setDataIntoView(DriverRequestModel model) {
+        Log.e(TAG, "setDataIntoView: UID->" + model.getUid());
         tvDateOfJourney.setText(model.getDateOfJourney());
         selectedDate = model.getDateOfJourney();
         etVehicleNumber.setText(model.getVehicleNumber());
@@ -98,21 +106,21 @@ public class DriverRideActivity extends AppCompatActivity implements View.OnClic
                 break;
             }
         }
-
-
-        if (model.getLuggageAllow().equals(getResources().getString(R.string.text_yes))) {
+        /*if (model.getLuggageAllow().equals(getResources().getString(R.string.text_yes))) {
             radioGrpLuggage.check(R.id.radioYesLuggage);
         } else {
             radioGrpLuggage.check(R.id.radioNoLuggage);
 
-        }
-        if (model.getPetsAllow().equals(getResources().getString(R.string.text_yes))) {
+        }*/
+        radioGrpLuggage.check(model.getLuggageAllow().equals(getResources().getString(R.string.text_yes)) ? R.id.radioYesLuggage : R.id.radioNoLuggage);
+        /*if (model.getPetsAllow().equals(getResources().getString(R.string.text_yes))) {
             radioGrpPets.check(R.id.radioYes);
         } else {
             radioGrpPets.check(R.id.radioNo);
-        }
-
+        }*/
+        radioGrpPets.check(model.getPetsAllow().equals(getResources().getString(R.string.text_yes)) ? R.id.radioYes : R.id.radioNo);
         btnSubmit.setText(getResources().getString(R.string.text_update));
+        btnSubmit.setVisibility(globals.getFireBaseId().equals(model.getUid()) ? View.VISIBLE : View.GONE);
     }
 
     private void setStatEndPlace() {
@@ -204,8 +212,8 @@ public class DriverRideActivity extends AppCompatActivity implements View.OnClic
                     selectLuggage = (RadioButton) findViewById(selectedIdLuggage);
                     data.put(Constant.RIDE_luggage_allow, selectLuggage.getText().toString());
 
-                    if(model!=null && btnSubmit.getText().toString().equals(getResources().getString(R.string.text_update))){
-                        FirebaseFirestore.getInstance().collection(Constant.RIDE_Driver_request).whereEqualTo(Constant.RIDE_driver_Uid,model.getDriverId()).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    if (model != null && btnSubmit.getText().toString().equals(getResources().getString(R.string.text_update))) {
+                        FirebaseFirestore.getInstance().collection(Constant.RIDE_Driver_request).whereEqualTo(Constant.RIDE_driver_Uid, model.getDriverId()).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                             @Override
                             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                                 if (task.isSuccessful()) {
@@ -220,7 +228,7 @@ public class DriverRideActivity extends AppCompatActivity implements View.OnClic
 
                             }
                         });
-                    }else {
+                    } else {
                         data.put(Constant.RIDE_driver_Uid, String.valueOf(System.currentTimeMillis()));
 
                         FirebaseFirestore.getInstance().collection(Constant.RIDE_Driver_request).add(data).addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
@@ -238,6 +246,9 @@ public class DriverRideActivity extends AppCompatActivity implements View.OnClic
                 }
                 break;
             }
+            case R.id.ivBack:
+                onBackPressed();
+                break;
         }
     }
 

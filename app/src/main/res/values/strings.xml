@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Ride</string>
+    <string name="app_name">Ride Share</string>
     <string name="text_enter_phone_no">Enter phone no.</string>
     <string name="text_firstname">Enter first name</string>
     <string name="text_lastname">Enter last name</string>
@@ -52,4 +52,7 @@
     <string name="err_cost_per_seat">Please enter cost per seat.</string>
     <string name="err_vehicle">Please enter vehicle number.</string>
     <string name="err_number_seat">Please enter number of seat available.</string>
+    <string name="chat">Chat</string>
+    <string name="ride_start">Ride Start</string>
+    <string name="enter_phone_no">Enter Phone No.</string>
 </resources>

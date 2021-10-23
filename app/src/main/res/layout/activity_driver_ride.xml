@@ -244,45 +244,94 @@
 
             </RadioGroup>
 
-
-            <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/btnSubmit"
-                android:layout_width="wrap_content"
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/_20sdp"
-                android:background="@color/purple_700"
-                android:gravity="center"
-                android:paddingStart="@dimen/_50sdp"
-                android:paddingTop="@dimen/_8sdp"
-                android:paddingEnd="@dimen/_50sdp"
-                android:paddingBottom="@dimen/_8sdp"
-                android:text="@string/text_submit"
-                android:textAllCaps="false"
-                android:textColor="@color/white"
-                android:textSize="@dimen/_15ssp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/radioGrpLuggage" />
+                android:orientation="vertical"
+                app:layout_constraintTop_toBottomOf="@id/radioGrpLuggage"
+                android:layout_marginTop="@dimen/_10sdp"
+                >
 
-            <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/btnDelete"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/_20sdp"
-                android:background="@color/purple_700"
-                android:gravity="center"
-                android:paddingStart="@dimen/_50sdp"
-                android:paddingTop="@dimen/_8sdp"
-                android:paddingEnd="@dimen/_50sdp"
-                android:paddingBottom="@dimen/_8sdp"
-                android:text="@string/text_delete"
-                android:textAllCaps="false"
-                android:textColor="@color/white"
-                android:textSize="@dimen/_15ssp"
-                android:visibility="gone"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/btnSubmit" />
+                <androidx.appcompat.widget.LinearLayoutCompat
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:paddingStart="@dimen/_10sdp"
+                    android:paddingEnd="@dimen/_10sdp"
+                    >
+
+                    <androidx.appcompat.widget.AppCompatButton
+                        android:id="@+id/btnSubmit"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0.5"
+                        android:background="@color/colorSecondary"
+                        android:text="@string/text_submit"
+                        android:textAllCaps="false"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/_15ssp"
+                        />
+
+                    <View
+                        android:layout_width="@dimen/_5sdp"
+                        android:layout_height="wrap_content"/>
+
+                    <androidx.appcompat.widget.AppCompatButton
+                        android:id="@+id/btnDelete"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0.5"
+                        android:background="@color/colorSecondary"
+                        android:text="@string/text_delete"
+                        android:textAllCaps="false"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/_15ssp"
+                        />
+
+
+                </androidx.appcompat.widget.LinearLayoutCompat>
+
+                <androidx.appcompat.widget.LinearLayoutCompat
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:paddingStart="@dimen/_10sdp"
+                    android:paddingEnd="@dimen/_10sdp"
+                    android:layout_marginTop="@dimen/_10sdp"
+                    >
+
+                    <androidx.appcompat.widget.AppCompatButton
+                        android:id="@+id/btnChat"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0.5"
+                        android:background="@color/colorSecondary"
+                        android:text="@string/chat"
+                        android:textAllCaps="false"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/_15ssp"
+                        />
+
+                    <View
+                        android:layout_width="@dimen/_5sdp"
+                        android:layout_height="wrap_content"/>
+
+                    <androidx.appcompat.widget.AppCompatButton
+                        android:id="@+id/btnRideStart"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0.5"
+                        android:background="@color/colorSecondary"
+                        android:text="@string/ride_start"
+                        android:textAllCaps="false"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/_15ssp"
+                        />
+
+                </androidx.appcompat.widget.LinearLayoutCompat>
+
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
 
 
         </androidx.constraintlayout.widget.ConstraintLayout>
