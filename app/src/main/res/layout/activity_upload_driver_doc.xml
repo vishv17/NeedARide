@@ -70,7 +70,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/_20sdp"
-        android:background="@color/purple_700"
+        android:background="@color/colorSecondary"
         android:gravity="center"
         android:paddingStart="@dimen/_50sdp"
         android:paddingTop="@dimen/_8sdp"

@@ -15,6 +15,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
+import androidx.appcompat.widget.AppCompatImageView;
 import androidx.appcompat.widget.AppCompatTextView;
 
 import com.app.ride.R;
@@ -46,6 +47,7 @@ public class PassengerActivity extends AppCompatActivity implements View.OnClick
     Globals globals;
     PassengerRequestModel model;
     Spinner spin, endSpin;
+    private AppCompatImageView ivBack;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,9 +64,12 @@ public class PassengerActivity extends AppCompatActivity implements View.OnClick
         radioGrpPets = findViewById(R.id.radioGrpPets);
         radioGrpLuggage = findViewById(R.id.radioGrpLuggage);
         btnSubmit = findViewById(R.id.btnSubmit);
+        ivBack = findViewById(R.id.ivBack);
+        ivBack.setVisibility(View.VISIBLE);
 
         tvDateOfJourney.setOnClickListener(this);
         btnSubmit.setOnClickListener(this);
+        ivBack.setOnClickListener(this);
     }
 
     private void setStatEndPlace() {
@@ -187,8 +192,8 @@ public class PassengerActivity extends AppCompatActivity implements View.OnClick
                     selectLuggage = (RadioButton) findViewById(selectedIdLuggage);
                     data.put(Constant.RIDE_luggage_allow, selectLuggage.getText().toString());
 
-                    if(model!=null && btnSubmit.getText().toString().equals(getResources().getString(R.string.text_update))){
-                        FirebaseFirestore.getInstance().collection(Constant.RIDE_passenger_request).whereEqualTo(Constant.RIDE_passenger_Uid,model.getPassengerId()).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    if (model != null && btnSubmit.getText().toString().equals(getResources().getString(R.string.text_update))) {
+                        FirebaseFirestore.getInstance().collection(Constant.RIDE_passenger_request).whereEqualTo(Constant.RIDE_passenger_Uid, model.getPassengerId()).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                             @Override
                             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                                 if (task.isSuccessful()) {
@@ -203,7 +208,7 @@ public class PassengerActivity extends AppCompatActivity implements View.OnClick
 
                             }
                         });
-                    }else {
+                    } else {
                         data.put(Constant.RIDE_passenger_Uid, String.valueOf(System.currentTimeMillis()));
                         FirebaseFirestore.getInstance().collection(Constant.RIDE_passenger_request).
                                 add(data).addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
@@ -220,6 +225,9 @@ public class PassengerActivity extends AppCompatActivity implements View.OnClick
                 }
                 break;
             }
+            case R.id.ivBack:
+                onBackPressed();
+                break;
         }
     }
 

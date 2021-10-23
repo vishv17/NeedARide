@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/colorPrimary"
+    >
 
 
     <androidx.appcompat.widget.AppCompatTextView
@@ -10,7 +12,8 @@
         android:textStyle="bold"
         android:gravity="center"
         android:text="@string/app_name"
-        android:textSize="@dimen/_20ssp"
-        android:textColor="@color/black"/>
+        android:fontFamily="@font/poppins_bold"
+        android:textSize="@dimen/_24ssp"
+        android:textColor="@color/white"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
