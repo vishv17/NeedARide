@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvGallery"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/text_gallery"
+        android:textSize="@dimen/_20ssp"
+        android:gravity="center"
+        android:padding="@dimen/_10sdp"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvCamera"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/text_camera"
+        android:textSize="@dimen/_20ssp"
+        android:gravity="center"
+        android:padding="@dimen/_10sdp"
+        app:layout_constraintTop_toBottomOf="@+id/tvGallery"/>
+
+    <View
+        android:id="@+id/viewLine"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_2sdp"
+        android:background="@color/black"
+        app:layout_constraintTop_toBottomOf="@+id/tvCamera"
+        />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvCancel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/text_cancel"
+        android:textSize="@dimen/_20ssp"
+        android:gravity="center"
+        android:padding="@dimen/_10sdp"
+        app:layout_constraintTop_toBottomOf="@+id/viewLine"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

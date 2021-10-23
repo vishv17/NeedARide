@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".authentication.activity.UploadDriverDocActivity">
+
+    <include
+        android:id="@+id/toolbar"
+        layout="@layout/header_layout" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/clDrivingLicense"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_100sdp"
+        android:layout_margin="@dimen/_20sdp"
+        android:background="@drawable/corner_12_2_light_black"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvDrivingLicense"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="@string/text_upload_driving_license"
+            android:textSize="@dimen/_15sdp" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/ivDrivingLicense"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/corner_12_2_light_black"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_launcher_background"
+            android:visibility="gone" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/clNoc"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_100sdp"
+        android:layout_margin="@dimen/_20sdp"
+        android:background="@drawable/corner_12_2_light_black"
+        app:layout_constraintTop_toBottomOf="@+id/clDrivingLicense">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvNoc"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="@string/text_police_noc"
+            android:textSize="@dimen/_15sdp" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/ivNoc"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/corner_12_2_light_black"
+            android:padding="@dimen/_2sdp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_launcher_background"
+            android:visibility="gone" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btnSubmit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/_20sdp"
+        android:background="@color/colorSecondary"
+        android:gravity="center"
+        android:paddingStart="@dimen/_50sdp"
+        android:paddingTop="@dimen/_8sdp"
+        android:paddingEnd="@dimen/_50sdp"
+        android:paddingBottom="@dimen/_8sdp"
+        android:text="@string/text_submit"
+        android:textAllCaps="false"
+        android:textColor="@color/white"
+        android:textSize="@dimen/_15ssp"
+        app:layout_constraintEnd_toEndOf="@+id/clNoc"
+        app:layout_constraintStart_toStartOf="@+id/clNoc"
+        app:layout_constraintTop_toBottomOf="@+id/clNoc" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
