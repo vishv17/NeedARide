@@ -3,6 +3,7 @@ package com.app.ride.authentication.activity;
 import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -48,6 +49,7 @@ public class DriverRideActivity extends AppCompatActivity implements View.OnClic
     String[] country = {"India", "USA", "China", "Japan", "Other"};
     Globals globals;
     DriverRequestModel model;
+    private static final String TAG = "DriverRideActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,6 +79,7 @@ public class DriverRideActivity extends AppCompatActivity implements View.OnClic
     }
 
     private void setDataIntoView(DriverRequestModel model) {
+        Log.e(TAG, "setDataIntoView: UID->"+model.getUid());
         tvDateOfJourney.setText(model.getDateOfJourney());
         selectedDate = model.getDateOfJourney();
         etVehicleNumber.setText(model.getVehicleNumber());
@@ -98,21 +101,21 @@ public class DriverRideActivity extends AppCompatActivity implements View.OnClic
                 break;
             }
         }
-
-
-        if (model.getLuggageAllow().equals(getResources().getString(R.string.text_yes))) {
+        /*if (model.getLuggageAllow().equals(getResources().getString(R.string.text_yes))) {
             radioGrpLuggage.check(R.id.radioYesLuggage);
         } else {
             radioGrpLuggage.check(R.id.radioNoLuggage);
 
-        }
-        if (model.getPetsAllow().equals(getResources().getString(R.string.text_yes))) {
+        }*/
+        radioGrpLuggage.check(model.getLuggageAllow().equals(getResources().getString(R.string.text_yes)) ? R.id.radioYesLuggage : R.id.radioNoLuggage);
+        /*if (model.getPetsAllow().equals(getResources().getString(R.string.text_yes))) {
             radioGrpPets.check(R.id.radioYes);
         } else {
             radioGrpPets.check(R.id.radioNo);
-        }
-
+        }*/
+        radioGrpPets.check(model.getPetsAllow().equals(getResources().getString(R.string.text_yes)) ? R.id.radioYes : R.id.radioNo);
         btnSubmit.setText(getResources().getString(R.string.text_update));
+        btnSubmit.setVisibility(globals.getFireBaseId().equals(model.getUid()) ? View.VISIBLE : View.GONE);
     }
 
     private void setStatEndPlace() {
