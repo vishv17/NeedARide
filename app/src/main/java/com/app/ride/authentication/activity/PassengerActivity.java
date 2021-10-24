@@ -19,7 +19,6 @@ import androidx.appcompat.widget.AppCompatImageView;
 import androidx.appcompat.widget.AppCompatTextView;
 
 import com.app.ride.R;
-import com.app.ride.authentication.model.DriverRequestModel;
 import com.app.ride.authentication.model.PassengerRequestModel;
 import com.app.ride.authentication.utility.Constant;
 import com.app.ride.authentication.utility.Globals;
@@ -42,11 +41,11 @@ public class PassengerActivity extends AppCompatActivity implements View.OnClick
     RadioGroup radioGrpPets, radioGrpLuggage;
     String selectedStartPlace, selectedEndPlace, selectedDate = "";
     RadioButton selectPet, selectLuggage;
-    AppCompatButton btnSubmit;
+    AppCompatButton btnSubmit, btnDelete, btnChat;
     String[] country = {"India", "USA", "China", "Japan", "Other"};
     Globals globals;
     PassengerRequestModel model;
-    Spinner spin, endSpin;
+    Spinner spStartPlace, spEndPlace;
     private AppCompatImageView ivBack;
 
     @Override
@@ -64,6 +63,8 @@ public class PassengerActivity extends AppCompatActivity implements View.OnClick
         radioGrpPets = findViewById(R.id.radioGrpPets);
         radioGrpLuggage = findViewById(R.id.radioGrpLuggage);
         btnSubmit = findViewById(R.id.btnSubmit);
+        btnDelete = findViewById(R.id.btnDelete);
+        btnChat = findViewById(R.id.btnChat);
         ivBack = findViewById(R.id.ivBack);
         ivBack.setVisibility(View.VISIBLE);
 
@@ -73,8 +74,8 @@ public class PassengerActivity extends AppCompatActivity implements View.OnClick
     }
 
     private void setStatEndPlace() {
-        spin = (Spinner) findViewById(R.id.spStartPlace);
-        spin.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        spStartPlace = (Spinner) findViewById(R.id.spStartPlace);
+        spStartPlace.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
                 selectedStartPlace = adapterView.getSelectedItem().toString();
@@ -87,11 +88,11 @@ public class PassengerActivity extends AppCompatActivity implements View.OnClick
         });
         ArrayAdapter<? extends String> aa = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, country);
         aa.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spin.setAdapter(aa);
+        spStartPlace.setAdapter(aa);
 
 
-        endSpin = (Spinner) findViewById(R.id.spEndPlace);
-        endSpin.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        spEndPlace = (Spinner) findViewById(R.id.spEndPlace);
+        spEndPlace.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
                 selectedEndPlace = adapterView.getSelectedItem().toString();
@@ -104,13 +105,32 @@ public class PassengerActivity extends AppCompatActivity implements View.OnClick
         });
         ArrayAdapter<? extends String> endAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, country);
         endAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        endSpin.setAdapter(endAdapter);
+        spEndPlace.setAdapter(endAdapter);
 
 
         Intent intent = getIntent();
         if (intent.hasExtra("DATA")) {
             model = (PassengerRequestModel) intent.getSerializableExtra("DATA");
             setDataIntoView(model);
+        } else {
+            btnSubmit.setVisibility(View.VISIBLE);
+            btnChat.setVisibility(View.GONE);
+            btnDelete.setVisibility(View.GONE);
+            enableDisableViews(true);
+        }
+    }
+
+    private void enableDisableViews(boolean enable) {
+        tvDateOfJourney.setEnabled(enable);
+        spStartPlace.setEnabled(enable);
+        spEndPlace.setEnabled(enable);
+        enableDisableRadioGroup(radioGrpPets,enable);
+        enableDisableRadioGroup(radioGrpLuggage,enable);
+    }
+
+    private void enableDisableRadioGroup(RadioGroup radioGroup, boolean enable) {
+        for (int i = 0; i < radioGroup.getChildCount(); i++) {
+            radioGroup.getChildAt(i).setEnabled(enable);
         }
     }
 
@@ -119,17 +139,17 @@ public class PassengerActivity extends AppCompatActivity implements View.OnClick
         selectedDate = model.getDateOfJourney();
         selectedStartPlace = model.getStartPlace();
 
-        for (int i = 0; i < spin.getCount(); i++) {
-            if (spin.getItemAtPosition(i).equals(selectedStartPlace)) {
-                spin.setSelection(i);
+        for (int i = 0; i < spStartPlace.getCount(); i++) {
+            if (spStartPlace.getItemAtPosition(i).equals(selectedStartPlace)) {
+                spStartPlace.setSelection(i);
                 break;
             }
         }
 
         selectedEndPlace = model.getEndPlace();
-        for (int i = 0; i < endSpin.getCount(); i++) {
-            if (endSpin.getItemAtPosition(i).equals(selectedEndPlace)) {
-                endSpin.setSelection(i);
+        for (int i = 0; i < spEndPlace.getCount(); i++) {
+            if (spEndPlace.getItemAtPosition(i).equals(selectedEndPlace)) {
+                spEndPlace.setSelection(i);
                 break;
             }
         }
@@ -148,6 +168,20 @@ public class PassengerActivity extends AppCompatActivity implements View.OnClick
         }
 
         btnSubmit.setText(getResources().getString(R.string.text_update));
+        if(!globals.getFireBaseId().equals(model.getUid()))
+        {
+            btnSubmit.setVisibility(View.GONE);
+            btnDelete.setVisibility(View.GONE);
+            btnChat.setVisibility(View.VISIBLE);
+            enableDisableViews(false);
+        }
+        else
+        {
+            btnSubmit.setVisibility(View.VISIBLE);
+            btnDelete.setVisibility(View.VISIBLE);
+            btnChat.setVisibility(View.GONE);
+            enableDisableViews(true);
+        }
     }
 
     @Override

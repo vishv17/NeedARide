@@ -46,8 +46,8 @@ public class DriverRideActivity extends AppCompatActivity implements View.OnClic
     RadioGroup radioGrpPets, radioGrpLuggage;
     String selectedStartPlace, selectedEndPlace, selectedDate = "";
     RadioButton selectPet, selectLuggage;
-    AppCompatButton btnSubmit, btnDelete;
-    Spinner spin, endSpin;
+    AppCompatButton btnSubmit, btnDelete, btnChat, btnRideStart;
+    Spinner spStartPlace, spEndPlace;
     String[] country = {"India", "USA", "China", "Japan", "Other"};
     Globals globals;
     DriverRequestModel model;
@@ -74,6 +74,8 @@ public class DriverRideActivity extends AppCompatActivity implements View.OnClic
         radioGrpLuggage = findViewById(R.id.radioGrpLuggage);
         btnSubmit = findViewById(R.id.btnSubmit);
         btnDelete = findViewById(R.id.btnDelete);
+        btnChat = findViewById(R.id.btnChat);
+        btnRideStart = findViewById(R.id.btnRideStart);
         ivBack = findViewById(R.id.ivBack);
         ivBack.setVisibility(View.VISIBLE);
 
@@ -92,17 +94,17 @@ public class DriverRideActivity extends AppCompatActivity implements View.OnClic
         etCostPerSeat.setText(model.getCostPerSeat());
         selectedStartPlace = model.getStartPlace();
 
-        for (int i = 0; i < spin.getCount(); i++) {
-            if (spin.getItemAtPosition(i).equals(selectedStartPlace)) {
-                spin.setSelection(i);
+        for (int i = 0; i < spStartPlace.getCount(); i++) {
+            if (spStartPlace.getItemAtPosition(i).equals(selectedStartPlace)) {
+                spStartPlace.setSelection(i);
                 break;
             }
         }
 
         selectedEndPlace = model.getEndPlace();
-        for (int i = 0; i < endSpin.getCount(); i++) {
-            if (endSpin.getItemAtPosition(i).equals(selectedEndPlace)) {
-                endSpin.setSelection(i);
+        for (int i = 0; i < spEndPlace.getCount(); i++) {
+            if (spEndPlace.getItemAtPosition(i).equals(selectedEndPlace)) {
+                spEndPlace.setSelection(i);
                 break;
             }
         }
@@ -120,12 +122,25 @@ public class DriverRideActivity extends AppCompatActivity implements View.OnClic
         }*/
         radioGrpPets.check(model.getPetsAllow().equals(getResources().getString(R.string.text_yes)) ? R.id.radioYes : R.id.radioNo);
         btnSubmit.setText(getResources().getString(R.string.text_update));
-        btnSubmit.setVisibility(globals.getFireBaseId().equals(model.getUid()) ? View.VISIBLE : View.GONE);
+        if (!globals.getFireBaseId().equals(model.getUid())) {
+            btnSubmit.setVisibility(View.GONE);
+            btnDelete.setVisibility(View.GONE);
+            btnRideStart.setVisibility(View.GONE);
+            btnChat.setVisibility(View.VISIBLE);
+            enableDisableViews(false);
+        } else {
+            btnSubmit.setVisibility(View.VISIBLE);
+            btnDelete.setVisibility(View.VISIBLE);
+            btnRideStart.setVisibility(View.VISIBLE);
+            btnChat.setVisibility(View.GONE);
+            enableDisableViews(true);
+        }
+//        btnSubmit.setVisibility(globals.getFireBaseId().equals(model.getUid()) ? View.VISIBLE : View.GONE);
     }
 
     private void setStatEndPlace() {
-        spin = (Spinner) findViewById(R.id.spStartPlace);
-        spin.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        spStartPlace = (Spinner) findViewById(R.id.spStartPlace);
+        spStartPlace.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
                 selectedStartPlace = adapterView.getSelectedItem().toString();
@@ -138,11 +153,11 @@ public class DriverRideActivity extends AppCompatActivity implements View.OnClic
         });
         ArrayAdapter<? extends String> aa = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, country);
         aa.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spin.setAdapter(aa);
+        spStartPlace.setAdapter(aa);
 
 
-        endSpin = (Spinner) findViewById(R.id.spEndPlace);
-        endSpin.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        spEndPlace = (Spinner) findViewById(R.id.spEndPlace);
+        spEndPlace.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
                 selectedEndPlace = adapterView.getSelectedItem().toString();
@@ -155,15 +170,40 @@ public class DriverRideActivity extends AppCompatActivity implements View.OnClic
         });
         ArrayAdapter<? extends String> endAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, country);
         endAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        endSpin.setAdapter(endAdapter);
+        spEndPlace.setAdapter(endAdapter);
 
         Intent intent = getIntent();
         if (intent.hasExtra("DATA")) {
             model = (DriverRequestModel) intent.getSerializableExtra("DATA");
             setDataIntoView(model);
-            btnDelete.setVisibility(View.VISIBLE);
+        } else {
+            btnDelete.setVisibility(View.GONE);
+            btnChat.setVisibility(View.GONE);
+            btnRideStart.setVisibility(View.GONE);
+            enableDisableViews(true);
         }
 
+    }
+
+    private void enableDisableViews(boolean enable) {
+        tvDateOfJourney.setEnabled(enable);
+        spStartPlace.setEnabled(enable);
+        spEndPlace.setEnabled(enable);
+        etVehicleNumber.setEnabled(enable);
+        etNumberOfSeatAvailable.setEnabled(enable);
+        etCostPerSeat.setEnabled(enable);
+        enableDisableRadioGroup(radioGrpPets,enable);
+        /*radioGrpPets.setEnabled(enable);
+        radioGrpLuggage.setEnabled(enable);*/
+
+        enableDisableRadioGroup(radioGrpPets,enable);
+        enableDisableRadioGroup(radioGrpLuggage,enable);
+    }
+
+    private void enableDisableRadioGroup(RadioGroup radioGroup, boolean enable) {
+        for (int i = 0; i < radioGroup.getChildCount(); i++) {
+            radioGroup.getChildAt(i).setEnabled(enable);
+        }
     }
 
 
