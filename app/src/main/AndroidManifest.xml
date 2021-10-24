@@ -15,27 +15,23 @@
         android:requestLegacyExternalStorage="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
+        android:name=".authentication.utility.Globals"
         android:theme="@style/Theme.SplashActivity">
         <activity
+            android:name=".authentication.activity.ProfileDetailsActivity"
+            android:exported="true" />
+        <activity
             android:name=".authentication.activity.UploadDriverDocActivity"
-            android:exported="true">
-
-        </activity>
+            android:exported="true"></activity>
         <activity
             android:name=".authentication.activity.PassengerActivity"
-            android:exported="true">
-
-        </activity>
+            android:exported="true"></activity>
         <activity
             android:name=".authentication.activity.DriverRideActivity"
-            android:exported="true">
-
-        </activity>
+            android:exported="true"></activity>
         <activity
             android:name=".authentication.activity.DashboardActivity"
-            android:exported="true">
-
-        </activity>
+            android:exported="true"></activity>
         <activity
             android:name=".authentication.activity.ProfileActivity"
             android:exported="true" />
@@ -47,9 +43,10 @@
             android:exported="true" />
         <activity
             android:name=".authentication.activity.SplashActivity"
-            android:exported="true" >
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>

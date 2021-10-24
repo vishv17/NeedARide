@@ -26,5 +26,6 @@ public class Constant {
     public static String RIDE_luggage_allow = "LuggageAllow";
     public static String RIDE_Driver_request = "DriverRequest";
     public static String RIDE_passenger_request = "PassengerRequest";
+    public static String USER = "User";
 
 }

@@ -20,6 +20,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.app.ride.R;
+import com.app.ride.authentication.model.UserModel;
 import com.app.ride.authentication.utility.Constant;
 import com.app.ride.authentication.utility.Globals;
 import com.bumptech.glide.Glide;
@@ -55,12 +56,14 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
     private AppCompatEditText etLastName;
     private AppCompatButton tvComplete;
     private String photoUploadUrl;
+    private ProfileActivity activity;
 Globals globals;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
+        activity = this;
         initView();
     }
 
@@ -133,6 +136,12 @@ Globals globals;
                                                     data.put(Constant.RIDE_Firebase_FirstName, etName.getText().toString().trim());
                                                     data.put(Constant.RIDE_Firebase_LastName, etLastName.getText().toString().trim());
                                                     data.put(Constant.RIDE_Firebase_ProfilePic, uri.toString());
+                                                    UserModel userModel = new UserModel();
+                                                    userModel.setUid(globals.getFireBaseId());
+                                                    userModel.setFirstName(Globals.getEditTextValue(etName));
+                                                    userModel.setLastName(Globals.getEditTextValue(etLastName));
+                                                    userModel.setProfilePic(uri.toString());
+                                                    globals.setuserDetails(activity,userModel);
                                                     FirebaseFirestore.getInstance().collection(Constant.RIDE_USERS).
                                                             document(globals.getFireBaseId()).collection("Data").add(data).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                                                         @Override
@@ -166,6 +175,7 @@ Globals globals;
         }
         else
         {
+            Toast.makeText(ProfileActivity.this, "Please Select Profile Image", Toast.LENGTH_SHORT).show();
             return false;
         }
         if (etName.getText().toString().trim().length() <= 0) {
