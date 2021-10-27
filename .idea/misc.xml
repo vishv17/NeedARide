@@ -7,6 +7,7 @@
         <entry key="..\:/Freelance/Android/Ride_22_10/Ride_13_0/app/src/main/res/drawable/ic_backspace.xml" value="0.23541666666666666" />
         <entry key="..\:/Freelance/Android/Ride_22_10/Ride_13_0/app/src/main/res/drawable/rounded_background.xml" value="0.23541666666666666" />
         <entry key="..\:/Freelance/Android/Ride_22_10/Ride_13_0/app/src/main/res/layout/activity_dashboard.xml" value="0.21927083333333333" />
+        <entry key="..\:/Freelance/Android/Ride_22_10/Ride_13_0/app/src/main/res/layout/activity_driver_document.xml" value="0.264" />
         <entry key="..\:/Freelance/Android/Ride_22_10/Ride_13_0/app/src/main/res/layout/activity_driver_ride.xml" value="0.1685185185185185" />
         <entry key="..\:/Freelance/Android/Ride_22_10/Ride_13_0/app/src/main/res/layout/activity_passenger.xml" value="0.21927083333333333" />
         <entry key="..\:/Freelance/Android/Ride_22_10/Ride_13_0/app/src/main/res/layout/activity_profile.xml" value="0.21927083333333333" />
@@ -15,7 +16,9 @@
         <entry key="..\:/Freelance/Android/Ride_22_10/Ride_13_0/app/src/main/res/layout/activity_splash.xml" value="0.21927083333333333" />
         <entry key="..\:/Freelance/Android/Ride_22_10/Ride_13_0/app/src/main/res/layout/activity_upload_driver_doc.xml" value="0.21927083333333333" />
         <entry key="..\:/Freelance/Android/Ride_22_10/Ride_13_0/app/src/main/res/layout/activity_verify_phone.xml" value="0.21927083333333333" />
+        <entry key="..\:/Freelance/Android/Ride_22_10/Ride_13_0/app/src/main/res/layout/fragment_driver.xml" value="0.2074074074074074" />
         <entry key="..\:/Freelance/Android/Ride_22_10/Ride_13_0/app/src/main/res/layout/header_layout.xml" value="0.21927083333333333" />
+        <entry key="..\:/Freelance/Android/Ride_22_10/Ride_13_0/app/src/main/res/layout/item_document_view.xml" value="0.21510416666666668" />
         <entry key="..\:/Freelance/Android/Ride_22_10/Ride_13_0/app/src/main/res/layout/item_driver_ride.xml" value="0.21927083333333333" />
         <entry key="..\:/Freelance/Android/Ride_22_10/Ride_13_0/app/src/main/res/layout/item_passenger_ride.xml" value="0.21927083333333333" />
       </map>

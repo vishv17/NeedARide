@@ -9,29 +9,32 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
+        android:name=".authentication.utility.Globals"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:requestLegacyExternalStorage="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:name=".authentication.utility.Globals"
         android:theme="@style/Theme.SplashActivity">
+        <activity
+            android:name=".authentication.activity.DriverDocumentActivity"
+            android:exported="true" />
         <activity
             android:name=".authentication.activity.ProfileDetailsActivity"
             android:exported="true" />
         <activity
             android:name=".authentication.activity.UploadDriverDocActivity"
-            android:exported="true"></activity>
+            android:exported="true" />
         <activity
             android:name=".authentication.activity.PassengerActivity"
-            android:exported="true"></activity>
+            android:exported="true" />
         <activity
             android:name=".authentication.activity.DriverRideActivity"
-            android:exported="true"></activity>
+            android:exported="true" />
         <activity
             android:name=".authentication.activity.DashboardActivity"
-            android:exported="true"></activity>
+            android:exported="true" />
         <activity
             android:name=".authentication.activity.ProfileActivity"
             android:exported="true" />
