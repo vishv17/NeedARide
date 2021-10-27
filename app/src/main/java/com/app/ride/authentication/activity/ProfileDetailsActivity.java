@@ -5,6 +5,7 @@ import androidx.appcompat.widget.AppCompatImageView;
 import androidx.appcompat.widget.AppCompatTextView;
 import androidx.cardview.widget.CardView;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -72,7 +73,12 @@ public class ProfileDetailsActivity extends AppCompatActivity implements View.On
                 onBackPressed();
                 break;
             case R.id.cdEdit:
+                Toast.makeText(activity,"Coming Soon!",Toast.LENGTH_LONG).show();
+                break;
             case R.id.cdUploadDocument:
+                Intent intent = new Intent(activity,DriverDocumentActivity.class);
+                startActivity(intent);
+                break;
             case R.id.cdSignOut:
                 Toast.makeText(activity,"Coming Soon!",Toast.LENGTH_LONG).show();
                 break;
