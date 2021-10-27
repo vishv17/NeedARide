@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".authentication.activity.DriverDocumentActivity">
+
+    <include
+        android:id="@+id/toolbar"
+        layout="@layout/header_layout" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingStart="@dimen/_10sdp"
+            android:paddingEnd="@dimen/_10sdp"
+            >
+
+            <com.skyhope.expandcollapsecardview.ExpandCollapseCard
+                android:id="@+id/cdDrivingLicense"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:item_inner_view="@layout/item_document_view"
+                app:title="Driving License"
+                app:title_color="@color/black"
+                app:title_size="@dimen/_14ssp"
+                android:layout_marginTop="@dimen/_8sdp"/>
+
+            <com.skyhope.expandcollapsecardview.ExpandCollapseCard
+                android:id="@+id/cdNoc"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:item_inner_view="@layout/item_document_view"
+                app:title="NOC"
+                app:title_color="@color/black"
+                app:title_size="@dimen/_14ssp"
+                android:layout_marginTop="@dimen/_20sdp"
+                />
+
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
+    </ScrollView>
+
+</androidx.appcompat.widget.LinearLayoutCompat>
