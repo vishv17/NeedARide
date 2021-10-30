@@ -84,4 +84,10 @@ dependencies {
     implementation 'com.github.mahimrocky:ExpandableCardView:1.0.1'
 
 
+    implementation 'com.google.firebase:firebase-firestore-ktx'
+
+    implementation 'com.google.firebase:firebase-messaging-ktx:22.0.0'
+    //pagination
+    implementation 'com.github.markomilos:paginate:1.0.0'
+
 }

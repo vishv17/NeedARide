@@ -82,6 +82,7 @@ public class DriverRideActivity extends AppCompatActivity implements View.OnClic
         tvDateOfJourney.setOnClickListener(this);
         btnSubmit.setOnClickListener(this);
         btnDelete.setOnClickListener(this);
+        btnChat.setOnClickListener(this);
         ivBack.setOnClickListener(this);
     }
 
@@ -108,18 +109,8 @@ public class DriverRideActivity extends AppCompatActivity implements View.OnClic
                 break;
             }
         }
-        /*if (model.getLuggageAllow().equals(getResources().getString(R.string.text_yes))) {
-            radioGrpLuggage.check(R.id.radioYesLuggage);
-        } else {
-            radioGrpLuggage.check(R.id.radioNoLuggage);
 
-        }*/
         radioGrpLuggage.check(model.getLuggageAllow().equals(getResources().getString(R.string.text_yes)) ? R.id.radioYesLuggage : R.id.radioNoLuggage);
-        /*if (model.getPetsAllow().equals(getResources().getString(R.string.text_yes))) {
-            radioGrpPets.check(R.id.radioYes);
-        } else {
-            radioGrpPets.check(R.id.radioNo);
-        }*/
         radioGrpPets.check(model.getPetsAllow().equals(getResources().getString(R.string.text_yes)) ? R.id.radioYes : R.id.radioNo);
         btnSubmit.setText(getResources().getString(R.string.text_update));
         if (!globals.getFireBaseId().equals(model.getUid())) {
@@ -182,7 +173,6 @@ public class DriverRideActivity extends AppCompatActivity implements View.OnClic
             btnRideStart.setVisibility(View.GONE);
             enableDisableViews(true);
         }
-
     }
 
     private void enableDisableViews(boolean enable) {
@@ -192,12 +182,10 @@ public class DriverRideActivity extends AppCompatActivity implements View.OnClic
         etVehicleNumber.setEnabled(enable);
         etNumberOfSeatAvailable.setEnabled(enable);
         etCostPerSeat.setEnabled(enable);
-        enableDisableRadioGroup(radioGrpPets,enable);
-        /*radioGrpPets.setEnabled(enable);
-        radioGrpLuggage.setEnabled(enable);*/
+        enableDisableRadioGroup(radioGrpPets, enable);
 
-        enableDisableRadioGroup(radioGrpPets,enable);
-        enableDisableRadioGroup(radioGrpLuggage,enable);
+        enableDisableRadioGroup(radioGrpPets, enable);
+        enableDisableRadioGroup(radioGrpLuggage, enable);
     }
 
     private void enableDisableRadioGroup(RadioGroup radioGroup, boolean enable) {
@@ -239,6 +227,8 @@ public class DriverRideActivity extends AppCompatActivity implements View.OnClic
                     data.put(Constant.RIDE_vehicle_number, etVehicleNumber.getText().toString());
                     data.put(Constant.RIDE_seat_available, etNumberOfSeatAvailable.getText().toString());
                     data.put(Constant.RIDE_cost_per_seat, etCostPerSeat.getText().toString());
+                    data.put(Constant.RIDE_name, globals.getUserDetails(DriverRideActivity.this).getFirstName() + " " +
+                            globals.getUserDetails(DriverRideActivity.this).getLastName());
 
                     // get selected radio button from radioGroup
                     int selectedId = radioGrpPets.getCheckedRadioButtonId();
@@ -289,8 +279,47 @@ public class DriverRideActivity extends AppCompatActivity implements View.OnClic
             case R.id.ivBack:
                 onBackPressed();
                 break;
+
+            case R.id.btnDelete:
+                deleteDriverRequest();
+                break;
+
+            case R.id.btnChat:
+                redirectToChatScreen();
+                break;
         }
     }
+
+
+    private void redirectToChatScreen() {
+        Intent intent = new Intent(DriverRideActivity.this, MessageActivity.class);
+        intent.putExtra(Constant.FD_OPPONENT_UID, model.getUid());
+        intent.putExtra(Constant.RIDE_name, model.getName());
+        startActivity(intent);
+    }
+
+    private void deleteDriverRequest() {
+        globals.showHideProgress(DriverRideActivity.this, true);
+
+        FirebaseFirestore.getInstance().collection(Constant.RIDE_Driver_request).
+                whereEqualTo(Constant.RIDE_driver_Uid, model.getDriverId()).get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                FirebaseFirestore.getInstance().collection(Constant.RIDE_Driver_request)
+                                        .document(document.getId()).delete();
+                                showMessage("data delete!!!!");
+                                globals.showHideProgress(DriverRideActivity.this, false);
+                                finish();
+                            }
+                        }
+
+                    }
+                });
+    }
+
 
     private boolean valid() {
         if (selectedDate.trim().equals("")) {

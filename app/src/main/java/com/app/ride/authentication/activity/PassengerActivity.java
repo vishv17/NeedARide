@@ -71,6 +71,7 @@ public class PassengerActivity extends AppCompatActivity implements View.OnClick
         tvDateOfJourney.setOnClickListener(this);
         btnSubmit.setOnClickListener(this);
         ivBack.setOnClickListener(this);
+        btnChat.setOnClickListener(this);
     }
 
     private void setStatEndPlace() {
@@ -124,8 +125,8 @@ public class PassengerActivity extends AppCompatActivity implements View.OnClick
         tvDateOfJourney.setEnabled(enable);
         spStartPlace.setEnabled(enable);
         spEndPlace.setEnabled(enable);
-        enableDisableRadioGroup(radioGrpPets,enable);
-        enableDisableRadioGroup(radioGrpLuggage,enable);
+        enableDisableRadioGroup(radioGrpPets, enable);
+        enableDisableRadioGroup(radioGrpLuggage, enable);
     }
 
     private void enableDisableRadioGroup(RadioGroup radioGroup, boolean enable) {
@@ -168,15 +169,12 @@ public class PassengerActivity extends AppCompatActivity implements View.OnClick
         }
 
         btnSubmit.setText(getResources().getString(R.string.text_update));
-        if(!globals.getFireBaseId().equals(model.getUid()))
-        {
+        if (!globals.getFireBaseId().equals(model.getUid())) {
             btnSubmit.setVisibility(View.GONE);
             btnDelete.setVisibility(View.GONE);
             btnChat.setVisibility(View.VISIBLE);
             enableDisableViews(false);
-        }
-        else
-        {
+        } else {
             btnSubmit.setVisibility(View.VISIBLE);
             btnDelete.setVisibility(View.VISIBLE);
             btnChat.setVisibility(View.GONE);
@@ -213,6 +211,8 @@ public class PassengerActivity extends AppCompatActivity implements View.OnClick
                     data.put(Constant.RIDE_DATE_OF_JOURNEY, selectedDate);
                     data.put(Constant.RIDE_START_PLACE, selectedStartPlace);
                     data.put(Constant.RIDE_END_PLACE, selectedEndPlace);
+                    data.put(Constant.RIDE_name,globals.getUserDetails(PassengerActivity.this).getFirstName()+ " "+
+                            globals.getUserDetails(PassengerActivity.this).getLastName());
 
                     // get selected radio button from radioGroup
                     int selectedId = radioGrpPets.getCheckedRadioButtonId();
@@ -262,8 +262,44 @@ public class PassengerActivity extends AppCompatActivity implements View.OnClick
             case R.id.ivBack:
                 onBackPressed();
                 break;
+
+            case R.id.btnDelete:
+                deletePassengerRequest();
+                break;
+            case R.id.btnChat:
+                redirectToChatScreen();
+                break;
+
         }
     }
+
+    private void redirectToChatScreen() {
+        Intent intent = new Intent(PassengerActivity.this, MessageActivity.class);
+        intent.putExtra(Constant.FD_OPPONENT_UID, model.getUid());
+        intent.putExtra(Constant.RIDE_name, model.getName());
+        startActivity(intent);
+    }
+
+
+    private void deletePassengerRequest() {
+        globals.showHideProgress(PassengerActivity.this, true);
+        FirebaseFirestore.getInstance().collection(Constant.RIDE_passenger_request).whereEqualTo(Constant.RIDE_passenger_Uid, model.getPassengerId()).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    for (QueryDocumentSnapshot document : task.getResult()) {
+                        FirebaseFirestore.getInstance().collection(Constant.RIDE_passenger_request)
+                                .document(document.getId()).delete();
+                        showMessage("data updateed!!!!");
+                        globals.showHideProgress(PassengerActivity.this, false);
+                        finish();
+                    }
+                }
+
+            }
+        });
+    }
+
 
     private boolean valid() {
         if (selectedDate.trim().equals("")) {

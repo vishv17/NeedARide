@@ -55,4 +55,7 @@
     <string name="chat">Chat</string>
     <string name="ride_start">Ride Start</string>
     <string name="enter_phone_no">Enter Phone No.</string>
+    <string name="today">Today</string>
+    <string name="text_type_something">Type something...</string>
+    <string name="yesterday">Yesterday</string>
 </resources>

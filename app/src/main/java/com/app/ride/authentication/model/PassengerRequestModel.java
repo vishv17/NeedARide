@@ -3,9 +3,17 @@ package com.app.ride.authentication.model;
 import java.io.Serializable;
 
 public class PassengerRequestModel implements Serializable {
-    String LuggageAllow,PetsAllow,Uid,dateOfJourney,endPlace,startPlace,passengerId;
+    String LuggageAllow,PetsAllow,Uid,dateOfJourney,endPlace,startPlace,passengerId,name;
 
-    public PassengerRequestModel(String luggageAllow, String petsAllow, String uid, String dateOfJourney, String endPlace, String startPlace, String passengerId) {
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public PassengerRequestModel(String luggageAllow, String petsAllow, String uid, String dateOfJourney, String endPlace, String startPlace, String passengerId, String name) {
         LuggageAllow = luggageAllow;
         PetsAllow = petsAllow;
         Uid = uid;
@@ -13,6 +21,7 @@ public class PassengerRequestModel implements Serializable {
         this.endPlace = endPlace;
         this.startPlace = startPlace;
         this.passengerId = passengerId;
+        this.name = name;
     }
 
     public String getPassengerId() {

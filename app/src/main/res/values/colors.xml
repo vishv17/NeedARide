@@ -10,6 +10,11 @@
     <color name="white">#FFFFFFFF</color>
     <color name="color_light_black">#454545</color>
     <color name="color_light_grey">#EEF0F0</color>
+    <color name="clr_border_text">#1E6784</color>
+    <color name="color_message_left_bg">#F0E0D8</color>
+    <color name="clr_choose">#007AFF</color>
+    <color name="clr_text_meetup">#E86E34</color>
+    <color name="color_message_right_bg">#E7F0EE</color>
 
 
 </resources>
