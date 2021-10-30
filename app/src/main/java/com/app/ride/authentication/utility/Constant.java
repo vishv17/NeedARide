@@ -22,10 +22,21 @@ public class Constant {
     public static String RIDE_vehicle_number = "vehicleNumber";
     public static String RIDE_seat_available = "seatAvailable";
     public static String RIDE_cost_per_seat = "costPerSeat";
+    public static String RIDE_name = "name";
     public static String RIDE_pets_allow = "PetsAllow";
     public static String RIDE_luggage_allow = "LuggageAllow";
     public static String RIDE_Driver_request = "DriverRequest";
     public static String RIDE_passenger_request = "PassengerRequest";
     public static String USER = "User";
+
+    public static String FD_OPPONENT_UID = "OpponentFbId";
+
+    public static String RISE_CONVERSATION_TABLE = "Conversation";
+    public static String RISE_MESSAGE_TABLE = "Messages";
+
+    public static String RISE_CREATED_AT = "createdAt";
+    public static String DATE_FORMAT_yyyy_MM_dd_hh_mm_ss_a = "yyyy-MM-dd hh:mm:ss a";
+    public static String DATE_FORMAT_hh_MM_aa = "hh:mm a";
+    public static String DATE_FORMAT_dd_MM_yyyy = "ddMMyyyy";
 
 }
