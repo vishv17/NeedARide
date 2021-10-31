@@ -1,11 +1,11 @@
 package com.app.ride.authentication.activity;
 
 import android.Manifest;
-import android.app.Activity;
 import android.app.Dialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.TextView;
@@ -24,6 +24,7 @@ import com.app.ride.authentication.utility.Constant;
 import com.app.ride.authentication.utility.Globals;
 import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
@@ -31,11 +32,16 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.google.mlkit.vision.common.InputImage;
+import com.google.mlkit.vision.text.Text;
+import com.google.mlkit.vision.text.TextRecognition;
+import com.google.mlkit.vision.text.TextRecognizer;
+import com.google.mlkit.vision.text.latin.TextRecognizerOptions;
 import com.gun0912.tedpermission.PermissionListener;
 import com.gun0912.tedpermission.TedPermission;
-import com.kaopiz.kprogresshud.KProgressHUD;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 
@@ -51,6 +57,10 @@ public class UploadDriverDocActivity extends AppCompatActivity implements View.O
     String typeImage, drivingImage, nocImage;
     String drivingImageDownload, nocImageDownload;
     Globals globals;
+    private static final String TAG = "UploadDriverDocActivity";
+
+    private TextRecognizer textRecognizer;
+    private InputImage licenseInputImage;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -71,6 +81,11 @@ public class UploadDriverDocActivity extends AppCompatActivity implements View.O
 
     private void initView() {
         globals = new Globals();
+        textRecognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS);
+        initViewListener();
+    }
+
+    private void initViewListener() {
         clDrivingLicense.setOnClickListener(this);
         clNoc.setOnClickListener(this);
         btnSubmit.setOnClickListener(this);
@@ -188,7 +203,39 @@ public class UploadDriverDocActivity extends AppCompatActivity implements View.O
             Toast.makeText(UploadDriverDocActivity.this, getResources().getString(R.string.err_noc), Toast.LENGTH_LONG).show();
             return false;
         }
+        if(!checkData())
+        {
+
+        }
         return true;
+    }
+
+    private boolean checkData() {
+        if(drivingImage!=null)
+        {
+            Uri licenseImageUri = Uri.fromFile(new File(drivingImage));
+            Log.e(TAG, "licenseImageUri: "+licenseImageUri.toString());
+            try {
+                licenseInputImage = InputImage.fromFilePath(getApplicationContext(),licenseImageUri);
+                Task<Text> result = textRecognizer.process(licenseInputImage)
+                        .addOnSuccessListener(new OnSuccessListener<Text>() {
+                            @Override
+                            public void onSuccess(@NonNull Text text) {
+                                Log.e(TAG, "onSuccess: Success->"+text.getText());
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Log.e(TAG, "onFailure: "+e.getMessage());
+                            }
+                        });
+            } catch (IOException e) {
+                Log.e(TAG, "checkData: Convert Image to text Error->"+e.getMessage());
+                e.printStackTrace();
+            }
+
+        }
+        return false;
     }
 
     public void showDialog() {
@@ -237,6 +284,7 @@ public class UploadDriverDocActivity extends AppCompatActivity implements View.O
                     Glide.with(UploadDriverDocActivity.this)
                             .load(drivingImage)
                             .into(ivDrivingLicense);
+                    checkData();
                 } else {
                     tvNoc.setVisibility(View.GONE);
                     ivNoc.setVisibility(View.VISIBLE);

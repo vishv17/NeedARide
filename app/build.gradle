@@ -90,4 +90,6 @@ dependencies {
     //pagination
     implementation 'com.github.markomilos:paginate:1.0.0'
 
+    //Firebase text extraction
+    implementation 'com.google.android.gms:play-services-mlkit-text-recognition:17.0.0'
 }
