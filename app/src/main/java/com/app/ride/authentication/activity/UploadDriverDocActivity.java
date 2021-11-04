@@ -3,6 +3,8 @@ package com.app.ride.authentication.activity;
 import android.Manifest;
 import android.app.Dialog;
 import android.content.Intent;
+import android.graphics.Point;
+import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -29,6 +31,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.ml.vision.common.FirebaseVisionImage;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -42,6 +45,10 @@ import com.gun0912.tedpermission.TedPermission;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -57,14 +64,18 @@ public class UploadDriverDocActivity extends AppCompatActivity implements View.O
     String typeImage, drivingImage, nocImage;
     String drivingImageDownload, nocImageDownload;
     Globals globals;
+    private String licenseCategory = "";
     private static final String TAG = "UploadDriverDocActivity";
 
     private TextRecognizer textRecognizer;
     private InputImage licenseInputImage;
+    private UploadDriverDocActivity activity;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_upload_driver_doc);
+        activity = UploadDriverDocActivity.this;
 
 
         clDrivingLicense = findViewById(R.id.clDrivingLicense);
@@ -137,7 +148,7 @@ public class UploadDriverDocActivity extends AppCompatActivity implements View.O
     }
 
     private void uploadImagesToDatabase() {
-        globals.showHideProgress(UploadDriverDocActivity.this,true);
+        globals.showHideProgress(UploadDriverDocActivity.this, true);
 
         String randomName = String.valueOf(System.currentTimeMillis());
 
@@ -177,7 +188,7 @@ public class UploadDriverDocActivity extends AppCompatActivity implements View.O
                                                     @Override
                                                     public void onSuccess(DocumentReference documentReference) {
                                                         Toast.makeText(UploadDriverDocActivity.this, "data added", Toast.LENGTH_LONG).show();
-                                                        globals.showHideProgress(UploadDriverDocActivity.this,false);
+                                                        globals.showHideProgress(UploadDriverDocActivity.this, false);
                                                     }
                                                 });
                                             }
@@ -203,39 +214,131 @@ public class UploadDriverDocActivity extends AppCompatActivity implements View.O
             Toast.makeText(UploadDriverDocActivity.this, getResources().getString(R.string.err_noc), Toast.LENGTH_LONG).show();
             return false;
         }
-        if(!checkData())
-        {
-
+        if (!checkDataForLicense()) {
+            Toast.makeText(UploadDriverDocActivity.this, getResources().getString(R.string.license_doc_upload_error), Toast.LENGTH_LONG).show();
+            return false;
         }
         return true;
     }
 
-    private boolean checkData() {
-        if(drivingImage!=null)
-        {
+    private boolean checkDataForLicense() {
+        boolean isValidData = true;
+        Text extractedText = null;
+        if (drivingImage != null) {
             Uri licenseImageUri = Uri.fromFile(new File(drivingImage));
-            Log.e(TAG, "licenseImageUri: "+licenseImageUri.toString());
+            Log.e(TAG, "licenseImageUri: " + licenseImageUri.toString());
             try {
-                licenseInputImage = InputImage.fromFilePath(getApplicationContext(),licenseImageUri);
+                licenseInputImage = InputImage.fromFilePath(getApplicationContext(), licenseImageUri);
                 Task<Text> result = textRecognizer.process(licenseInputImage)
                         .addOnSuccessListener(new OnSuccessListener<Text>() {
                             @Override
                             public void onSuccess(@NonNull Text text) {
-                                Log.e(TAG, "onSuccess: Success->"+text.getText());
+                                Log.e(TAG, "onSuccess: Success->" + text.getText());
+//                                extractedText[0] = text;
                             }
                         }).addOnFailureListener(new OnFailureListener() {
                             @Override
                             public void onFailure(@NonNull Exception e) {
-                                Log.e(TAG, "onFailure: "+e.getMessage());
+                                Log.e(TAG, "onFailure: " + e.getMessage());
+                            }
+                        }).addOnCompleteListener(new OnCompleteListener<Text>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Text> task) {
+                                /*if(task.isSuccessful())
+                                {
+                                    extractedText[0] = task.getResult();
+                                }*/
                             }
                         });
+                if (result.isSuccessful()) {
+                    extractedText = result.getResult();
+                    isValidData = validateData(extractedText);
+                } else {
+                    isValidData = false;
+                }
             } catch (IOException e) {
-                Log.e(TAG, "checkData: Convert Image to text Error->"+e.getMessage());
+                Log.e(TAG, "checkData: Convert Image to text Error->" + e.getMessage());
                 e.printStackTrace();
             }
 
         }
-        return false;
+        Log.e(TAG, "checkDataForLicense: isValidate->" + String.valueOf(isValidData));
+        return isValidData;
+    }
+
+    private boolean validateData(Text text) {
+        String result = text.getText();
+        String expDate = "";
+        boolean returnResult = true;
+        int blockCount = 0;
+        for (Text.TextBlock block : text.getTextBlocks()) {
+            String blockText = block.getText();
+            Log.e(TAG, "onSuccess: blockText--->" + blockText);
+            blockCount += 1;
+            Point[] blockCornerPoints = block.getCornerPoints();
+            Rect blockFrame = block.getBoundingBox();
+            Log.e(TAG, "onSuccess: BlockCount--->" + blockCount);
+            if (blockCount == 13) {
+                licenseCategory = blockText;
+            }
+//            Log.e(TAG, "validateData: License Category -> "+licenseCategory);
+            /*if (licenseCategory.trim().toLowerCase().equals("g1") || licenseCategory.trim().toLowerCase().isEmpty()) {
+                Toast.makeText(UploadDriverDocActivity.this, "Your License is not valid, Please upload a valid License", Toast.LENGTH_SHORT).show();
+                return false;
+            } else {
+                Log.e(TAG, "validateData: license Category->" + licenseCategory.toLowerCase());
+            }*/
+            for (Text.Line line : block.getLines()) {
+                String lineText = line.getText();
+                Log.e(TAG, "onSuccess: LineText--->" + lineText);
+                Point[] lineCornerPoints = line.getCornerPoints();
+                Rect lineFrame = line.getBoundingBox();
+                if (lineText.contains("EXPI EXP")) {
+                    int elementsSize = line.getElements().size();
+                    expDate = line.getElements().get((elementsSize - 1)).getText().toString();
+                    /*boolean dateResult = compareDate(expDate);
+                    if (!dateResult) {
+                        returnResult = false;
+                        break;
+                    }*/
+                }
+                for (Text.Element element : line.getElements()) {
+                    String elementText = element.getText();
+                    Log.e(TAG, "onSuccess: ElementText--->" + elementText);
+                    Point[] elementCornerPoints = element.getCornerPoints();
+                    Rect elementFrame = element.getBoundingBox();
+                }
+            }
+
+            /*if(!returnResult)
+            {
+                break;
+            }*/
+        }
+        Log.e(TAG, "License Category:->" + licenseCategory.toLowerCase().trim().toString());
+        //If License Category is G1 or Not fetched properly then return as false
+        if (licenseCategory.toLowerCase().trim().toString().equals("g1") || (licenseCategory.toLowerCase().trim().toString().isEmpty())) {
+            returnResult = false;
+        } else {
+            //If License is expired then return as false
+            if (!compareDate(expDate)) {
+                returnResult = false;
+            }
+        }
+        return returnResult;
+    }
+
+    private boolean compareDate(String expDate) {
+        SimpleDateFormat format = new SimpleDateFormat("yyyy/mm/dd");
+        try {
+            Date date = format.parse(expDate);
+            if (new Date().after(date)) {
+                return false;
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return true;
     }
 
     public void showDialog() {
@@ -284,7 +387,9 @@ public class UploadDriverDocActivity extends AppCompatActivity implements View.O
                     Glide.with(UploadDriverDocActivity.this)
                             .load(drivingImage)
                             .into(ivDrivingLicense);
-                    checkData();
+                    if (!checkDataForLicense()) {
+                        Toast.makeText(UploadDriverDocActivity.this, getResources().getString(R.string.license_doc_upload_error), Toast.LENGTH_LONG).show();
+                    }
                 } else {
                     tvNoc.setVisibility(View.GONE);
                     ivNoc.setVisibility(View.VISIBLE);
