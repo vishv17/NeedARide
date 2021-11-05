@@ -397,6 +397,7 @@ public class UploadDriverDocActivity extends AppCompatActivity implements View.O
                     Glide.with(UploadDriverDocActivity.this)
                             .load(nocImage)
                             .into(ivNoc);
+                    checkDataForNoc();
                 }
             }
 
@@ -408,5 +409,9 @@ public class UploadDriverDocActivity extends AppCompatActivity implements View.O
                 }
             }
         });
+    }
+
+    private void checkDataForNoc() {
+
     }
 }

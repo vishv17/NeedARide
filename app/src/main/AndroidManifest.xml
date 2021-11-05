@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.app.ride">
+    package="com.app.ride" >
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.CAMERA" />
@@ -16,7 +16,10 @@
         android:requestLegacyExternalStorage="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.SplashActivity">
+        android:theme="@style/Theme.SplashActivity" >
+        <activity
+            android:name=".authentication.activity.GetStartedActivity"
+            android:exported="true" />
         <activity
             android:name=".authentication.activity.DriverDocumentActivity"
             android:exported="true" />
@@ -25,12 +28,15 @@
             android:exported="true" />
         <activity
             android:name=".authentication.activity.UploadDriverDocActivity"
-            android:exported="true">
+            android:exported="true" >
+
+            <!--
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            -->
         </activity>
         <activity
             android:name=".authentication.activity.PassengerActivity"
@@ -54,21 +60,19 @@
             android:name=".authentication.activity.MessageActivity"
             android:exported="true" >
         </activity>
-
         <activity
             android:name=".authentication.activity.SplashActivity"
-            android:exported="true">
-            <!--<intent-filter>
+            android:exported="true" >
+            <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>-->
+            </intent-filter>
         </activity>
 
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
-
         <meta-data
             android:name="com.google.mlkit.vision.DEPENDENCIES"
             android:value="ocr" />

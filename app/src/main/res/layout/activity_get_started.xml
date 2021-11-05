@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorPrimary"
+    android:orientation="vertical"
+    tools:context=".authentication.activity.SignUpActivity">
+
+    <!--<include
+        android:id="@+id/toolbar"
+        layout="@layout/header_layout" />-->
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingStart="@dimen/_20sdp"
+        >
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_30sdp"
+            android:text="Ride Share App"
+            android:textColor="@color/white"
+            android:fontFamily="@font/poppins_bold"
+            android:textSize="@dimen/_24ssp" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Get Started"
+            android:textColor="@color/white"
+            android:textSize="@dimen/_20ssp"
+            android:layout_marginTop="@dimen/_10sdp"
+            android:fontFamily="@font/poppins_medium"
+            />
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/rounded_background"
+        android:orientation="vertical"
+        android:layout_marginTop="@dimen/_20sdp"
+        >
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/enter_phone_no"
+            android:fontFamily="@font/poppins_medium"
+            android:textSize="@dimen/_16ssp"
+            android:layout_marginStart="@dimen/_20sdp"
+            android:layout_marginTop="@dimen/_20sdp"
+            android:background="@color/white"
+            android:textColor="@color/black"
+            />
+
+        <androidx.appcompat.widget.AppCompatEditText
+            android:id="@+id/etPhoneNumber"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/_20sdp"
+            android:layout_marginEnd="@dimen/_20sdp"
+            android:layout_marginTop="@dimen/_20sdp"
+            android:background="@drawable/corner_12_2_light_black"
+            android:hint="@string/text_enter_phone_no"
+            android:inputType="number"
+            android:maxLength="10"
+            android:minHeight="@dimen/_35sdp"
+            android:paddingStart="@dimen/_15sdp"
+            android:paddingTop="@dimen/_10sdp"
+            android:paddingEnd="@dimen/_10sdp"
+            android:paddingBottom="@dimen/_10sdp"
+            android:singleLine="true"
+            android:imeOptions="actionDone"
+            />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnLogin"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/_20sdp"
+            android:background="@color/colorPrimary"
+            android:text="@string/login"
+            android:fontFamily="@font/poppins_medium"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            android:textSize="@dimen/_15ssp"
+            android:layout_gravity="center_horizontal"
+            />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Not have account ?"
+            android:fontFamily="@font/poppins_medium"
+            android:textSize="@dimen/_12ssp"
+            android:background="@color/white"
+            android:textColor="@color/black"
+            android:layout_gravity="center_horizontal"
+            />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/txtCreateAccount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Create a Account"
+            android:fontFamily="@font/poppins_medium"
+            android:textSize="@dimen/_16ssp"
+            android:background="@color/white"
+            android:textColor="@color/colorPrimary"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="@dimen/_10sdp"
+            />
+    </androidx.appcompat.widget.LinearLayoutCompat>
+</androidx.appcompat.widget.LinearLayoutCompat>

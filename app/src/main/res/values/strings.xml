@@ -59,4 +59,5 @@
     <string name="text_type_something">Type something...</string>
     <string name="yesterday">Yesterday</string>
     <string name="license_doc_upload_error">Something wrong with the License, Please check and re-uplaod License Image</string>
+    <string name="login">Login</string>
 </resources>

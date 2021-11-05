@@ -25,11 +25,14 @@ import java.util.Objects;
 public class SplashActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     Globals globals;
+    private SplashActivity mContext;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
+        mContext = this;
+
 
         initView();
     }
@@ -65,7 +68,20 @@ public class SplashActivity extends AppCompatActivity {
 
     private void checkDataAvailable() {
 
-        FirebaseFirestore.getInstance().collection(Constant.RIDE_USERS).
+        if(globals.getUserDetails(mContext)!=null)
+        {
+            Intent intent = new Intent(SplashActivity.this,DashboardActivity.class);
+            startActivity(intent);
+            finish();
+        }
+        else
+        {
+            Intent intent = new Intent(mContext,GetStartedActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            startActivity(intent);
+        }
+
+        /*FirebaseFirestore.getInstance().collection(Constant.RIDE_USERS).
                 document(globals.getFireBaseId()).
                 collection(Constant.RIDE_USER_DATA).whereEqualTo(Constant.RIDE_Firebase_Uid,
                 globals.getFireBaseId()).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -89,6 +105,6 @@ public class SplashActivity extends AppCompatActivity {
                     }
                 }
             }
-        });
+        });*/
     }
 }
