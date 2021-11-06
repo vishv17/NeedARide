@@ -26,10 +26,12 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.google.mlkit.vision.common.InputImage;
 import com.google.mlkit.vision.text.Text;
 import com.google.mlkit.vision.text.TextRecognition;
@@ -43,6 +45,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 import pl.aprilapps.easyphotopicker.DefaultCallback;
@@ -57,11 +60,12 @@ public class DriverDocumentActivity extends AppCompatActivity implements ExpandC
     private DriverDocumentActivity activity;
     private static final String TAG = "DriverDocuemntActivity";
     private ActivityResultLauncher activityResultLauncher;
-    private String typeImage,drivingImage, nocImage;
+    private String typeImage, drivingImage, nocImage;
     private String licenseCategory = "";
     private TextRecognizer textRecognizer;
     private InputImage licenseInputImage;
-    private String drivingLicenseUrl,nocUrl;
+    private String drivingLicenseUrl, nocUrl;
+    private String drivingImageDownload;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,7 +99,7 @@ public class DriverDocumentActivity extends AppCompatActivity implements ExpandC
             if (task.isSuccessful()) {
                 DocumentSnapshot documentSnapshot = task.getResult().getDocuments().get(0);
                 if (documentSnapshot.get(Constant.RIDE_DRIVING) != null && !documentSnapshot.get(Constant.RIDE_DRIVING).equals("")) {
-                    drivingLicenseUrl = documentSnapshot.get(Constant.RIDE_DRIVING,String.class);
+                    drivingLicenseUrl = documentSnapshot.get(Constant.RIDE_DRIVING, String.class);
                     Glide.with(activity)
                             .load(documentSnapshot.get(Constant.RIDE_DRIVING))
                             .placeholder(R.drawable.ic_document)
@@ -103,7 +107,7 @@ public class DriverDocumentActivity extends AppCompatActivity implements ExpandC
                 }
 
                 if (documentSnapshot.get(Constant.RIDE_NOC) != null && !documentSnapshot.get(Constant.RIDE_NOC).equals("")) {
-                    nocUrl = documentSnapshot.get(Constant.RIDE_NOC,String.class);
+                    nocUrl = documentSnapshot.get(Constant.RIDE_NOC, String.class);
                     Glide.with(activity)
                             .load(documentSnapshot.get(Constant.RIDE_NOC))
                             .placeholder(R.drawable.ic_document)
@@ -269,9 +273,8 @@ public class DriverDocumentActivity extends AppCompatActivity implements ExpandC
                             .into(ivDriving);
                     if (!checkDataForLicense()) {
                         Toast.makeText(activity, getResources().getString(R.string.license_doc_upload_error), Toast.LENGTH_LONG).show();
-                    }
-                    else {
                         replaceDriverLicense();
+                    } else {
                     }
                 } else {
                     nocImage = imageFiles.get(0).getAbsolutePath();
@@ -295,7 +298,6 @@ public class DriverDocumentActivity extends AppCompatActivity implements ExpandC
     private void replaceDriverLicense() {
         FirebaseStorage firebaseStorage = FirebaseStorage.getInstance();
         StorageReference sRef = firebaseStorage.getReferenceFromUrl(drivingLicenseUrl);
-//        Log.e(TAG, "replaceDriverLicense: oldLicense Url : "+sRef.toString());
         sRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(@NonNull Void unused) {
@@ -305,7 +307,37 @@ public class DriverDocumentActivity extends AppCompatActivity implements ExpandC
     }
 
     private void uploadNewImage() {
+        globals.showHideProgress(activity, true);
 
+        String randomName = String.valueOf(System.currentTimeMillis());
+
+        StorageReference filePath = FirebaseStorage.getInstance().getReference().
+                child(Constant.RIDE_Firebase_DOCUMENT).child(randomName + ".jpg");
+
+        filePath.putFile(Uri.fromFile(new File(drivingImage))).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+                if (task.isSuccessful()) {
+                    filePath.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                        @Override
+                        public void onSuccess(@NonNull Uri uri) {
+                            drivingImageDownload = uri.toString();
+                            HashMap<String, String> data = new HashMap<>();
+                            data.put(Constant.RIDE_Firebase_Uid, globals.getFireBaseId());
+                            data.put(Constant.RIDE_DRIVING, drivingImageDownload);
+                            FirebaseFirestore.getInstance().collection(Constant.RIDE_DRIVER_DOC_DATA).
+                                    document(globals.getFireBaseId()).collection(Constant.RIDE_DOC).add(data).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                                @Override
+                                public void onSuccess(DocumentReference documentReference) {
+                                    Toast.makeText(activity, "Document Updated Successfully", Toast.LENGTH_LONG).show();
+                                    globals.showHideProgress(activity, false);
+                                }
+                            });
+                        }
+                    });
+                }
+            }
+        });
     }
 
     @Override
