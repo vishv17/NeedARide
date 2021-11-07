@@ -6,11 +6,14 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatImageView;
 
+import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -44,6 +47,8 @@ import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -59,11 +64,10 @@ public class DriverDocumentActivity extends AppCompatActivity implements ExpandC
     private Globals globals;
     private DriverDocumentActivity activity;
     private static final String TAG = "DriverDocuemntActivity";
-    private ActivityResultLauncher activityResultLauncher;
     private String typeImage, drivingImage, nocImage;
     private String licenseCategory = "";
     private TextRecognizer textRecognizer;
-    private InputImage licenseInputImage;
+    private InputImage licenseInputImage, nocInputImage;
     private String drivingLicenseUrl, nocUrl;
     private String drivingImageDownload;
 
@@ -160,8 +164,177 @@ public class DriverDocumentActivity extends AppCompatActivity implements ExpandC
         dialog.show();
     }
 
+    private class NocDataTask extends AsyncTask<Void, Void, Void> {
+        boolean isValidData = false;
+        Text extractedText = null;
+        Uri nocImageUri;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            nocImageUri = Uri.fromFile(new File(nocImage));
+            try {
+                nocInputImage = InputImage.fromFilePath(getApplicationContext(), nocImageUri);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            if (textRecognizer == null) {
+                textRecognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS);
+            }
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            textRecognizer.process(nocInputImage)
+                    .addOnSuccessListener(new OnSuccessListener<Text>() {
+                        @Override
+                        public void onSuccess(@NonNull Text text) {
+                            Log.e(TAG, "onSuccess: Success->" + text.getText());
+                            String[] splittedString = text.getText().split("\n");
+                            List<String> splittedArrayList = Arrays.asList(splittedString);
+                            for(String s:splittedArrayList)
+                            {
+                                Log.e(TAG, "onSuccess: Splitted String -->"+s);
+                            }
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Log.e(TAG, "onFailure: " + e.getMessage());
+                }
+            }).addOnCompleteListener(new OnCompleteListener<Text>() {
+                @Override
+                public void onComplete(@NonNull Task<Text> task) {
+                    if (task.isSuccessful()) {
+                        extractedText = task.getResult();
+                        isValidData = validateNocData(extractedText);
+                        if (isValidData) {
+                            Glide.with(activity)
+                                    .load(drivingImage)
+                                    .into(ivDriving);
+                            replaceDriverLicense();
+                        } else {
+                            /*AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(activity);
+
+                            // set title
+                            alertDialogBuilder.setTitle(getResources().getString(R.string.app_name));
+
+                            // set dialog message
+                            alertDialogBuilder
+                                    .setMessage("Something Went Wrong with the image uploaded into the app, Please check the image and re-upload")
+                                    .setCancelable(false)
+                                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int id) {
+                                            // if this button is clicked, close
+                                            // current activity
+                                            dialog.dismiss();
+//                                finish();
+                                        }
+                                    });
+
+                            AlertDialog alertDialog = alertDialogBuilder.create();
+
+                            // show it
+                            alertDialog.show();*/
+                        }
+                    } else {
+                        Log.e(TAG, "doInBackground: Result is false");
+                    }
+                }
+            });
+            Log.e(TAG, "doInBackground: Called");
+            return null;
+        }
+    }
+
+    private class LicenseDataTask extends AsyncTask<Void, Void, Void> {
+        boolean isValidData = false;
+        Text extractedtext = null;
+        Uri licenseImageUri;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            licenseImageUri = Uri.fromFile(new File(drivingImage));
+            try {
+                licenseInputImage = InputImage.fromFilePath(getApplicationContext(), licenseImageUri);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            if (textRecognizer == null) {
+                textRecognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS);
+            }
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            textRecognizer.process(licenseInputImage)
+                    .addOnSuccessListener(new OnSuccessListener<Text>() {
+                        @Override
+                        public void onSuccess(@NonNull Text text) {
+                            Log.e(TAG, "onSuccess: Success->" + text.getText());
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Log.e(TAG, "onFailure: " + e.getMessage());
+                }
+            }).addOnCompleteListener(new OnCompleteListener<Text>() {
+                @Override
+                public void onComplete(@NonNull Task<Text> task) {
+                    if (task.isSuccessful()) {
+                        extractedtext = task.getResult();
+                        isValidData = validateLicenseData(extractedtext);
+                        if (isValidData) {
+                            Glide.with(activity)
+                                    .load(drivingImage)
+                                    .into(ivDriving);
+                            replaceDriverLicense();
+                        } else {
+                            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(activity);
+
+                            // set title
+                            alertDialogBuilder.setTitle(getResources().getString(R.string.app_name));
+
+                            // set dialog message
+                            alertDialogBuilder
+                                    .setMessage("Something Went Wrong with the image uploaded into the app, Please check the image and re-upload")
+                                    .setCancelable(false)
+                                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int id) {
+                                            // if this button is clicked, close
+                                            // current activity
+                                            dialog.dismiss();
+//                                finish();
+                                        }
+                                    });
+
+                            AlertDialog alertDialog = alertDialogBuilder.create();
+
+                            // show it
+                            alertDialog.show();
+                        }
+                    } else {
+                        Log.e(TAG, "doInBackground: Result is false");
+                    }
+                }
+            });
+            Log.e(TAG, "doInBackground: Called");
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aBoolean) {
+            super.onPostExecute(aBoolean);
+            Log.e(TAG, "onPostExecute: Called");
+            /*if (extractedtext != null) {
+                isValidData = validateLicenseData(extractedtext);
+            }*/
+        }
+    }
+
     private boolean checkDataForLicense() {
-        boolean isValidData = true;
+        boolean isValidData = false;
         Text extractedText = null;
         if (drivingImage != null) {
             Uri licenseImageUri = Uri.fromFile(new File(drivingImage));
@@ -188,11 +361,9 @@ public class DriverDocumentActivity extends AppCompatActivity implements ExpandC
                         });
                 if (result.isSuccessful()) {
                     extractedText = result.getResult();
-                    isValidData = validateData(extractedText);
-                } else {
-                    isValidData = false;
+                    isValidData = validateLicenseData(extractedText);
                 }
-            } catch (IOException e) {
+            } catch (Exception e) {
                 Log.e(TAG, "checkData: Convert Image to text Error->" + e.getMessage());
                 e.printStackTrace();
             }
@@ -202,7 +373,8 @@ public class DriverDocumentActivity extends AppCompatActivity implements ExpandC
         return isValidData;
     }
 
-    private boolean validateData(Text text) {
+    private boolean validateLicenseData(Text text) {
+        Log.e(TAG, "validateLicenseData: Inside this function");
         String result = text.getText();
         String expDate = "";
         boolean returnResult = true;
@@ -268,19 +440,26 @@ public class DriverDocumentActivity extends AppCompatActivity implements ExpandC
             public void onImagesPicked(@NonNull List<File> imageFiles, EasyImage.ImageSource source, int type) {
                 if (typeImage.equals(getResources().getString(R.string.text_driving_license))) {
                     drivingImage = imageFiles.get(0).getAbsolutePath();
-                    Glide.with(activity)
-                            .load(drivingImage)
-                            .into(ivDriving);
-                    if (!checkDataForLicense()) {
+                    /*if (!checkDataForLicense()) {
                         Toast.makeText(activity, getResources().getString(R.string.license_doc_upload_error), Toast.LENGTH_LONG).show();
-                        replaceDriverLicense();
                     } else {
-                    }
+                        Glide.with(activity)
+                                .load(drivingImage)
+                                .into(ivDriving);
+                        replaceDriverLicense();
+                    }*/
+                    new LicenseDataTask().execute();
                 } else {
                     nocImage = imageFiles.get(0).getAbsolutePath();
-                    Glide.with(activity)
-                            .load(nocImage)
-                            .into(ivNoc);
+                    new NocDataTask().execute();
+                    /*if (checkDataForNoc()) {
+                        Glide.with(activity)
+                                .load(nocImage)
+                                .into(ivNoc);
+                    } else {
+
+                    }*/
+
 //                    checkDataForNoc();
                 }
             }
@@ -293,6 +472,92 @@ public class DriverDocumentActivity extends AppCompatActivity implements ExpandC
                 }
             }
         });
+    }
+
+    private boolean checkDataForNoc() {
+        boolean isValidData = false;
+        Text extractedText = null;
+        if (textRecognizer == null) {
+            textRecognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS);
+        }
+        if (nocImage != null) {
+            Uri nocImageUri = Uri.fromFile(new File(nocImage));
+            Log.e(TAG, "NocImage: " + nocImageUri.toString());
+            try {
+                nocInputImage = InputImage.fromFilePath(getApplicationContext(), nocImageUri);
+                Task<Text> result = textRecognizer.process(nocInputImage)
+                        .addOnSuccessListener(new OnSuccessListener<Text>() {
+                            @Override
+                            public void onSuccess(@NonNull Text text) {
+
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+
+                            }
+                        }).addOnCompleteListener(new OnCompleteListener<Text>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Text> task) {
+
+                            }
+                        });
+                if (result.isSuccessful()) {
+                    extractedText = result.getResult();
+                    isValidData = validateNocData(extractedText);
+                } else {
+                    Log.e(TAG, "checkDataForNoc: Unable to read NOC Data for the uploaded document");
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                Log.e(TAG, "checkDataForNoc: Convert Image to Text Failed Error->" + e.getMessage());
+            }
+        }
+        return isValidData;
+    }
+
+    private boolean validateNocData(Text extractedText) {
+        String result = extractedText.toString();
+        String expDate = "";
+        boolean returnResult = false;
+        int blockCount = 0;
+        String[] splittedString = result.toLowerCase().split("\n");
+        Log.e(TAG, "validateNocData: splittedString Array Size-->"+splittedString.length);
+        List<String> textList = Arrays.asList(splittedString);
+        Log.e(TAG, "validateNocData: splittedString List Size-->"+textList.size());
+        for(String s : textList)
+        {
+//            Log.e(TAG, "validateNocData: text-->"+s);
+        }
+        if(textList.contains("g1"))
+        {
+            Log.e(TAG, "validateNocData: Returned");
+            return false;
+        }
+//        ArrayList<String> splittedStringList = ArrayList(new (result.split("\n")));
+
+        for (Text.TextBlock block : extractedText.getTextBlocks()) {
+            String blockText = block.getText();
+            Log.e(TAG, "validateNocData: BlockText-->" + blockText);
+            blockCount += 1;
+            Point[] blockCornerPoints = block.getCornerPoints();
+            Rect blockFrame = block.getBoundingBox();
+            Log.e(TAG, "validateNocData: BlockCount-->" + blockCount);
+            for (Text.Line line : block.getLines()) {
+                String lineText = line.getText();
+                Log.e(TAG, "validateNocData: LineText-->" + lineText);
+                Point[] lineCornerPoints = line.getCornerPoints();
+                Rect lineFrame = line.getBoundingBox();
+                for (Text.Element element : line.getElements()) {
+                    String elementText = element.getText();
+                    Log.e(TAG, "validateNocData: Element text-->" + elementText);
+                    Point[] elementCornerPoints = element.getCornerPoints();
+                    Rect elementFrame = element.getBoundingBox();
+                }
+            }
+
+        }
+        return returnResult;
     }
 
     private void replaceDriverLicense() {
