@@ -52,44 +52,46 @@ public class DriverFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        globals =  new Globals();
+        globals = new Globals();
         rvDriverList = view.findViewById(R.id.rvDriverList);
         getDataFromDatabase();
     }
 
     private void getDataFromDatabase() {
-        globals.showHideProgress((Activity) context,true);
+        globals.showHideProgress((Activity) context, true);
 
         FirebaseFirestore.getInstance().collection(Constant.RIDE_Driver_request).addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
 
+                globals.showHideProgress((Activity) context, false);
+                if (value != null) {
+                    if (value.isEmpty()) {
 
-                if(value.isEmpty()){
-                    globals.showHideProgress((Activity) context,false);
-                    return;
-                }else {
-                    List<DriverRequestModel> downloadInfoList = value.toObjects(DriverRequestModel.class);
-                    // Add all to your list
-                    dataList =  new ArrayList<DriverRequestModel>();
-                    for (int i = 0 ;i<downloadInfoList.size();i++){
-                        dataList.add(downloadInfoList.get(i));
-                    }
+                        return;
+                    } else {
+                        List<DriverRequestModel> downloadInfoList = value.toObjects(DriverRequestModel.class);
+                        // Add all to your list
+                        dataList = new ArrayList<DriverRequestModel>();
+                        for (int i = 0; i < downloadInfoList.size(); i++) {
+                            dataList.add(downloadInfoList.get(i));
+                        }
 
 //                    dataList.addAll(downloadInfoList);
-                    DriverRideListAdapter adapter = new DriverRideListAdapter(context, dataList, new DriverRideListAdapter.OnViewClick() {
-                        @Override
-                        public void onEditClick(DriverRequestModel model) {
-                            Intent intent = new Intent(context, DriverRideActivity.class);
-                            intent.putExtra("DATA",model);
-                            startActivity(intent);
-                        }
-                    });
-                    rvDriverList.setHasFixedSize(true);
-                    rvDriverList.setLayoutManager(new LinearLayoutManager(context));
-                    rvDriverList.setAdapter(adapter);
-                    globals.showHideProgress((Activity) context,false);
+                        DriverRideListAdapter adapter = new DriverRideListAdapter(context, dataList, new DriverRideListAdapter.OnViewClick() {
+                            @Override
+                            public void onEditClick(DriverRequestModel model) {
+                                Intent intent = new Intent(context, DriverRideActivity.class);
+                                intent.putExtra("DATA", model);
+                                startActivity(intent);
+                            }
+                        });
+                        rvDriverList.setHasFixedSize(true);
+                        rvDriverList.setLayoutManager(new LinearLayoutManager(context));
+                        rvDriverList.setAdapter(adapter);
+                        globals.showHideProgress((Activity) context, false);
 
+                    }
                 }
             }
         });

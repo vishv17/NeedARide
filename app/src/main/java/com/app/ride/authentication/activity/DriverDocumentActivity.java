@@ -6,6 +6,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatImageView;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
@@ -45,6 +46,7 @@ import com.skyhope.expandcollapsecardview.ExpandCollapseListener;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -70,6 +72,8 @@ public class DriverDocumentActivity extends AppCompatActivity implements ExpandC
     private InputImage licenseInputImage, nocInputImage;
     private String drivingLicenseUrl, nocUrl;
     private String drivingImageDownload;
+    private final int PICK_PDF_CODE = 101;
+    private String PATH_FILE = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -134,9 +138,17 @@ public class DriverDocumentActivity extends AppCompatActivity implements ExpandC
         });
         ivNoc.setOnClickListener(view -> {
             typeImage = getResources().getString(R.string.text_noc);
-            showDialog(typeImage);
+            showPDFDialog();
+//            showDialog(typeImage);
 //            Toast.makeText(activity, "Coming Soon!", Toast.LENGTH_SHORT).show();
         });
+    }
+
+    private void showPDFDialog() {
+        Intent intentPDF = new Intent(Intent.ACTION_GET_CONTENT);
+        intentPDF.setType("application/pdf");
+        intentPDF.addCategory(Intent.CATEGORY_OPENABLE);
+        startActivityForResult(Intent.createChooser(intentPDF, "Select PDF"), PICK_PDF_CODE);
     }
 
     public void showDialog(String imageType) {
@@ -192,9 +204,8 @@ public class DriverDocumentActivity extends AppCompatActivity implements ExpandC
                             Log.e(TAG, "onSuccess: Success->" + text.getText());
                             String[] splittedString = text.getText().split("\n");
                             List<String> splittedArrayList = Arrays.asList(splittedString);
-                            for(String s:splittedArrayList)
-                            {
-                                Log.e(TAG, "onSuccess: Splitted String -->"+s);
+                            for (String s : splittedArrayList) {
+                                Log.e(TAG, "onSuccess: Splitted String -->" + s);
                             }
                         }
                     }).addOnFailureListener(new OnFailureListener() {
@@ -435,11 +446,31 @@ public class DriverDocumentActivity extends AppCompatActivity implements ExpandC
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        EasyImage.handleActivityResult(requestCode, resultCode, data, this, new DefaultCallback() {
-            @Override
-            public void onImagesPicked(@NonNull List<File> imageFiles, EasyImage.ImageSource source, int type) {
-                if (typeImage.equals(getResources().getString(R.string.text_driving_license))) {
-                    drivingImage = imageFiles.get(0).getAbsolutePath();
+        if (requestCode == PICK_PDF_CODE) {
+            if(resultCode == Activity.RESULT_OK)
+            {
+                Uri uri = data.getData();
+                if(uri != null)
+                {
+                    Log.e(TAG, "onActivityResult: URI-->"+uri.toString());
+                    String uriString = uri.toString();
+                    File myFile = new File(uriString);
+                    PATH_FILE = myFile.getAbsolutePath();
+                }
+                else
+                {
+                    Log.e(TAG, "onActivityResult: URI-->URI is null");
+                }
+                Glide.with(activity)
+                        .load(R.drawable.ic_document)
+                        .into(ivNoc);
+            }
+        } else {
+            EasyImage.handleActivityResult(requestCode, resultCode, data, this, new DefaultCallback() {
+                @Override
+                public void onImagesPicked(@NonNull List<File> imageFiles, EasyImage.ImageSource source, int type) {
+                    if (typeImage.equals(getResources().getString(R.string.text_driving_license))) {
+                        drivingImage = imageFiles.get(0).getAbsolutePath();
                     /*if (!checkDataForLicense()) {
                         Toast.makeText(activity, getResources().getString(R.string.license_doc_upload_error), Toast.LENGTH_LONG).show();
                     } else {
@@ -448,10 +479,10 @@ public class DriverDocumentActivity extends AppCompatActivity implements ExpandC
                                 .into(ivDriving);
                         replaceDriverLicense();
                     }*/
-                    new LicenseDataTask().execute();
-                } else {
-                    nocImage = imageFiles.get(0).getAbsolutePath();
-                    new NocDataTask().execute();
+                        new LicenseDataTask().execute();
+                    } else {
+                        nocImage = imageFiles.get(0).getAbsolutePath();
+                        new NocDataTask().execute();
                     /*if (checkDataForNoc()) {
                         Glide.with(activity)
                                 .load(nocImage)
@@ -461,17 +492,18 @@ public class DriverDocumentActivity extends AppCompatActivity implements ExpandC
                     }*/
 
 //                    checkDataForNoc();
+                    }
                 }
-            }
 
-            @Override
-            public void onCanceled(EasyImage.ImageSource source, int type) {
-                if (source == EasyImage.ImageSource.CAMERA_IMAGE) {
-                    File photoFile = EasyImage.lastlyTakenButCanceledPhoto(activity);
-                    photoFile.delete();
+                @Override
+                public void onCanceled(EasyImage.ImageSource source, int type) {
+                    if (source == EasyImage.ImageSource.CAMERA_IMAGE) {
+                        File photoFile = EasyImage.lastlyTakenButCanceledPhoto(activity);
+                        photoFile.delete();
+                    }
                 }
-            }
-        });
+            });
+        }
     }
 
     private boolean checkDataForNoc() {
@@ -522,15 +554,13 @@ public class DriverDocumentActivity extends AppCompatActivity implements ExpandC
         boolean returnResult = false;
         int blockCount = 0;
         String[] splittedString = result.toLowerCase().split("\n");
-        Log.e(TAG, "validateNocData: splittedString Array Size-->"+splittedString.length);
+        Log.e(TAG, "validateNocData: splittedString Array Size-->" + splittedString.length);
         List<String> textList = Arrays.asList(splittedString);
-        Log.e(TAG, "validateNocData: splittedString List Size-->"+textList.size());
-        for(String s : textList)
-        {
+        Log.e(TAG, "validateNocData: splittedString List Size-->" + textList.size());
+        for (String s : textList) {
 //            Log.e(TAG, "validateNocData: text-->"+s);
         }
-        if(textList.contains("g1"))
-        {
+        if (textList.contains("g1")) {
             Log.e(TAG, "validateNocData: Returned");
             return false;
         }

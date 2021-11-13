@@ -37,7 +37,7 @@
                 android:id="@+id/cdNoc"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:item_inner_view="@layout/item_document_view"
+                app:item_inner_view="@layout/item_pdf_view"
                 app:title="NOC"
                 app:title_color="@color/black"
                 app:title_size="@dimen/_14ssp"

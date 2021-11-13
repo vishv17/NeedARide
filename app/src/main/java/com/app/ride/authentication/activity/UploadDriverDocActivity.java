@@ -66,6 +66,7 @@ public class UploadDriverDocActivity extends AppCompatActivity implements View.O
     Globals globals;
     private String licenseCategory = "";
     private static final String TAG = "UploadDriverDocActivity";
+    private final int PICK_PDF_CODE = 101;
 
     private TextRecognizer textRecognizer;
     private InputImage licenseInputImage;
@@ -126,7 +127,8 @@ public class UploadDriverDocActivity extends AppCompatActivity implements View.O
                 @Override
                 public void onPermissionGranted() {
                     typeImage = getResources().getString(R.string.text_noc);
-                    showDialog();
+                    showPdfDialog();
+//                    showDialog();
                 }
 
                 @Override
@@ -145,6 +147,13 @@ public class UploadDriverDocActivity extends AppCompatActivity implements View.O
         } else if (view.getId() == R.id.ivBack) {
             onBackPressed();
         }
+    }
+
+    private void showPdfDialog() {
+        Intent intentPDF = new Intent(Intent.ACTION_GET_CONTENT);
+        intentPDF.setType("application/pdf");
+        intentPDF.addCategory(Intent.CATEGORY_OPENABLE);
+        startActivityForResult(Intent.createChooser(intentPDF,"Select PDF"),PICK_PDF_CODE);
     }
 
     private void uploadImagesToDatabase() {

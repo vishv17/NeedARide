@@ -64,29 +64,31 @@ public class PassengerFragment extends Fragment {
         FirebaseFirestore.getInstance().collection(Constant.RIDE_passenger_request).addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
-                if(value.isEmpty()){
-                    globals.showHideProgress((Activity) context,false);
-                    return;
-                }else {
-                    List<PassengerRequestModel> downloadInfoList = value.toObjects(PassengerRequestModel.class);
-                    // Add all to your list
-                    dataList =  new ArrayList<PassengerRequestModel>();
-                    for (int i = 0 ;i<downloadInfoList.size();i++){
-                        dataList.add(downloadInfoList.get(i));
-                    }
-                    PassengerRideListAdapter adapter = new PassengerRideListAdapter(context, dataList, new PassengerRideListAdapter.OnViewClick() {
-                        @Override
-                        public void onEditClick(PassengerRequestModel model) {
-                            Intent intent = new Intent(context, PassengerActivity.class);
-                            intent.putExtra("DATA",model);
-                            startActivity(intent);
+                globals.showHideProgress((Activity) context, false);
+                if(value!=null) {
+                    if (value.isEmpty()) {
+                        return;
+                    } else {
+                        List<PassengerRequestModel> downloadInfoList = value.toObjects(PassengerRequestModel.class);
+                        // Add all to your list
+                        dataList = new ArrayList<PassengerRequestModel>();
+                        for (int i = 0; i < downloadInfoList.size(); i++) {
+                            dataList.add(downloadInfoList.get(i));
                         }
-                    });
-                    rvPassengerList.setHasFixedSize(true);
-                    rvPassengerList.setLayoutManager(new LinearLayoutManager(context));
-                    rvPassengerList.setAdapter(adapter);
-                    globals.showHideProgress((Activity) context,false);
+                        PassengerRideListAdapter adapter = new PassengerRideListAdapter(context, dataList, new PassengerRideListAdapter.OnViewClick() {
+                            @Override
+                            public void onEditClick(PassengerRequestModel model) {
+                                Intent intent = new Intent(context, PassengerActivity.class);
+                                intent.putExtra("DATA", model);
+                                startActivity(intent);
+                            }
+                        });
+                        rvPassengerList.setHasFixedSize(true);
+                        rvPassengerList.setLayoutManager(new LinearLayoutManager(context));
+                        rvPassengerList.setAdapter(adapter);
+                        globals.showHideProgress((Activity) context, false);
 
+                    }
                 }
             }
         });
