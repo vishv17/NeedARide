@@ -1,21 +1,23 @@
 package com.app.ride.authentication.activity;
 
-import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatImageView;
+import androidx.appcompat.widget.AppCompatTextView;
 
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.provider.OpenableColumns;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
@@ -26,6 +28,7 @@ import com.app.ride.R;
 import com.app.ride.authentication.utility.Constant;
 import com.app.ride.authentication.utility.Globals;
 import com.bumptech.glide.Glide;
+import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -33,6 +36,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -46,10 +50,8 @@ import com.skyhope.expandcollapsecardview.ExpandCollapseListener;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -71,9 +73,10 @@ public class DriverDocumentActivity extends AppCompatActivity implements ExpandC
     private TextRecognizer textRecognizer;
     private InputImage licenseInputImage, nocInputImage;
     private String drivingLicenseUrl, nocUrl;
-    private String drivingImageDownload;
+    private String drivingImageDownload, nocImageDownload;
     private final int PICK_PDF_CODE = 101;
     private String PATH_FILE = "";
+    private AppCompatTextView txtFileName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,6 +96,7 @@ public class DriverDocumentActivity extends AppCompatActivity implements ExpandC
         cdNoc = findViewById(R.id.cdNoc);
         ivDriving = cdDrivingLicense.getChildView().findViewById(R.id.image);
         ivNoc = cdNoc.getChildView().findViewById(R.id.image);
+        txtFileName = cdNoc.getChildView().findViewById(R.id.txtFileName);
         ivBack = findViewById(R.id.ivBack);
         ivBack.setVisibility(View.VISIBLE);
 
@@ -447,18 +451,18 @@ public class DriverDocumentActivity extends AppCompatActivity implements ExpandC
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == PICK_PDF_CODE) {
-            if(resultCode == Activity.RESULT_OK)
-            {
+            if (resultCode == Activity.RESULT_OK) {
                 Uri uri = data.getData();
-                if(uri != null)
-                {
-                    Log.e(TAG, "onActivityResult: URI-->"+uri.toString());
+                if (uri != null) {
+                    Log.e(TAG, "onActivityResult: URI-->" + uri.toString());
                     String uriString = uri.toString();
                     File myFile = new File(uriString);
+                    if (myFile != null) {
+                        txtFileName.setText(getFileName(uriString));
+                    }
                     PATH_FILE = myFile.getAbsolutePath();
-                }
-                else
-                {
+                    replaceNocDocument(uri);
+                } else {
                     Log.e(TAG, "onActivityResult: URI-->URI is null");
                 }
                 Glide.with(activity)
@@ -504,6 +508,56 @@ public class DriverDocumentActivity extends AppCompatActivity implements ExpandC
                 }
             });
         }
+    }
+
+    private void replaceNocDocument(Uri uri) {
+        globals.showHideProgress(activity, true);
+        File myFile = new File(uri.toString());
+        String randomName = String.valueOf(System.currentTimeMillis());
+
+        StorageReference filePath = FirebaseStorage.getInstance().getReference().
+                child(Constant.RIDE_Firebase_DOCUMENT).child(randomName + ".pdf");
+        filePath.putFile(uri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+                if (task.isSuccessful()) {
+                    filePath.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                        @Override
+                        public void onSuccess(@NonNull Uri uri) {
+                            nocImageDownload = uri.toString();
+                            HashMap<String, Object> data = new HashMap<>();
+//                            data.put(Constant.RIDE_Firebase_Uid, globals.getFireBaseId());
+                            data.put(Constant.RIDE_NOC, nocImageDownload);
+
+                            FirebaseFirestore.getInstance().collection(Constant.RIDE_DRIVER_DOC_DATA)
+                                    .document(globals.getFireBaseId()).
+                                    collection(Constant.RIDE_DOC).whereEqualTo(Constant.RIDE_Firebase_Uid, globals.getFireBaseId()).
+                                    get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                @Override
+                                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                    if (task.isSuccessful()) {
+                                        DocumentSnapshot documentSnapshot = task.getResult().getDocuments().get(0);
+                                        Log.e(TAG, "onComplete: documentSnapShot id-->" + documentSnapshot.getId());
+                                        FirebaseFirestore.getInstance().collection(Constant.RIDE_DRIVER_DOC_DATA).
+                                                document(globals.getFireBaseId()).collection(Constant.RIDE_DOC).
+                                                document(documentSnapshot.getId()).
+                                                update(data).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                            @Override
+                                            public void onSuccess(@NonNull Void unused) {
+                                                Toast.makeText(activity, "Document Updated Successfully", Toast.LENGTH_LONG).show();
+                                                globals.showHideProgress(activity, false);
+                                            }
+                                        });
+                                    }
+                                }
+                            });
+                        }
+                    });
+                } else {
+                    globals.showHideProgress(activity, false);
+                }
+            }
+        });
     }
 
     private boolean checkDataForNoc() {
@@ -630,6 +684,8 @@ public class DriverDocumentActivity extends AppCompatActivity implements ExpandC
                             });
                         }
                     });
+                } else {
+                    globals.showHideProgress(activity, false);
                 }
             }
         });
@@ -647,5 +703,28 @@ public class DriverDocumentActivity extends AppCompatActivity implements ExpandC
                 onBackPressed();
                 break;
         }
+    }
+
+    private String getFileName(String imageUri) {
+        String result = "";
+        if (imageUri.startsWith("content")) {
+            Cursor cursor = getContentResolver().query(Uri.parse(imageUri), null, null, null, null);
+            try {
+                if (cursor != null && cursor.moveToFirst()) {
+                    result = cursor.getString(cursor.getColumnIndexOrThrow(OpenableColumns.DISPLAY_NAME));
+                }
+            } finally {
+                cursor.close();
+            }
+        }
+        if (result == null) {
+            result = Uri.parse(imageUri).getPath();
+            int cut = result.lastIndexOf('/');
+            if (cut != -1) {
+                result = result.substring(cut + 1);
+            }
+        }
+
+        return result;
     }
 }

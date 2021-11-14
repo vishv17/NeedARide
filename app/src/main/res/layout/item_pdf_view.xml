@@ -1,13 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="@dimen/_200sdp"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
-    app:cardCornerRadius="@dimen/_5sdp"
-    app:cardElevation="@dimen/_3sdp"
     android:layout_margin="@dimen/_5sdp"
-    app:cardUseCompatPadding="true"
+    android:gravity="center"
     >
 
 
@@ -17,8 +15,17 @@
         android:layout_height="@dimen/_60sdp"
         android:src="@drawable/ic_document"
         android:scaleType="centerCrop"
-        android:layout_gravity="center"
         />
 
 
-</androidx.cardview.widget.CardView>
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/txtFileName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="FileName"
+        android:textStyle="bold"
+        android:textSize="@dimen/_14ssp"
+        android:layout_marginTop="@dimen/_10sdp"
+        />
+
+</androidx.appcompat.widget.LinearLayoutCompat>
