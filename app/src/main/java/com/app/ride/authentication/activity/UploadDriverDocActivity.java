@@ -19,6 +19,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.appcompat.widget.AppCompatTextView;
+import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.app.ride.R;
@@ -57,7 +58,7 @@ import pl.aprilapps.easyphotopicker.EasyImage;
 
 public class UploadDriverDocActivity extends AppCompatActivity implements View.OnClickListener {
 
-    ConstraintLayout clDrivingLicense, clNoc;
+    CardView clDrivingLicense, clNoc;
     AppCompatTextView tvDrivingLicense, tvNoc;
     AppCompatImageView ivDrivingLicense, ivNoc, ivBack;
     AppCompatButton btnSubmit;

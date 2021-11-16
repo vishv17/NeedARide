@@ -96,8 +96,8 @@ public class VerifyPhoneActivity extends AppCompatActivity implements View.OnCli
         PhoneAuthOptions options =
                 PhoneAuthOptions.newBuilder(mAuth)
 //                        .setPhoneNumber("+1" + "6505554567")       // Phone number to verify
-//                        .setPhoneNumber("+91" + mobile)       // Phone number to verify
-                        .setPhoneNumber("+1" + mobile)       // Phone number to verify
+                        .setPhoneNumber("+91" + mobile)       // Phone number to verify
+//                        .setPhoneNumber("+1" + mobile)       // Phone number to verify
                         .setTimeout(120L, TimeUnit.SECONDS) // Timeout and unit
                         .setActivity(this)                 // Activity (for callback binding)
                         .setCallbacks(mCallbacks)          // OnVerificationStateChangedCallbacks

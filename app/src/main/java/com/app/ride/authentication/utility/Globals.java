@@ -45,10 +45,9 @@ public class Globals extends CoreApp implements Application.ActivityLifecycleCal
             return FirebaseAuth.getInstance().getCurrentUser().getUid();
         }else {
             return "";
-
         }
-//        return "123456789";
 }
+
     public void showHideProgress(Activity activity, Boolean isShow){
         try {
             if (mKProgressHUD == null) {

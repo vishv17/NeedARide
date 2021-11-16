@@ -123,7 +123,8 @@ public class DriverRideActivity extends AppCompatActivity implements View.OnClic
             btnSubmit.setVisibility(View.VISIBLE);
             btnDelete.setVisibility(View.VISIBLE);
             btnRideStart.setVisibility(View.VISIBLE);
-            btnChat.setVisibility(View.GONE);
+            btnChat.setVisibility(View.VISIBLE);
+            btnChat.setText(getResources().getString(R.string.request_list));
             enableDisableViews(true);
         }
 //        btnSubmit.setVisibility(globals.getFireBaseId().equals(model.getUid()) ? View.VISIBLE : View.GONE);
@@ -285,16 +286,30 @@ public class DriverRideActivity extends AppCompatActivity implements View.OnClic
                 break;
 
             case R.id.btnChat:
-                redirectToChatScreen();
+                if (btnChat.getText().toString().equals(getResources().getString(R.string.request_list))) {
+                    redirectToChatListScreen();
+                } else {
+                    redirectToChatScreen();
+                }
                 break;
         }
+    }
+
+    private void redirectToChatListScreen() {
+        Intent intent = new Intent(DriverRideActivity.this, MessageListActivity.class);
+        startActivity(intent);
     }
 
 
     private void redirectToChatScreen() {
         Intent intent = new Intent(DriverRideActivity.this, MessageActivity.class);
         intent.putExtra(Constant.FD_OPPONENT_UID, model.getUid());
-        intent.putExtra(Constant.RIDE_name, model.getName());
+        intent.putExtra(Constant.RIDE_REQUEST_ID, model.getDriverId());
+        if(model.getName()!=null && model.getName().equals("")){
+            intent.putExtra(Constant.RIDE_name, "");
+        }else {
+            intent.putExtra(Constant.RIDE_name, model.getName());
+        }
         startActivity(intent);
     }
 

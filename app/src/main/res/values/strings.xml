@@ -60,4 +60,7 @@
     <string name="yesterday">Yesterday</string>
     <string name="license_doc_upload_error">Something wrong with the License, Please check and re-uplaod License Image</string>
     <string name="login">Login</string>
+    <string name="no_msg_found">No message found.</string>
+    <string name="request_list">Request List</string>
+
 </resources>

@@ -34,10 +34,12 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.SetOptions;
 import com.paginate.Paginate;
 import com.paginate.recycler.LoadingListItemSpanLookup;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class MessageActivity extends AppCompatActivity {
 
@@ -52,6 +54,7 @@ public class MessageActivity extends AppCompatActivity {
     private FirebaseUser firebaseUser;
     private String opponentId = "";
     private String receiverName = "";
+    private String requestId = "";
     private String firebaseUserid;
     private String conversationKey = "";
     private DocumentSnapshot lastVisible;
@@ -81,11 +84,7 @@ public class MessageActivity extends AppCompatActivity {
         ivSend = findViewById(R.id.ivSend);
         tvTitle = findViewById(R.id.tvTitle);
         progressbar = findViewById(R.id.progressbar);
-
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-        firebaseUserid = firebaseUser.getUid();
-//        firebaseUserid = "fzuHO1EzsBSO10qQR0F17Jzlbcm2";
-//        opponentId = "rvcFda6QMvOH4Gsw8MS83Qq6d9e2";
 
         //opponent Firebase id
         if (getIntent().hasExtra(Constant.FD_OPPONENT_UID)) {
@@ -97,9 +96,15 @@ public class MessageActivity extends AppCompatActivity {
             receiverName = getIntent().getStringExtra(Constant.RIDE_name);
             tvTitle.setText(receiverName);
         }
+        if (getIntent().hasExtra(Constant.RIDE_REQUEST_ID)) {
+            requestId = getIntent().getStringExtra(Constant.RIDE_REQUEST_ID);
+        }
+        if (getIntent().hasExtra(Constant.RIDE_CONVERSATION_KEY)) {
+            conversationKey = getIntent().getStringExtra(Constant.RIDE_CONVERSATION_KEY);
+        }
 
         if (conversationKey.isEmpty()) {
-            conversationKey = generateConversationId(opponentId, firebaseUserid);
+            conversationKey = generateConversationId(opponentId, globals.getFireBaseId());
             Log.e("TAG", "conversationKey: $conversationKey");
         }
 
@@ -169,12 +174,14 @@ public class MessageActivity extends AppCompatActivity {
         progressbar.setVisibility(View.VISIBLE);
 
         FirebaseFirestore.getInstance()
-                .collection(Constant.RISE_CONVERSATION_TABLE).document(conversationKey)
+                .collection(Constant.RISE_CONVERSATION_TABLE).document(requestId)
                 .collection(Constant.RISE_MESSAGE_TABLE)
                 .orderBy(Constant.RISE_CREATED_AT, Query.Direction.DESCENDING).limit(pagePerCount).addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
                 loading = false;
+                progressbar.setVisibility(View.GONE);
+
                 if (value != null && value.getDocuments().size() > 0) {
                     messagesArrayList = new ArrayList<MessageModel>();
                     for (DocumentSnapshot snapshot : value.getDocuments()) {
@@ -217,9 +224,11 @@ public class MessageActivity extends AppCompatActivity {
     private void loadNextMessages() {
         loading = true;
         if (lastVisible != null) {
+            progressbar.setVisibility(View.VISIBLE);
+
             Query query = FirebaseFirestore.getInstance()
                     .collection(Constant.RISE_CONVERSATION_TABLE)
-                    .document(conversationKey)
+                    .document(requestId)
                     .collection(Constant.RISE_MESSAGE_TABLE)
                     .orderBy(Constant.RISE_CREATED_AT, Query.Direction.DESCENDING).startAfter(lastVisible).limit(pagePerCount);
 
@@ -251,15 +260,37 @@ public class MessageActivity extends AppCompatActivity {
                     adapter.doRefresh(messagesArrayList);
                 }
             });
+            progressbar.setVisibility(View.GONE);
+
         }
     }
 
     private void sendMessage(String message) {
-        MessageModel chatData = new MessageModel(message.trim(), firebaseUserid, opponentId, false, 1,
+        MessageModel chatData = new MessageModel(message.trim(), globals.getFireBaseId(), opponentId, false, 1,
                 new DateTimeUtil().getCurrentUTCTimeStampForChat());
+
+        ArrayList<String> userIds = new ArrayList<>();
+        userIds.add(opponentId);
+        userIds.add(globals.getFireBaseId());
+
+        HashMap<String, Object> mapConversation = new HashMap<String, Object>();
+        mapConversation.put(Constant.RIDE_UPDATED_AT, String.valueOf(new DateTimeUtil().getCurrentUTCTimeStampForChat()));
+        if(receiverName == null){
+            receiverName = "";
+        }
+        mapConversation.put(Constant.RIDE_USER_NAME, receiverName);
+        mapConversation.put(Constant.RIDE_USER_ID, userIds);
+        mapConversation.put(Constant.RIDE_LAST_MESSAGE, message);
+        mapConversation.put(Constant.RIDE_CONVERSATION_KEY, conversationKey);
+        mapConversation.put(Constant.RIDE_REQUEST_ID, requestId);
+
+        // Set Last Conversation
+        FirebaseFirestore.getInstance().collection(Constant.RISE_CONVERSATION_TABLE)
+                .document(requestId).set(mapConversation, SetOptions.merge());
+
         //Send message
         FirebaseFirestore.getInstance().collection(Constant.RISE_CONVERSATION_TABLE)
-                .document(conversationKey)
+                .document(requestId)
                 .collection(Constant.RISE_MESSAGE_TABLE)
                 .add(chatData).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
             @Override

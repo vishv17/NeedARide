@@ -39,4 +39,12 @@ public class Constant {
     public static String DATE_FORMAT_hh_MM_aa = "hh:mm a";
     public static String DATE_FORMAT_dd_MM_yyyy = "ddMMyyyy";
 
+    public static String RIDE_REQUEST_ID = "requestId";
+
+    public static String RIDE_UPDATED_AT = "updatedAt";
+    public static String RIDE_USER_NAME = "username";
+    public static String RIDE_USER_ID = "userIds";
+    public static String RIDE_CONVERSATION_KEY = "conversationKey";
+    public static String RIDE_LAST_MESSAGE = "lastMessage";
+
 }

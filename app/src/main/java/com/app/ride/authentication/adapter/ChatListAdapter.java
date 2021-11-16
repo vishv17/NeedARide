@@ -31,13 +31,15 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         this.dataList = listData;
         this.context = context;
     }
+
     public void cleanup() {
         if (dataList != null) {
             dataList.clear();
         }
         notifyDataSetChanged();
     }
-    public void doRefresh(ArrayList<MessageModel>  chatMessages) {
+
+    public void doRefresh(ArrayList<MessageModel> chatMessages) {
         this.dataList.clear();
         this.dataList.addAll(chatMessages);
         notifyDataSetChanged();
@@ -47,9 +49,9 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         if (viewType == SENDER.value()) {
-           return new LeftMessageHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_message_left, parent, false));
+            return new LeftMessageHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_message_right, parent, false));
         } else {
-            return new RightMessageHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_message_right, parent, false));
+            return new RightMessageHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_message_left, parent, false));
         }
     }
 
@@ -58,10 +60,10 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         try {
             if (holder.getItemViewType() == SENDER.value()) {
-                LeftMessageHolder leftMessageHolder= (LeftMessageHolder) holder;
+                LeftMessageHolder leftMessageHolder = (LeftMessageHolder) holder;
                 leftMessageHolder.setDataToView(dataList.get(position));
             } else {
-                RightMessageHolder rightMessageHolder= (RightMessageHolder) holder;
+                RightMessageHolder rightMessageHolder = (RightMessageHolder) holder;
                 rightMessageHolder.setDataToView(dataList.get(position));
             }
 
@@ -77,18 +79,25 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     @Override
     public int getItemViewType(int position) {
-        if (dataList.get(position).getSenderId().equals(globals.getFireBaseId())) {
-            return SENDER.value();
+        if (dataList.size() > 0 && dataList.get(position).getSenderId() != null) {
+            if (dataList.get(position).getSenderId().equals(globals.getFireBaseId())) {
+                return SENDER.value();
+            } else {
+                return RECEIVER.value();
+
+            }
         } else {
             return RECEIVER.value();
 
         }
+
     }
 
 
     private class LeftMessageHolder extends RecyclerView.ViewHolder {
 
         AppCompatTextView tvMessage, tvTime, tvHeaderText;
+
         public LeftMessageHolder(View inflate) {
             super(inflate);
             tvMessage = inflate.findViewById(R.id.tvMessage);
@@ -98,7 +107,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
         public void setDataToView(MessageModel messageModel) {
             tvMessage.setText(messageModel.getMessage());
-            tvTime.setText( new DateTimeUtil().convertUtcTimeToLocalTimeFormatForChat(messageModel.getCreatedAt()));
+            tvTime.setText(new DateTimeUtil().convertUtcTimeToLocalTimeFormatForChat(messageModel.getCreatedAt()));
             tvHeaderText.setText(new DateTimeUtil().convertUTCTToLocalDate(messageModel.getCreatedAt(), context, false));
             headerVisibility(tvHeaderText, getAdapterPosition(), messageModel);
         }
@@ -116,7 +125,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
         public void setDataToView(MessageModel MessageModel) {
             tvMessage.setText(MessageModel.getMessage());
-            tvTime.setText( new DateTimeUtil().convertUtcTimeToLocalTimeFormatForChat(MessageModel.getCreatedAt()));
+            tvTime.setText(new DateTimeUtil().convertUtcTimeToLocalTimeFormatForChat(MessageModel.getCreatedAt()));
             tvHeaderText.setText(new DateTimeUtil().convertUTCTToLocalDate(MessageModel.getCreatedAt(), context, false));
             headerVisibility(tvHeaderText, getAdapterPosition(), MessageModel);
         }
@@ -126,7 +135,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
         if (adapterPosition < dataList.size() - 1) {
             if (!new DateTimeUtil().convertUTCTToLocalDate(messageModel.getCreatedAt(), context, false).equals(
-                    new DateTimeUtil().convertUTCTToLocalDate(dataList.get(adapterPosition + 1).getCreatedAt(), context, false) )) {
+                    new DateTimeUtil().convertUTCTToLocalDate(dataList.get(adapterPosition + 1).getCreatedAt(), context, false))) {
                 tvHeaderText.setVisibility(View.VISIBLE);
             } else {
                 tvHeaderText.setVisibility(View.GONE);

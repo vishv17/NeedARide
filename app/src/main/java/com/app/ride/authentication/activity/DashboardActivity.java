@@ -91,6 +91,7 @@ public class DashboardActivity extends AppCompatActivity {
                     Intent intent = new Intent(DashboardActivity.this, PassengerActivity.class);
                     startActivity(intent);
                 }
+
             }
         });
 
