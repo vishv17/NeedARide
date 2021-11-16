@@ -59,7 +59,12 @@ public class DriverRideActivity extends AppCompatActivity implements View.OnClic
         setContentView(R.layout.activity_driver_ride);
 
         initView();
+        initViewListener();
         setStatEndPlace();
+    }
+
+    private void initViewListener() {
+        btnRideStart.setOnClickListener(this);
     }
 
 
@@ -292,12 +297,19 @@ public class DriverRideActivity extends AppCompatActivity implements View.OnClic
                     redirectToChatScreen();
                 }
                 break;
+            case R.id.btnRideStart:
+                sendNotification();
+                break;
         }
     }
 
     private void redirectToChatListScreen() {
         Intent intent = new Intent(DriverRideActivity.this, MessageListActivity.class);
         startActivity(intent);
+    }
+
+    private void sendNotification() {
+
     }
 
 

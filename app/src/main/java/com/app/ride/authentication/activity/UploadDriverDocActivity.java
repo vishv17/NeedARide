@@ -68,6 +68,7 @@ public class UploadDriverDocActivity extends AppCompatActivity implements View.O
     private String licenseCategory = "";
     private static final String TAG = "UploadDriverDocActivity";
     private final int PICK_PDF_CODE = 101;
+    private String PATH_FILE = "";
 
     private TextRecognizer textRecognizer;
     private InputImage licenseInputImage;
@@ -179,7 +180,7 @@ public class UploadDriverDocActivity extends AppCompatActivity implements View.O
                             //upload image
                             StorageReference filePath =
                                     FirebaseStorage.getInstance().getReference().child(Constant.RIDE_Firebase_DOCUMENT).
-                                            child(randomName + ".jpg");
+                                            child(randomName + ".pdf");
 
                             filePath.putFile(Uri.fromFile(new File(nocImage))).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
                                 @Override
@@ -387,38 +388,63 @@ public class UploadDriverDocActivity extends AppCompatActivity implements View.O
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        EasyImage.handleActivityResult(requestCode, resultCode, data, UploadDriverDocActivity.this, new DefaultCallback() {
-            @Override
-            public void onImagesPicked(@NonNull List<File> imageFiles, EasyImage.ImageSource source, int type) {
-                if (typeImage.equals(getResources().getString(R.string.text_driving_license))) {
-                    tvDrivingLicense.setVisibility(View.GONE);
-                    ivDrivingLicense.setVisibility(View.VISIBLE);
-                    drivingImage = imageFiles.get(0).getAbsolutePath();
-                    Glide.with(UploadDriverDocActivity.this)
-                            .load(drivingImage)
-                            .into(ivDrivingLicense);
-                    if (!checkDataForLicense()) {
-                        Toast.makeText(UploadDriverDocActivity.this, getResources().getString(R.string.license_doc_upload_error), Toast.LENGTH_LONG).show();
+        if(requestCode == PICK_PDF_CODE)
+        {
+            if(resultCode == RESULT_OK)
+            {
+                tvNoc.setVisibility(View.GONE);
+                ivNoc.setVisibility(View.VISIBLE);
+                Uri uri = data.getData();
+                if(uri != null)
+                {
+                    Log.e(TAG, "onActivityResult: URI-->"+uri.toString());
+                    String uriString = uri.toString();
+                    File myFile = new File(uriString);
+                    if(myFile != null)
+                    {
+                        nocImage = myFile.getAbsolutePath();
                     }
-                } else {
-                    tvNoc.setVisibility(View.GONE);
+
+                    Glide.with(activity)
+                            .load(R.drawable.ic_document)
+                            .into(ivNoc);
+                }
+            }
+        }
+        else {
+            EasyImage.handleActivityResult(requestCode, resultCode, data, UploadDriverDocActivity.this, new DefaultCallback() {
+                @Override
+                public void onImagesPicked(@NonNull List<File> imageFiles, EasyImage.ImageSource source, int type) {
+                    if (typeImage.equals(getResources().getString(R.string.text_driving_license))) {
+                        tvDrivingLicense.setVisibility(View.GONE);
+                        ivDrivingLicense.setVisibility(View.VISIBLE);
+                        drivingImage = imageFiles.get(0).getAbsolutePath();
+                        Glide.with(UploadDriverDocActivity.this)
+                                .load(drivingImage)
+                                .into(ivDrivingLicense);
+                        if (!checkDataForLicense()) {
+                            Toast.makeText(UploadDriverDocActivity.this, getResources().getString(R.string.license_doc_upload_error), Toast.LENGTH_LONG).show();
+                        }
+                    } else {
+                    /*tvNoc.setVisibility(View.GONE);
                     ivNoc.setVisibility(View.VISIBLE);
                     nocImage = imageFiles.get(0).getAbsolutePath();
                     Glide.with(UploadDriverDocActivity.this)
                             .load(nocImage)
                             .into(ivNoc);
-                    checkDataForNoc();
+                    checkDataForNoc();*/
+                    }
                 }
-            }
 
-            @Override
-            public void onCanceled(EasyImage.ImageSource source, int type) {
-                if (source == EasyImage.ImageSource.CAMERA_IMAGE) {
-                    File photoFile = EasyImage.lastlyTakenButCanceledPhoto(UploadDriverDocActivity.this);
-                    photoFile.delete();
+                @Override
+                public void onCanceled(EasyImage.ImageSource source, int type) {
+                    if (source == EasyImage.ImageSource.CAMERA_IMAGE) {
+                        File photoFile = EasyImage.lastlyTakenButCanceledPhoto(UploadDriverDocActivity.this);
+                        photoFile.delete();
+                    }
                 }
-            }
-        });
+            });
+        }
     }
 
     private void checkDataForNoc() {
