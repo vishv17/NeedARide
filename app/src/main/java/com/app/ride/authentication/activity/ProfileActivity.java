@@ -1,23 +1,20 @@
 package com.app.ride.authentication.activity;
 
+import android.Manifest;
+import android.app.Dialog;
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Bundle;
+import android.view.View;
+import android.view.Window;
+import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.AppCompatEditText;
-
-import android.Manifest;
-import android.app.Activity;
-import android.app.Dialog;
-import android.content.Intent;
-import android.net.Uri;
-import android.os.Bundle;
-import android.os.SystemClock;
-import android.view.View;
-import android.view.Window;
-import android.widget.Button;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.app.ride.R;
 import com.app.ride.authentication.model.UserModel;
@@ -27,20 +24,16 @@ import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.SetOptions;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.gun0912.tedpermission.PermissionListener;
 import com.gun0912.tedpermission.TedPermission;
-import com.kaopiz.kprogresshud.KProgressHUD;
 
 import java.io.File;
 import java.util.HashMap;
@@ -57,7 +50,9 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
     private AppCompatButton tvComplete;
     private String photoUploadUrl;
     private ProfileActivity activity;
-Globals globals;
+    Globals globals;
+    private boolean isEdit = false;
+    String firstName, lastName, profileImage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,6 +70,19 @@ Globals globals;
         tvComplete = findViewById(R.id.tvComplete);
         ivProfile.setOnClickListener(this);
         tvComplete.setOnClickListener(this);
+
+
+        if (getIntent().hasExtra(Constant.RIDE_EDIT)) {
+            isEdit = true;
+            firstName = getIntent().getStringExtra(Constant.RIDE_firstName);
+            lastName = getIntent().getStringExtra(Constant.RIDE_lastName);
+            profileImage = getIntent().getStringExtra(Constant.RIDE_profileImage);
+            photoUploadUrl = profileImage;
+            Glide.with(ProfileActivity.this).load(photoUploadUrl).into(ivProfile);
+            etName.setText(firstName);
+            etLastName.setText(lastName);
+            tvComplete.setText(getResources().getString(R.string.text_update));
+        }
     }
 
     @Override
@@ -102,7 +110,7 @@ Globals globals;
     }
 
     private void addDataOnDatabase() {
-        globals.showHideProgress(ProfileActivity.this,true);
+        globals.showHideProgress(ProfileActivity.this, true);
         FirebaseFirestore.getInstance().collection(Constant.RIDE_USERS).
                 document(globals.getFireBaseId()).
                 collection(Constant.RIDE_USER_DATA).whereEqualTo(Constant.RIDE_Firebase_Uid,
@@ -111,9 +119,11 @@ Globals globals;
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()) {
                     if (task.getResult().getDocuments().size() > 0) {
+                        if(isEdit){
+                            updateDataBase();
+                        }
                         Toast.makeText(ProfileActivity.this, "data already added", Toast.LENGTH_LONG).show();
-                        globals.showHideProgress(ProfileActivity.this,false);
-
+                        globals.showHideProgress(ProfileActivity.this, false);
                     } else {
                         String randomName = FieldValue.serverTimestamp().toString();
 
@@ -127,7 +137,6 @@ Globals globals;
                                     @Override
                                     public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
                                         if (task.isSuccessful()) {
-
                                             filepath.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                                                 @Override
                                                 public void onSuccess(Uri uri) {
@@ -136,18 +145,20 @@ Globals globals;
                                                     data.put(Constant.RIDE_Firebase_FirstName, etName.getText().toString().trim());
                                                     data.put(Constant.RIDE_Firebase_LastName, etLastName.getText().toString().trim());
                                                     data.put(Constant.RIDE_Firebase_ProfilePic, uri.toString());
+
                                                     UserModel userModel = new UserModel();
                                                     userModel.setUid(globals.getFireBaseId());
                                                     userModel.setFirstName(Globals.getEditTextValue(etName));
                                                     userModel.setLastName(Globals.getEditTextValue(etLastName));
                                                     userModel.setProfilePic(uri.toString());
-                                                    globals.setuserDetails(activity,userModel);
+                                                    globals.setuserDetails(activity, userModel);
+
                                                     FirebaseFirestore.getInstance().collection(Constant.RIDE_USERS).
                                                             document(globals.getFireBaseId()).collection("Data").add(data).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                                                         @Override
                                                         public void onSuccess(DocumentReference documentReference) {
                                                             Toast.makeText(ProfileActivity.this, "data added", Toast.LENGTH_LONG).show();
-                                                            globals.showHideProgress(ProfileActivity.this,false);
+                                                            globals.showHideProgress(ProfileActivity.this, false);
                                                             Intent intent = new Intent(ProfileActivity.this, DashboardActivity.class);
                                                             startActivity(intent);
                                                         }
@@ -167,14 +178,88 @@ Globals globals;
 
     }
 
+    private void updateDataBase() {
+        String randomName = FieldValue.serverTimestamp().toString();
+
+        if(profileImage.equals(globals.getUserDetails(this).getProfilePic())){
+            HashMap<String, String> data = new HashMap<>();
+            data.put(Constant.RIDE_Firebase_Uid, globals.getFireBaseId());
+            data.put(Constant.RIDE_Firebase_FirstName, etName.getText().toString().trim());
+            data.put(Constant.RIDE_Firebase_LastName, etLastName.getText().toString().trim());
+            data.put(Constant.RIDE_Firebase_ProfilePic,profileImage);
+            UserModel userModel = new UserModel();
+            userModel.setUid(globals.getFireBaseId());
+            userModel.setFirstName(Globals.getEditTextValue(etName));
+            userModel.setLastName(Globals.getEditTextValue(etLastName));
+            userModel.setProfilePic(profileImage);
+            globals.setuserDetails(activity, userModel);
+
+            FirebaseFirestore.getInstance().collection(Constant.RIDE_USERS)
+                    .document(globals.getFireBaseId()).set(data, SetOptions.merge());
+
+            globals.showHideProgress(ProfileActivity.this, false);
+            Intent intent = new Intent(ProfileActivity.this, DashboardActivity.class);
+            startActivity(intent);
+        }else {
+
+            //upload image
+            StorageReference filepath = FirebaseStorage.getInstance().getReference()
+                    .child(Constant.RIDE_PROFILE_IMAGE)
+                    .child(randomName + ".jpg");
+
+            filepath.putFile(Uri.fromFile(new File(String.valueOf(Uri.parse(photoUploadUrl))))).
+                    addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+                            if (task.isSuccessful()) {
+
+                                filepath.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                    @Override
+                                    public void onSuccess(Uri uri) {
+                                        HashMap<String, String> data = new HashMap<>();
+                                        data.put(Constant.RIDE_Firebase_Uid, globals.getFireBaseId());
+                                        data.put(Constant.RIDE_Firebase_FirstName, etName.getText().toString().trim());
+                                        data.put(Constant.RIDE_Firebase_LastName, etLastName.getText().toString().trim());
+                                        data.put(Constant.RIDE_Firebase_ProfilePic, uri.toString());
+                                        UserModel userModel = new UserModel();
+                                        userModel.setUid(globals.getFireBaseId());
+                                        userModel.setFirstName(Globals.getEditTextValue(etName));
+                                        userModel.setLastName(Globals.getEditTextValue(etLastName));
+                                        userModel.setProfilePic(uri.toString());
+                                        globals.setuserDetails(activity, userModel);
+
+                                        FirebaseFirestore.getInstance().collection(Constant.RIDE_USERS)
+                                                .document(globals.getFireBaseId()).set(data, SetOptions.merge());
+
+
+                                        globals.showHideProgress(ProfileActivity.this, false);
+                                        Intent intent = new Intent(ProfileActivity.this, DashboardActivity.class);
+                                        startActivity(intent);
+                             /*       FirebaseFirestore.getInstance().collection(Constant.RIDE_USERS).
+                                            document(globals.getFireBaseId()).collection("Data").add(data).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                                        @Override
+                                        public void onSuccess(DocumentReference documentReference) {
+                                            Toast.makeText(ProfileActivity.this, "data added", Toast.LENGTH_LONG).show();
+                                            globals.showHideProgress(ProfileActivity.this, false);
+                                            Intent intent = new Intent(ProfileActivity.this, DashboardActivity.class);
+                                            startActivity(intent);
+                                        }
+                                    });*/
+                                    }
+                                });
+                            }
+
+                        }
+                    });
+        }
+    }
+
     private boolean Valid() {
-        if(photoUploadUrl!=null) {
+        if (photoUploadUrl != null) {
             if (photoUploadUrl.trim().length() <= 0) {
                 return false;
             }
-        }
-        else
-        {
+        } else {
             Toast.makeText(ProfileActivity.this, "Please Select Profile Image", Toast.LENGTH_SHORT).show();
             return false;
         }

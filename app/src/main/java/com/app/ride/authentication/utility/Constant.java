@@ -47,4 +47,9 @@ public class Constant {
     public static String RIDE_CONVERSATION_KEY = "conversationKey";
     public static String RIDE_LAST_MESSAGE = "lastMessage";
 
+
+    public static String RIDE_EDIT = "EDIT";
+    public static String RIDE_firstName = "firstName";
+    public static String RIDE_lastName = "lastName";
+    public static String RIDE_profileImage = "profileImage";
 }

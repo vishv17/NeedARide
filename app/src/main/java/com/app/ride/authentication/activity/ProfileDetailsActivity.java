@@ -13,8 +13,10 @@ import android.widget.Toast;
 
 import com.app.ride.R;
 import com.app.ride.authentication.model.UserModel;
+import com.app.ride.authentication.utility.Constant;
 import com.app.ride.authentication.utility.Globals;
 import com.bumptech.glide.Glide;
+import com.google.firebase.auth.FirebaseAuth;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -27,6 +29,7 @@ public class ProfileDetailsActivity extends AppCompatActivity implements View.On
     private AppCompatImageView ivBack;
     private Globals globals;
     private static final String TAG = "ProfileDetailsActivity";
+    UserModel userModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,7 +54,7 @@ public class ProfileDetailsActivity extends AppCompatActivity implements View.On
 
         if(globals.getUserDetails(activity) != null)
         {
-            UserModel userModel = globals.getUserDetails(activity);
+            userModel = globals.getUserDetails(activity);
             Glide.with(activity)
                     .load(globals.getUserDetails(activity).getProfilePic())
                     .into(ivProfileDetails);
@@ -73,14 +76,21 @@ public class ProfileDetailsActivity extends AppCompatActivity implements View.On
                 onBackPressed();
                 break;
             case R.id.cdEdit:
-                Toast.makeText(activity,"Coming Soon!",Toast.LENGTH_LONG).show();
+                Intent intent1 =new Intent(ProfileDetailsActivity.this, ProfileActivity.class);
+                intent1.putExtra(Constant.RIDE_EDIT,"edit");
+                intent1.putExtra(Constant.RIDE_firstName,userModel.getFirstName());
+                intent1.putExtra(Constant.RIDE_lastName,userModel.getLastName());
+                intent1.putExtra(Constant.RIDE_profileImage,globals.getUserDetails(activity).getProfilePic());
+                startActivity(intent1);
                 break;
             case R.id.cdUploadDocument:
                 Intent intent = new Intent(activity,DriverDocumentActivity.class);
                 startActivity(intent);
                 break;
             case R.id.cdSignOut:
-                Toast.makeText(activity,"Coming Soon!",Toast.LENGTH_LONG).show();
+                FirebaseAuth.getInstance().signOut();
+                startActivity(new Intent(ProfileDetailsActivity.this, SignUpActivity.class));
+                finish();
                 break;
         }
     }
