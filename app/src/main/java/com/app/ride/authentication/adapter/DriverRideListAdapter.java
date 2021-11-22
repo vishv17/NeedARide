@@ -64,7 +64,7 @@ public class DriverRideListAdapter extends RecyclerView.Adapter<DriverRideListAd
         holder.tvDateOfJourney.setText(context.getString(R.string.text_dis_date)+" - "+model.getDateOfJourney());
         holder.tvStartPlace.setText(context.getString(R.string.text_start__dis_place)+" - "+model.getStartPlace());
         holder.tvEndPlace.setText(context.getString(R.string.text_end_dis_place)+" - "+model.getEndPlace());
-        holder.tvSeatAvailable.setText(context.getString(R.string.text_number_of_seat_available_dis)+" - "+model.getSeatAvailable());
+        holder.tvSeatAvailable.setText(context.getString(R.string.text_number_of_seat_available_dis)+" - "+String.valueOf(model.getSeatAvailable()));
         holder.tvCostPerSeat.setText(context.getString(R.string.text_cost_per_seat_dis)+" - "+model.getCostPerSeat());
 
         /*holder.tvEdit.setOnClickListener(new View.OnClickListener() {
