@@ -96,7 +96,7 @@ public class DriverRideActivity extends AppCompatActivity implements View.OnClic
         tvDateOfJourney.setText(model.getDateOfJourney());
         selectedDate = model.getDateOfJourney();
         etVehicleNumber.setText(model.getVehicleNumber());
-        etNumberOfSeatAvailable.setText(model.getSeatAvailable());
+        etNumberOfSeatAvailable.setText(String.valueOf(model.getSeatAvailable()));
         etCostPerSeat.setText(model.getCostPerSeat());
         selectedStartPlace = model.getStartPlace();
 
