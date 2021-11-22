@@ -68,6 +68,18 @@ public class Globals extends CoreApp implements Application.ActivityLifecycleCal
         }
     }
 
+    public void setFCMToken(Context context,String token)
+    {
+        getEditor(context).putString(Constant.TOKEN,token);
+        getEditor(context).commit();
+    }
+
+    public String getFCMToken(Context context)
+    {
+        SharedPreferences prefs = context.getSharedPreferences("secrets",Context.MODE_PRIVATE);
+        return prefs.getString(Constant.TOKEN,null);
+    }
+
 
     public void setuserDetails(Context context,UserModel userModel)
     {

@@ -7,7 +7,7 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE"/>
+    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
 
     <application
         android:name=".authentication.utility.Globals"
@@ -74,7 +74,7 @@
 
         <activity
             android:name=".authentication.activity.MessageListActivity"
-            android:exported="true" >
+            android:exported="true">
 
         </activity>
 
@@ -85,7 +85,7 @@
             android:name="com.google.mlkit.vision.DEPENDENCIES"
             android:value="ocr" />
 
-        <service android:name=".MyFirebaseMessagingService"
+        <service android:name=".authentication.service.MyFirebaseMessagingService"
 
             android:permission="com.google.android.c2dm.permission.SEND"
             android:exported="true">

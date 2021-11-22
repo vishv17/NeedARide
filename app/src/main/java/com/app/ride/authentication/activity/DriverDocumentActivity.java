@@ -423,7 +423,7 @@ public class DriverDocumentActivity extends AppCompatActivity implements ExpandC
         }
         Log.e(TAG, "License Category:->" + licenseCategory.toLowerCase().trim().toString());
         //If License Category is G1 or Not fetched properly then return as false
-        if (licenseCategory.toLowerCase().trim().toString().equals("g1") || (licenseCategory.toLowerCase().trim().toString().isEmpty())) {
+        if (licenseCategory.toLowerCase().trim().toString().equals("g2") || (licenseCategory.toLowerCase().trim().toString().isEmpty())) {
             returnResult = false;
         } else {
             //If License is expired then return as false

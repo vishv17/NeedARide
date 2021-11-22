@@ -28,6 +28,8 @@ public class Constant {
     public static String RIDE_Driver_request = "DriverRequest";
     public static String RIDE_passenger_request = "PassengerRequest";
     public static String USER = "User";
+    public static String TOKEN = "Token";
+    public static String ACCEPTED_ID = "acceptedId";
 
     public static String FD_OPPONENT_UID = "OpponentFbId";
 

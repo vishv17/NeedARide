@@ -20,22 +20,37 @@ import androidx.appcompat.widget.AppCompatEditText;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.appcompat.widget.AppCompatTextView;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.app.ride.R;
 import com.app.ride.authentication.model.DriverRequestModel;
 import com.app.ride.authentication.utility.Constant;
 import com.app.ride.authentication.utility.Globals;
+import com.app.ride.authentication.utility.MySingleton;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.SetOptions;
+import com.google.firebase.firestore.auth.Token;
+import com.google.firebase.iid.FirebaseInstanceIdReceiver;
+import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.gson.JsonObject;
+
+import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 
 public class DriverRideActivity extends AppCompatActivity implements View.OnClickListener {
@@ -46,12 +61,20 @@ public class DriverRideActivity extends AppCompatActivity implements View.OnClic
     RadioGroup radioGrpPets, radioGrpLuggage;
     String selectedStartPlace, selectedEndPlace, selectedDate = "";
     RadioButton selectPet, selectLuggage;
-    AppCompatButton btnSubmit, btnDelete, btnChat, btnRideStart;
+    AppCompatButton btnSubmit, btnDelete, btnChat, btnRideStart,btnConfirm;
     Spinner spStartPlace, spEndPlace;
     String[] country = {"India", "USA", "China", "Japan", "Other"};
     Globals globals;
     DriverRequestModel model;
     private static final String TAG = "DriverRideActivity";
+    private String refreshToken;
+    final private String FCM_API = "https://fcm.googleapis.com/fcm/send";
+    final private String contentType = "application/json";
+    private final String serverKey = "key=AAAAvgzBmsk:APA91bG2rz5lOW0WL78U_p-944xIXwnulUU-gEIxwGyTlB-_bX35e2SKTeDNU1jRlh5qmkrfAHHvc00WW66jFb50M6rJ5qsm0CuBxYs6XokBK1nFcGR93gBpFpOfWTnEz8mB1GOXBpSf";
+    private final String SENDER_ID = "816257800905";
+    String NOTIFICATION_TITLE;
+    String NOTIFICATION_MESSAGE;
+    String TOPIC;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,10 +84,30 @@ public class DriverRideActivity extends AppCompatActivity implements View.OnClic
         initView();
         initViewListener();
         setStatEndPlace();
+        updateToken();
+    }
+
+    private void updateToken() {
+        Log.e(TAG, "updateToken: "+globals.getFireBaseId());
+        FirebaseMessaging.getInstance().getToken().addOnCompleteListener(new OnCompleteListener<String>() {
+            @Override
+            public void onComplete(@NonNull Task<String> task) {
+                if(!task.isSuccessful())
+                {
+                    return;
+                }
+
+                String token = task.getResult();
+                globals.setFCMToken(DriverRideActivity.this,token);
+                Log.e(TAG, "onComplete: Toke is-->"+token);
+            }
+        });
+//        FirebaseDatabase.getInstance().getReference("Tokens").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).setValue(token);
     }
 
     private void initViewListener() {
         btnRideStart.setOnClickListener(this);
+        btnConfirm.setOnClickListener(this);
     }
 
 
@@ -80,6 +123,7 @@ public class DriverRideActivity extends AppCompatActivity implements View.OnClic
         btnSubmit = findViewById(R.id.btnSubmit);
         btnDelete = findViewById(R.id.btnDelete);
         btnChat = findViewById(R.id.btnChat);
+        btnConfirm = findViewById(R.id.btnConfirm);
         btnRideStart = findViewById(R.id.btnRideStart);
         ivBack = findViewById(R.id.ivBack);
         ivBack.setVisibility(View.VISIBLE);
@@ -96,7 +140,7 @@ public class DriverRideActivity extends AppCompatActivity implements View.OnClic
         tvDateOfJourney.setText(model.getDateOfJourney());
         selectedDate = model.getDateOfJourney();
         etVehicleNumber.setText(model.getVehicleNumber());
-        etNumberOfSeatAvailable.setText(model.getSeatAvailable());
+        etNumberOfSeatAvailable.setText(String.valueOf(model.getSeatAvailable()));
         etCostPerSeat.setText(model.getCostPerSeat());
         selectedStartPlace = model.getStartPlace();
 
@@ -123,12 +167,14 @@ public class DriverRideActivity extends AppCompatActivity implements View.OnClic
             btnDelete.setVisibility(View.GONE);
             btnRideStart.setVisibility(View.GONE);
             btnChat.setVisibility(View.VISIBLE);
+            btnConfirm.setVisibility(View.VISIBLE);
             enableDisableViews(false);
         } else {
             btnSubmit.setVisibility(View.VISIBLE);
             btnDelete.setVisibility(View.VISIBLE);
             btnRideStart.setVisibility(View.VISIBLE);
             btnChat.setVisibility(View.VISIBLE);
+            btnConfirm.setVisibility(View.VISIBLE);
             btnChat.setText(getResources().getString(R.string.request_list));
             enableDisableViews(true);
         }
@@ -176,6 +222,7 @@ public class DriverRideActivity extends AppCompatActivity implements View.OnClic
         } else {
             btnDelete.setVisibility(View.GONE);
             btnChat.setVisibility(View.GONE);
+            btnConfirm.setVisibility(View.GONE);
             btnRideStart.setVisibility(View.GONE);
             enableDisableViews(true);
         }
@@ -225,7 +272,7 @@ public class DriverRideActivity extends AppCompatActivity implements View.OnClic
             case R.id.btnSubmit: {
                 if (valid()) {
                     globals.showHideProgress(DriverRideActivity.this, true);
-                    HashMap<String, String> data = new HashMap<>();
+                    HashMap<String, Object> data = new HashMap<>();
                     data.put(Constant.RIDE_Firebase_Uid, globals.getFireBaseId());
                     data.put(Constant.RIDE_DATE_OF_JOURNEY, selectedDate);
                     data.put(Constant.RIDE_START_PLACE, selectedStartPlace);
@@ -247,9 +294,13 @@ public class DriverRideActivity extends AppCompatActivity implements View.OnClic
                     // find the radiobutton by returned id
                     selectLuggage = (RadioButton) findViewById(selectedIdLuggage);
                     data.put(Constant.RIDE_luggage_allow, selectLuggage.getText().toString());
-
+                    ArrayList<String> fcmList = new ArrayList<>();
+                    fcmList.add(globals.getFCMToken(DriverRideActivity.this));
+                    data.put("acceptedId",fcmList);
                     if (model != null && btnSubmit.getText().toString().equals(getResources().getString(R.string.text_update))) {
-                        FirebaseFirestore.getInstance().collection(Constant.RIDE_Driver_request).whereEqualTo(Constant.RIDE_driver_Uid, model.getDriverId()).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                        FirebaseFirestore.getInstance().collection(Constant.RIDE_Driver_request).
+                                whereEqualTo(Constant.RIDE_driver_Uid, model.getDriverId()).get().
+                                addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                             @Override
                             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                                 if (task.isSuccessful()) {
@@ -300,7 +351,47 @@ public class DriverRideActivity extends AppCompatActivity implements View.OnClic
             case R.id.btnRideStart:
                 sendNotification();
                 break;
+            case R.id.btnConfirm:
+                if(model.getSeatAvailable() > 0)
+                {
+                    addBooking();
+                }
+                break;
         }
+    }
+
+    private void addBooking() {
+        globals.showHideProgress(DriverRideActivity.this, true);
+        HashMap<String, Object> data = new HashMap<>();
+        ArrayList<String> fcmList = new ArrayList<>();
+        fcmList.add(globals.getFCMToken(DriverRideActivity.this));
+        data.put(Constant.RIDE_seat_available,(model.getSeatAvailable() - 1));
+        data.put("acceptedId",fcmList);
+
+        FirebaseFirestore.getInstance().collection(Constant.RIDE_Driver_request).
+                whereEqualTo(Constant.RIDE_driver_Uid, model.getDriverId()).get().
+                addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                FirebaseFirestore.getInstance().collection(Constant.RIDE_Driver_request)
+                                        .document(document.getId()).set(data, SetOptions.merge());
+                                showMessage("data updateed!!!!");
+                                globals.showHideProgress(DriverRideActivity.this, false);
+                                finish();
+                            }
+                        }
+                        else
+                        {
+                            globals.showHideProgress(DriverRideActivity.this, false);
+                            Toast.makeText(DriverRideActivity.this, "Error Occured while Updating Data", Toast.LENGTH_SHORT).show();
+                            finish();
+                        }
+
+                    }
+                });
+
     }
 
     private void redirectToChatListScreen() {
@@ -309,7 +400,53 @@ public class DriverRideActivity extends AppCompatActivity implements View.OnClic
     }
 
     private void sendNotification() {
+        NOTIFICATION_TITLE = "Notification Title";
+        NOTIFICATION_MESSAGE = "Ride Start";
 
+        JSONObject notification = new JSONObject();
+        JSONObject notifcationBody = new JSONObject();
+
+        try {
+            notifcationBody.put("body", NOTIFICATION_TITLE);
+//            notifcationBody.put("message", NOTIFICATION_MESSAGE);
+            /*notification.put("to",
+                    "rvcFda6QMvOH4Gsw8MS83Qq6d9e2");*/
+            notification.put("to",
+                    globals.getFCMToken(DriverRideActivity.this));
+            notification.put("data", notifcationBody);
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.e(TAG, "sendNotification: " + e.getMessage());
+        }
+
+        sendNotificationApiCall(notification);
+    }
+
+    private void sendNotificationApiCall(JSONObject notification) {
+        Log.e(TAG, "sendNotificationApiCall: notification Data-->"+notification.toString());
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(FCM_API, notification, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                Log.e(TAG, "onResponse:-->" + response.toString());
+            }
+        },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.e(TAG, "onErrorResponse: error-->"+error.getMessage());
+                        Toast.makeText(DriverRideActivity.this, "Request error", Toast.LENGTH_LONG).show();
+                    }
+                }) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> params = new HashMap<>();
+                params.put("Authorization", serverKey);
+                params.put("Content-Type", contentType);
+                return params;
+            }
+        };
+
+        MySingleton.getInstance(getApplicationContext()).addToRequestQueue(jsonObjectRequest);
     }
 
 
@@ -317,9 +454,9 @@ public class DriverRideActivity extends AppCompatActivity implements View.OnClic
         Intent intent = new Intent(DriverRideActivity.this, MessageActivity.class);
         intent.putExtra(Constant.FD_OPPONENT_UID, model.getUid());
         intent.putExtra(Constant.RIDE_REQUEST_ID, model.getDriverId());
-        if(model.getName()!=null && model.getName().equals("")){
+        if (model.getName() != null && model.getName().equals("")) {
             intent.putExtra(Constant.RIDE_name, "");
-        }else {
+        } else {
             intent.putExtra(Constant.RIDE_name, model.getName());
         }
         startActivity(intent);

@@ -14,6 +14,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.app.ride.R;
+import com.app.ride.authentication.model.UserModel;
 import com.app.ride.authentication.utility.Constant;
 import com.app.ride.authentication.utility.Globals;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -30,7 +31,11 @@ import com.google.firebase.auth.FirebaseAuthSettings;
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthOptions;
 import com.google.firebase.auth.PhoneAuthProvider;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 public class VerifyPhoneActivity extends AppCompatActivity implements View.OnClickListener {
@@ -96,8 +101,8 @@ public class VerifyPhoneActivity extends AppCompatActivity implements View.OnCli
         PhoneAuthOptions options =
                 PhoneAuthOptions.newBuilder(mAuth)
 //                        .setPhoneNumber("+1" + "6505554567")       // Phone number to verify
-                        .setPhoneNumber("+91" + mobile)       // Phone number to verify
-//                        .setPhoneNumber("+1" + mobile)       // Phone number to verify
+//                        .setPhoneNumber("+91" + mobile)       // Phone number to verify
+                        .setPhoneNumber("+1" + mobile)       // Phone number to verify
                         .setTimeout(120L, TimeUnit.SECONDS) // Timeout and unit
                         .setActivity(this)                 // Activity (for callback binding)
                         .setCallbacks(mCallbacks)          // OnVerificationStateChangedCallbacks
@@ -120,9 +125,35 @@ public class VerifyPhoneActivity extends AppCompatActivity implements View.OnCli
                         globals.showHideProgress(VerifyPhoneActivity.this,false);
 
                         if (task.isSuccessful()) {
-                            Intent intent = new Intent(VerifyPhoneActivity.this, ProfileActivity.class);
-                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                            startActivity(intent);
+                            FirebaseFirestore.getInstance().collection(Constant.RIDE_USERS).
+                                    document(globals.getFireBaseId()).
+                                    collection(Constant.RIDE_USER_DATA).whereEqualTo(Constant.RIDE_Firebase_Uid,
+                                    task.getResult().getUser().getUid()).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                @Override
+                                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                    if (task.isSuccessful()) {
+                                        if (Objects.requireNonNull(task.getResult()).getDocuments().size() > 0) {
+                                            for (DocumentSnapshot snapshot : task.getResult().getDocuments()) {
+                                                UserModel userModel = snapshot.toObject(UserModel.class);
+                                                globals.setuserDetails(VerifyPhoneActivity.this, userModel);
+                                                Intent intent = new Intent(VerifyPhoneActivity.this, DashboardActivity.class);
+                                                startActivity(intent);
+                                                finish();
+                                            }
+
+
+                                        } else {
+                                            /*Intent intent = new Intent(VerifyPhoneActivity.this, ProfileActivity.class);
+                                            startActivity(intent);
+                                            finish();*/
+                                            Intent intent = new Intent(VerifyPhoneActivity.this, ProfileActivity.class);
+                                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                            startActivity(intent);
+                                            finish();
+                                        }
+                                    }
+                                }
+                            });
                         } else {
                             String message = "Somthing is wrong, we will fix it soon...";
                             if (task.getException() instanceof FirebaseAuthInvalidCredentialsException) {

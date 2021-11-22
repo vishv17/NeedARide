@@ -89,7 +89,9 @@ public class ProfileDetailsActivity extends AppCompatActivity implements View.On
                 break;
             case R.id.cdSignOut:
                 FirebaseAuth.getInstance().signOut();
-                startActivity(new Intent(ProfileDetailsActivity.this, SignUpActivity.class));
+                Intent intent2 = new Intent(ProfileDetailsActivity.this,SignUpActivity.class);
+                intent2.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent2);
                 finish();
                 break;
         }
