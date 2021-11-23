@@ -39,6 +39,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     @Override
     public void onMessageReceived(@NonNull RemoteMessage remoteMessage) {
         super.onMessageReceived(remoteMessage);
+        Log.e(TAG, "onMessageReceived: Remote Message-->"+remoteMessage.getData().toString());
         final Intent intent = new Intent(this, DashboardActivity.class);
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         int notificationID = new Random().nextInt(3000);

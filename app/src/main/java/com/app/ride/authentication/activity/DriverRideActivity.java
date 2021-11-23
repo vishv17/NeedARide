@@ -1,5 +1,7 @@
 package com.app.ride.authentication.activity;
 
+import static com.app.ride.authentication.utility.Constant.ACCEPTED_ID;
+
 import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
@@ -178,6 +180,17 @@ public class DriverRideActivity extends AppCompatActivity implements View.OnClic
             btnChat.setText(getResources().getString(R.string.request_list));
             enableDisableViews(true);
         }
+        if(model.getAcceptedId()!=null)
+        {
+            if(model.getAcceptedId().contains(globals.getFCMToken(DriverRideActivity.this)))
+            {
+                btnConfirm.setVisibility(View.GONE);
+            }
+            else
+            {
+                btnConfirm.setVisibility(View.VISIBLE);
+            }
+        }
 //        btnSubmit.setVisibility(globals.getFireBaseId().equals(model.getUid()) ? View.VISIBLE : View.GONE);
     }
 
@@ -295,8 +308,8 @@ public class DriverRideActivity extends AppCompatActivity implements View.OnClic
                     selectLuggage = (RadioButton) findViewById(selectedIdLuggage);
                     data.put(Constant.RIDE_luggage_allow, selectLuggage.getText().toString());
                     ArrayList<String> fcmList = new ArrayList<>();
-                    fcmList.add(globals.getFCMToken(DriverRideActivity.this));
-                    data.put("acceptedId",fcmList);
+//                    fcmList.add(globals.getFCMToken(DriverRideActivity.this));
+                    data.put(ACCEPTED_ID,fcmList);
                     if (model != null && btnSubmit.getText().toString().equals(getResources().getString(R.string.text_update))) {
                         FirebaseFirestore.getInstance().collection(Constant.RIDE_Driver_request).
                                 whereEqualTo(Constant.RIDE_driver_Uid, model.getDriverId()).get().
@@ -356,6 +369,10 @@ public class DriverRideActivity extends AppCompatActivity implements View.OnClic
                 {
                     addBooking();
                 }
+                else
+                {
+                    Toast.makeText(DriverRideActivity.this, "Sorry No Seat is available", Toast.LENGTH_SHORT).show();
+                }
                 break;
         }
     }
@@ -403,23 +420,26 @@ public class DriverRideActivity extends AppCompatActivity implements View.OnClic
         NOTIFICATION_TITLE = "Notification Title";
         NOTIFICATION_MESSAGE = "Ride Start";
 
-        JSONObject notification = new JSONObject();
-        JSONObject notifcationBody = new JSONObject();
+        for(String s : model.getAcceptedId())
+        {
+            JSONObject notification = new JSONObject();
+            JSONObject notifcationBody = new JSONObject();
 
-        try {
-            notifcationBody.put("body", NOTIFICATION_TITLE);
-//            notifcationBody.put("message", NOTIFICATION_MESSAGE);
+            try {
+                notifcationBody.put("title", NOTIFICATION_TITLE);
+            notifcationBody.put("message", NOTIFICATION_MESSAGE);
             /*notification.put("to",
                     "rvcFda6QMvOH4Gsw8MS83Qq6d9e2");*/
-            notification.put("to",
-                    globals.getFCMToken(DriverRideActivity.this));
-            notification.put("data", notifcationBody);
-        } catch (Exception e) {
-            e.printStackTrace();
-            Log.e(TAG, "sendNotification: " + e.getMessage());
-        }
+                notification.put("to",
+                        globals.getFCMToken(DriverRideActivity.this));
+                notification.put("data", notifcationBody);
+            } catch (Exception e) {
+                e.printStackTrace();
+                Log.e(TAG, "sendNotification: " + e.getMessage());
+            }
 
-        sendNotificationApiCall(notification);
+            sendNotificationApiCall(notification);
+        }
     }
 
     private void sendNotificationApiCall(JSONObject notification) {
@@ -428,6 +448,7 @@ public class DriverRideActivity extends AppCompatActivity implements View.OnClic
             @Override
             public void onResponse(JSONObject response) {
                 Log.e(TAG, "onResponse:-->" + response.toString());
+                btnRideStart.setEnabled(false);
             }
         },
                 new Response.ErrorListener() {

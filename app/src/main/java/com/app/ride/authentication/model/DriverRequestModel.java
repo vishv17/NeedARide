@@ -1,11 +1,21 @@
 package com.app.ride.authentication.model;
 
 import java.io.Serializable;
+import java.util.List;
 
 public class DriverRequestModel implements Serializable {
     String LuggageAllow,PetsAllow,Uid,costPerSeat,dateOfJourney,endPlace,startPlace,
             vehicleNumber,driverId,name;
     int    seatAvailable;
+    List<String> acceptedId;
+
+    public List<String> getAcceptedId() {
+        return acceptedId;
+    }
+
+    public void setAcceptedId(List<String> acceptedId) {
+        this.acceptedId = acceptedId;
+    }
 
     public String getName() {
         return name;

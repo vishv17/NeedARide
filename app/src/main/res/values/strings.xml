@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Ride Share</string>
+    <string name="app_name">NeedARide</string>
     <string name="text_enter_phone_no">Enter phone no.</string>
     <string name="text_firstname">Enter first name</string>
     <string name="text_lastname">Enter last name</string>
