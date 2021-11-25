@@ -33,17 +33,12 @@ import com.app.ride.authentication.utility.Globals;
 import com.app.ride.authentication.utility.MySingleton;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.SetOptions;
-import com.google.firebase.firestore.auth.Token;
-import com.google.firebase.iid.FirebaseInstanceIdReceiver;
 import com.google.firebase.messaging.FirebaseMessaging;
-import com.google.gson.JsonObject;
 
 import org.json.JSONObject;
 
@@ -63,7 +58,7 @@ public class DriverRideActivity extends AppCompatActivity implements View.OnClic
     RadioGroup radioGrpPets, radioGrpLuggage;
     String selectedStartPlace, selectedEndPlace, selectedDate = "";
     RadioButton selectPet, selectLuggage;
-    AppCompatButton btnSubmit, btnDelete, btnChat, btnRideStart,btnConfirm;
+    AppCompatButton btnSubmit, btnDelete, btnChat, btnRideStart, btnConfirm, btnRideEnd;
     Spinner spStartPlace, spEndPlace;
     String[] country = {"India", "USA", "China", "Japan", "Other"};
     Globals globals;
@@ -90,18 +85,17 @@ public class DriverRideActivity extends AppCompatActivity implements View.OnClic
     }
 
     private void updateToken() {
-        Log.e(TAG, "updateToken: "+globals.getFireBaseId());
+        Log.e(TAG, "updateToken: " + globals.getFireBaseId());
         FirebaseMessaging.getInstance().getToken().addOnCompleteListener(new OnCompleteListener<String>() {
             @Override
             public void onComplete(@NonNull Task<String> task) {
-                if(!task.isSuccessful())
-                {
+                if (!task.isSuccessful()) {
                     return;
                 }
 
                 String token = task.getResult();
-                globals.setFCMToken(DriverRideActivity.this,token);
-                Log.e(TAG, "onComplete: Toke is-->"+token);
+                globals.setFCMToken(DriverRideActivity.this, token);
+                Log.e(TAG, "onComplete: Toke is-->" + token);
             }
         });
 //        FirebaseDatabase.getInstance().getReference("Tokens").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).setValue(token);
@@ -109,6 +103,7 @@ public class DriverRideActivity extends AppCompatActivity implements View.OnClic
 
     private void initViewListener() {
         btnRideStart.setOnClickListener(this);
+        btnRideEnd.setOnClickListener(this);
         btnConfirm.setOnClickListener(this);
     }
 
@@ -127,6 +122,7 @@ public class DriverRideActivity extends AppCompatActivity implements View.OnClic
         btnChat = findViewById(R.id.btnChat);
         btnConfirm = findViewById(R.id.btnConfirm);
         btnRideStart = findViewById(R.id.btnRideStart);
+        btnRideEnd = findViewById(R.id.btnRideEnd);
         ivBack = findViewById(R.id.ivBack);
         ivBack.setVisibility(View.VISIBLE);
 
@@ -167,31 +163,49 @@ public class DriverRideActivity extends AppCompatActivity implements View.OnClic
         if (!globals.getFireBaseId().equals(model.getUid())) {
             btnSubmit.setVisibility(View.GONE);
             btnDelete.setVisibility(View.GONE);
-            btnRideStart.setVisibility(View.GONE);
+//            btnRideStart.setVisibility(View.GONE);
             btnChat.setVisibility(View.VISIBLE);
             btnConfirm.setVisibility(View.VISIBLE);
             enableDisableViews(false);
         } else {
             btnSubmit.setVisibility(View.VISIBLE);
             btnDelete.setVisibility(View.VISIBLE);
-            btnRideStart.setVisibility(View.VISIBLE);
+//            btnRideStart.setVisibility(View.VISIBLE);
             btnChat.setVisibility(View.VISIBLE);
             btnConfirm.setVisibility(View.VISIBLE);
             btnChat.setText(getResources().getString(R.string.request_list));
             enableDisableViews(true);
         }
-        if(model.getAcceptedId()!=null)
-        {
-            if(model.getAcceptedId().contains(globals.getFCMToken(DriverRideActivity.this)))
-            {
+        if (model.getAcceptedId() != null) {
+            if (model.getAcceptedId().contains(globals.getFCMToken(DriverRideActivity.this))) {
                 btnConfirm.setVisibility(View.GONE);
-            }
-            else
-            {
+            } else {
                 btnConfirm.setVisibility(View.VISIBLE);
             }
         }
+        hideVisibleRideStartEnd(model);
 //        btnSubmit.setVisibility(globals.getFireBaseId().equals(model.getUid()) ? View.VISIBLE : View.GONE);
+    }
+
+    private void hideVisibleRideStartEnd(DriverRequestModel model) {
+        if(model.isRideCompleted())
+        {
+            btnRideStart.setVisibility(View.GONE);
+            btnRideEnd.setVisibility(View.GONE);
+        }
+        else
+        {
+            if(model.isRideStarted())
+            {
+                btnRideStart.setVisibility(View.GONE);
+                btnRideEnd.setVisibility(View.VISIBLE);
+            }
+            else
+            {
+                btnRideStart.setVisibility(View.VISIBLE);
+                btnRideEnd.setVisibility(View.GONE);
+            }
+        }
     }
 
     private void setStatEndPlace() {
@@ -309,25 +323,25 @@ public class DriverRideActivity extends AppCompatActivity implements View.OnClic
                     data.put(Constant.RIDE_luggage_allow, selectLuggage.getText().toString());
                     ArrayList<String> fcmList = new ArrayList<>();
 //                    fcmList.add(globals.getFCMToken(DriverRideActivity.this));
-                    data.put(ACCEPTED_ID,fcmList);
+                    data.put(ACCEPTED_ID, fcmList);
                     if (model != null && btnSubmit.getText().toString().equals(getResources().getString(R.string.text_update))) {
                         FirebaseFirestore.getInstance().collection(Constant.RIDE_Driver_request).
                                 whereEqualTo(Constant.RIDE_driver_Uid, model.getDriverId()).get().
                                 addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                            @Override
-                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                if (task.isSuccessful()) {
-                                    for (QueryDocumentSnapshot document : task.getResult()) {
-                                        FirebaseFirestore.getInstance().collection(Constant.RIDE_Driver_request)
-                                                .document(document.getId()).set(data, SetOptions.merge());
-                                        showMessage("data updateed!!!!");
-                                        globals.showHideProgress(DriverRideActivity.this, false);
-                                        finish();
-                                    }
-                                }
+                                    @Override
+                                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                        if (task.isSuccessful()) {
+                                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                                FirebaseFirestore.getInstance().collection(Constant.RIDE_Driver_request)
+                                                        .document(document.getId()).set(data, SetOptions.merge());
+                                                showMessage("data updateed!!!!");
+                                                globals.showHideProgress(DriverRideActivity.this, false);
+                                                finish();
+                                            }
+                                        }
 
-                            }
-                        });
+                                    }
+                                });
                     } else {
                         data.put(Constant.RIDE_driver_Uid, String.valueOf(System.currentTimeMillis()));
 
@@ -362,19 +376,80 @@ public class DriverRideActivity extends AppCompatActivity implements View.OnClic
                 }
                 break;
             case R.id.btnRideStart:
-                sendNotification();
+                updateRideStatus(true);
+                break;
+            case R.id.btnRideEnd:
+                updateRideStatus(false);
+//                sendNotificationforEndRide();
                 break;
             case R.id.btnConfirm:
-                if(model.getSeatAvailable() > 0)
-                {
+                if (model.getSeatAvailable() > 0) {
                     addBooking();
-                }
-                else
-                {
+                } else {
                     Toast.makeText(DriverRideActivity.this, "Sorry No Seat is available", Toast.LENGTH_SHORT).show();
                 }
                 break;
         }
+    }
+
+    private void updateRideStatus(boolean status) {
+        globals.showHideProgress(DriverRideActivity.this, true);
+        HashMap<String, Object> data = new HashMap<>();
+        if (status) {
+            data.put(Constant.RIDE_STARTED, true);
+            data.put(Constant.RIDE_COMPLETED, false);
+        } else {
+            data.put(Constant.RIDE_STARTED, false);
+            data.put(Constant.RIDE_COMPLETED, true);
+        }
+        FirebaseFirestore.getInstance().collection(Constant.RIDE_Driver_request).
+                whereEqualTo(Constant.RIDE_driver_Uid, model.getDriverId()).get().
+                addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                FirebaseFirestore.getInstance().collection(Constant.RIDE_Driver_request)
+                                        .document(document.getId()).set(data, SetOptions.merge());
+                                globals.showHideProgress(DriverRideActivity.this, false);
+                                if (status) {
+                                    sendNotificationForRideStart();
+                                } else {
+                                    sendNotificationforEndRide();
+                                }
+                            }
+                        } else {
+                            globals.showHideProgress(DriverRideActivity.this, false);
+                            Toast.makeText(DriverRideActivity.this, "Error Occured while Updating Data", Toast.LENGTH_SHORT).show();
+                        }
+
+                    }
+                });
+    }
+
+    private void sendNotificationforEndRide() {
+        NOTIFICATION_TITLE = getString(R.string.app_name);
+        NOTIFICATION_MESSAGE = "Ride End";
+
+        for (String s : model.getAcceptedId()) {
+            JSONObject notification = new JSONObject();
+            JSONObject notifcationBody = new JSONObject();
+            try {
+                notifcationBody.put("title", NOTIFICATION_TITLE);
+                notifcationBody.put("message", NOTIFICATION_MESSAGE);
+                notifcationBody.put("end", String.valueOf(true));
+                notification.put("to",
+                        s);
+                notification.put("data", notifcationBody);
+            } catch (Exception e) {
+                e.printStackTrace();
+                Log.e(TAG, "sendNotification: " + e.getMessage());
+            }
+
+            sendNotificationApiCall(notification);
+        }
+        Toast.makeText(DriverRideActivity.this, "Ride Ended", Toast.LENGTH_SHORT).show();
+        finish();
     }
 
     private void addBooking() {
@@ -382,8 +457,8 @@ public class DriverRideActivity extends AppCompatActivity implements View.OnClic
         HashMap<String, Object> data = new HashMap<>();
         ArrayList<String> fcmList = new ArrayList<>();
         fcmList.add(globals.getFCMToken(DriverRideActivity.this));
-        data.put(Constant.RIDE_seat_available,(model.getSeatAvailable() - 1));
-        data.put("acceptedId",fcmList);
+        data.put(Constant.RIDE_seat_available, (model.getSeatAvailable() - 1));
+        data.put("acceptedId", fcmList);
 
         FirebaseFirestore.getInstance().collection(Constant.RIDE_Driver_request).
                 whereEqualTo(Constant.RIDE_driver_Uid, model.getDriverId()).get().
@@ -398,9 +473,7 @@ public class DriverRideActivity extends AppCompatActivity implements View.OnClic
                                 globals.showHideProgress(DriverRideActivity.this, false);
                                 finish();
                             }
-                        }
-                        else
-                        {
+                        } else {
                             globals.showHideProgress(DriverRideActivity.this, false);
                             Toast.makeText(DriverRideActivity.this, "Error Occured while Updating Data", Toast.LENGTH_SHORT).show();
                             finish();
@@ -416,22 +489,22 @@ public class DriverRideActivity extends AppCompatActivity implements View.OnClic
         startActivity(intent);
     }
 
-    private void sendNotification() {
+    private void sendNotificationForRideStart() {
         NOTIFICATION_TITLE = "Notification Title";
         NOTIFICATION_MESSAGE = "Ride Start";
 
-        for(String s : model.getAcceptedId())
-        {
+        for (String s : model.getAcceptedId()) {
             JSONObject notification = new JSONObject();
             JSONObject notifcationBody = new JSONObject();
 
             try {
                 notifcationBody.put("title", NOTIFICATION_TITLE);
-            notifcationBody.put("message", NOTIFICATION_MESSAGE);
+                notifcationBody.put("message", NOTIFICATION_MESSAGE);
+                notifcationBody.put("end", String.valueOf(false));
             /*notification.put("to",
                     "rvcFda6QMvOH4Gsw8MS83Qq6d9e2");*/
                 notification.put("to",
-                        globals.getFCMToken(DriverRideActivity.this));
+                        s);
                 notification.put("data", notifcationBody);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -440,21 +513,25 @@ public class DriverRideActivity extends AppCompatActivity implements View.OnClic
 
             sendNotificationApiCall(notification);
         }
+        Toast.makeText(DriverRideActivity.this, "Ride is started.", Toast.LENGTH_SHORT).show();
+        finish();
     }
 
     private void sendNotificationApiCall(JSONObject notification) {
-        Log.e(TAG, "sendNotificationApiCall: notification Data-->"+notification.toString());
+        Log.e(TAG, "sendNotificationApiCall: notification Data-->" + notification.toString());
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(FCM_API, notification, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 Log.e(TAG, "onResponse:-->" + response.toString());
                 btnRideStart.setEnabled(false);
+                btnRideEnd.setVisibility(View.VISIBLE);
+                btnRideStart.setVisibility(View.GONE);
             }
         },
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Log.e(TAG, "onErrorResponse: error-->"+error.getMessage());
+                        Log.e(TAG, "onErrorResponse: error-->" + error.getMessage());
                         Toast.makeText(DriverRideActivity.this, "Request error", Toast.LENGTH_LONG).show();
                     }
                 }) {

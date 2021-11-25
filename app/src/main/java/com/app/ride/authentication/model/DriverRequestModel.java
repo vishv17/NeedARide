@@ -7,7 +7,24 @@ public class DriverRequestModel implements Serializable {
     String LuggageAllow,PetsAllow,Uid,costPerSeat,dateOfJourney,endPlace,startPlace,
             vehicleNumber,driverId,name;
     int    seatAvailable;
+    boolean rideCompleted,rideStarted;
     List<String> acceptedId;
+
+    public boolean isRideCompleted() {
+        return rideCompleted;
+    }
+
+    public void setRideCompleted(boolean rideCompleted) {
+        this.rideCompleted = rideCompleted;
+    }
+
+    public boolean isRideStarted() {
+        return rideStarted;
+    }
+
+    public void setRideStarted(boolean rideStarted) {
+        this.rideStarted = rideStarted;
+    }
 
     public List<String> getAcceptedId() {
         return acceptedId;

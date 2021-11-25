@@ -328,6 +328,19 @@
                         android:textSize="@dimen/_15ssp"
                         />
 
+                    <androidx.appcompat.widget.AppCompatButton
+                        android:id="@+id/btnRideEnd"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0.5"
+                        android:background="@color/colorSecondary"
+                        android:text="@string/ride_end"
+                        android:textAllCaps="false"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/_15ssp"
+                        android:visibility="gone"
+                        />
+
                 </androidx.appcompat.widget.LinearLayoutCompat>
 
                 <androidx.appcompat.widget.LinearLayoutCompat

@@ -63,5 +63,6 @@
     <string name="no_msg_found">No message found.</string>
     <string name="request_list">Request List</string>
     <string name="confirm">Confirm</string>
+    <string name="ride_end">Ride End</string>
 
 </resources>
