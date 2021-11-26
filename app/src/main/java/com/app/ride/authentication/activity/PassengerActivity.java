@@ -82,7 +82,9 @@ public class PassengerActivity extends AppCompatActivity implements View.OnClick
         btnSubmit.setOnClickListener(this);
         ivBack.setOnClickListener(this);
         btnChat.setOnClickListener(this);
-        config = new PayPalConfiguration().environment(PayPalConfiguration.ENVIRONMENT_SANDBOX).acceptCreditCards(true).
+        /*config = new PayPalConfiguration().environment(PayPalConfiguration.ENVIRONMENT_SANDBOX).acceptCreditCards(true).
+                clientId("AaTa8QSjo4-22iYzx60thgiqSvlCu0qPmX-H51M9QCpFIu9Rqak1J9S7IJtN2FxzExWoIyRGC0yzB2og");*/
+        config = new PayPalConfiguration().environment(PayPalConfiguration.ENVIRONMENT_SANDBOX).
                 clientId("AaTa8QSjo4-22iYzx60thgiqSvlCu0qPmX-H51M9QCpFIu9Rqak1J9S7IJtN2FxzExWoIyRGC0yzB2og");
 
     }

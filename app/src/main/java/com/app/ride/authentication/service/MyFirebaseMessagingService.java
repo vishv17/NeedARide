@@ -19,6 +19,8 @@ import androidx.core.app.NotificationCompat;
 
 import com.app.ride.R;
 import com.app.ride.authentication.activity.DashboardActivity;
+import com.app.ride.authentication.activity.RatingActivity;
+import com.app.ride.authentication.utility.Constant;
 import com.google.firebase.iid.FirebaseInstanceIdReceiver;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
@@ -50,7 +52,18 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         }
 
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_ONE_SHOT);
+        PendingIntent pendingIntent = null;
+        if(remoteMessage.getData().get("end").equals("true"))
+        {
+            String riderId = remoteMessage.getData().get(Constant.RIDE_USER_ID);
+            Intent intent1 = new Intent(this, RatingActivity.class);
+            intent1.putExtra(Constant.RIDE_USER_ID,riderId);
+            pendingIntent = PendingIntent.getActivity(this,0,intent1,PendingIntent.FLAG_ONE_SHOT);
+        }
+        else
+        {
+            pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_ONE_SHOT);
+        }
         Bitmap largeIcon = BitmapFactory.decodeResource(getResources(), R.drawable.ic_notification);
         Uri notificationSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 

@@ -163,14 +163,12 @@ public class DriverRideActivity extends AppCompatActivity implements View.OnClic
         if (!globals.getFireBaseId().equals(model.getUid())) {
             btnSubmit.setVisibility(View.GONE);
             btnDelete.setVisibility(View.GONE);
-//            btnRideStart.setVisibility(View.GONE);
             btnChat.setVisibility(View.VISIBLE);
             btnConfirm.setVisibility(View.VISIBLE);
             enableDisableViews(false);
         } else {
             btnSubmit.setVisibility(View.VISIBLE);
             btnDelete.setVisibility(View.VISIBLE);
-//            btnRideStart.setVisibility(View.VISIBLE);
             btnChat.setVisibility(View.VISIBLE);
             btnConfirm.setVisibility(View.VISIBLE);
             btnChat.setText(getResources().getString(R.string.request_list));
@@ -184,7 +182,6 @@ public class DriverRideActivity extends AppCompatActivity implements View.OnClic
             }
         }
         hideVisibleRideStartEnd(model);
-//        btnSubmit.setVisibility(globals.getFireBaseId().equals(model.getUid()) ? View.VISIBLE : View.GONE);
     }
 
     private void hideVisibleRideStartEnd(DriverRequestModel model) {
@@ -324,6 +321,8 @@ public class DriverRideActivity extends AppCompatActivity implements View.OnClic
                     ArrayList<String> fcmList = new ArrayList<>();
 //                    fcmList.add(globals.getFCMToken(DriverRideActivity.this));
                     data.put(ACCEPTED_ID, fcmList);
+                    data.put(Constant.RIDE_STARTED,false);
+                    data.put(Constant.RIDE_COMPLETED,false);
                     if (model != null && btnSubmit.getText().toString().equals(getResources().getString(R.string.text_update))) {
                         FirebaseFirestore.getInstance().collection(Constant.RIDE_Driver_request).
                                 whereEqualTo(Constant.RIDE_driver_Uid, model.getDriverId()).get().
@@ -438,6 +437,7 @@ public class DriverRideActivity extends AppCompatActivity implements View.OnClic
                 notifcationBody.put("title", NOTIFICATION_TITLE);
                 notifcationBody.put("message", NOTIFICATION_MESSAGE);
                 notifcationBody.put("end", String.valueOf(true));
+                notifcationBody.put(Constant.RIDE_USER_ID, globals.getFireBaseId());
                 notification.put("to",
                         s);
                 notification.put("data", notifcationBody);
@@ -501,6 +501,7 @@ public class DriverRideActivity extends AppCompatActivity implements View.OnClic
                 notifcationBody.put("title", NOTIFICATION_TITLE);
                 notifcationBody.put("message", NOTIFICATION_MESSAGE);
                 notifcationBody.put("end", String.valueOf(false));
+                notifcationBody.put(Constant.RIDE_USER_ID, globals.getFireBaseId());
             /*notification.put("to",
                     "rvcFda6QMvOH4Gsw8MS83Qq6d9e2");*/
                 notification.put("to",
@@ -524,8 +525,8 @@ public class DriverRideActivity extends AppCompatActivity implements View.OnClic
             public void onResponse(JSONObject response) {
                 Log.e(TAG, "onResponse:-->" + response.toString());
                 btnRideStart.setEnabled(false);
-                btnRideEnd.setVisibility(View.VISIBLE);
-                btnRideStart.setVisibility(View.GONE);
+                /*btnRideEnd.setVisibility(View.VISIBLE);
+                btnRideStart.setVisibility(View.GONE);*/
             }
         },
                 new Response.ErrorListener() {

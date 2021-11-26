@@ -18,7 +18,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.SplashActivity">
-
+        <activity
+            android:name=".authentication.activity.RatingActivity"
+            android:exported="true" />
         <activity
             android:name=".authentication.activity.GetStartedActivity"
             android:exported="true" />
@@ -70,13 +72,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-
         <activity
             android:name=".authentication.activity.MessageListActivity"
-            android:exported="true">
-
-        </activity>
+            android:exported="true"></activity>
 
         <meta-data
             android:name="preloaded_fonts"
@@ -85,16 +83,15 @@
             android:name="com.google.mlkit.vision.DEPENDENCIES"
             android:value="ocr" />
 
-        <service android:name=".authentication.service.MyFirebaseMessagingService"
-
-            android:permission="com.google.android.c2dm.permission.SEND"
-            android:exported="true">
+        <service
+            android:name=".authentication.service.MyFirebaseMessagingService"
+            android:exported="true"
+            android:permission="com.google.android.c2dm.permission.SEND">
             <intent-filter>
-                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
-                    <action android:name="com.google.android.c2dm.intent.RECEIVE"/>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
             </intent-filter>
         </service>
-
         <service
             android:name="com.paypal.android.sdk.payments.PayPalService"
             android:exported="false" />
