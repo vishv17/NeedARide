@@ -239,6 +239,21 @@
                         android:textColor="@color/white"
                         android:textSize="@dimen/_15ssp"
                         />
+                    <View
+                        android:layout_width="@dimen/_5sdp"
+                        android:layout_height="wrap_content"/>
+
+                    <androidx.appcompat.widget.AppCompatButton
+                        android:id="@+id/btnPay"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0.5"
+                        android:background="@color/colorSecondary"
+                        android:text="@string/pay"
+                        android:textAllCaps="false"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/_15ssp"
+                        />
 
                 </androidx.appcompat.widget.LinearLayoutCompat>
 

@@ -5,12 +5,12 @@ plugins {
 }
 
 android {
-    compileSdk 31
+    compileSdk 30
 
     defaultConfig {
         applicationId "com.app.ride"
         minSdk 21
-        targetSdk 31
+        targetSdk 30
         versionCode 1
         versionName "1.0"
 
@@ -100,4 +100,7 @@ dependencies {
     implementation 'com.google.android.gms:play-services-mlkit-text-recognition:17.0.0'
     implementation 'com.google.firebase:firebase-core:16.0.6'
     implementation 'com.google.firebase:firebase-ml-vision:18.0.2'
+
+    implementation 'com.razorpay:checkout:1.6.12'
+
 }

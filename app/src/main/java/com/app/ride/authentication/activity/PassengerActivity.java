@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -36,6 +37,10 @@ import com.paypal.android.sdk.payments.PayPalPayment;
 import com.paypal.android.sdk.payments.PayPalService;
 import com.paypal.android.sdk.payments.PaymentActivity;
 import com.paypal.android.sdk.payments.PaymentConfirmation;
+import com.razorpay.Checkout;
+import com.razorpay.PaymentResultListener;
+
+import org.json.JSONObject;
 
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
@@ -44,12 +49,12 @@ import java.util.HashMap;
 import java.util.Locale;
 
 
-public class PassengerActivity extends AppCompatActivity implements View.OnClickListener {
+public class PassengerActivity extends AppCompatActivity implements View.OnClickListener, PaymentResultListener {
     AppCompatTextView tvDateOfJourney;
     RadioGroup radioGrpPets, radioGrpLuggage;
     String selectedStartPlace, selectedEndPlace, selectedDate = "";
     RadioButton selectPet, selectLuggage;
-    AppCompatButton btnSubmit, btnDelete, btnChat;
+    AppCompatButton btnSubmit, btnDelete, btnChat, btnPay;
     String[] country = {"India", "USA", "China", "Japan", "Other"};
     Globals globals;
     PassengerRequestModel model;
@@ -68,6 +73,9 @@ public class PassengerActivity extends AppCompatActivity implements View.OnClick
     }
 
     private void initView() {
+
+        Checkout.preload(getApplicationContext());
+
         globals = new Globals();
         tvDateOfJourney = findViewById(R.id.tvDateOfJourney);
         radioGrpPets = findViewById(R.id.radioGrpPets);
@@ -75,6 +83,7 @@ public class PassengerActivity extends AppCompatActivity implements View.OnClick
         btnSubmit = findViewById(R.id.btnSubmit);
         btnDelete = findViewById(R.id.btnDelete);
         btnChat = findViewById(R.id.btnChat);
+        btnPay = findViewById(R.id.btnPay);
         ivBack = findViewById(R.id.ivBack);
         ivBack.setVisibility(View.VISIBLE);
 
@@ -82,6 +91,7 @@ public class PassengerActivity extends AppCompatActivity implements View.OnClick
         btnSubmit.setOnClickListener(this);
         ivBack.setOnClickListener(this);
         btnChat.setOnClickListener(this);
+        btnPay.setOnClickListener(this);
         /*config = new PayPalConfiguration().environment(PayPalConfiguration.ENVIRONMENT_SANDBOX).acceptCreditCards(true).
                 clientId("AaTa8QSjo4-22iYzx60thgiqSvlCu0qPmX-H51M9QCpFIu9Rqak1J9S7IJtN2FxzExWoIyRGC0yzB2og");*/
         config = new PayPalConfiguration().environment(PayPalConfiguration.ENVIRONMENT_SANDBOX).
@@ -284,14 +294,19 @@ public class PassengerActivity extends AppCompatActivity implements View.OnClick
 
 
                 break;
+
+            case R.id.btnPay:
+                startPayment();
+                break;
+
             case R.id.btnChat:
-               /* if (btnChat.getText().toString().equals(getResources().getString(R.string.request_list))) {
+                if (btnChat.getText().toString().equals(getResources().getString(R.string.request_list))) {
                     redirectToChatListScreen();
                 } else {
                     redirectToChatScreen();
-                }*/
+                }
 
-                onInitPayPal();
+//                onInitPayPal();
 
                 break;
 
@@ -299,11 +314,46 @@ public class PassengerActivity extends AppCompatActivity implements View.OnClick
 
     }
 
+
+    public void startPayment() {
+        /*
+          You need to pass current activity in order to let Razorpay create CheckoutActivity
+         */
+        final Activity activity = this;
+
+        final Checkout co = new Checkout();
+
+        try {
+            JSONObject options = new JSONObject();
+            options.put("name", "RIDE");
+            options.put("description", "Ride Charges");
+            options.put("send_sms_hash", true);
+            options.put("allow_rotation", true);
+            //You can omit the image option to fetch the image from dashboard
+            options.put("image", "https://s3.amazonaws.com/rzp-mobile/images/rzp.png");
+            options.put("currency", "USD");
+            options.put("amount", "100");
+
+            JSONObject preFill = new JSONObject();
+            preFill.put("email", "test@razorpay.com");
+            preFill.put("contact", "9924204267");
+
+            options.put("prefill", preFill);
+
+            co.open(activity, options);
+        } catch (Exception e) {
+            Toast.makeText(activity, "Error in payment: " + e.getMessage(), Toast.LENGTH_SHORT)
+                    .show();
+            e.printStackTrace();
+        }
+    }
+
+
     private void onInitPayPal() {
         Intent intent = new Intent(this, PayPalService.class);
         intent.putExtra(PayPalService.EXTRA_PAYPAL_CONFIGURATION, config);
         startService(intent);
-        PayPalPayment payment = new PayPalPayment(new BigDecimal(1), "EUR", "Test", PayPalPayment.PAYMENT_INTENT_SALE);
+        PayPalPayment payment = new PayPalPayment(new BigDecimal(1), "USD", "Test", PayPalPayment.PAYMENT_INTENT_SALE);
         Intent paymentIntent = new Intent(this, PaymentActivity.class);
         paymentIntent.putExtra(PayPalService.EXTRA_PAYPAL_CONFIGURATION, config);
         paymentIntent.putExtra(PaymentActivity.EXTRA_PAYMENT, payment);
@@ -385,5 +435,29 @@ public class PassengerActivity extends AppCompatActivity implements View.OnClick
 
     private void showMessage(String message) {
         Toast.makeText(PassengerActivity.this, message, Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onPaymentSuccess(String razorpayPaymentID) {
+        try {
+            Toast.makeText(this, "Payment Successful: " + razorpayPaymentID, Toast.LENGTH_SHORT).show();
+            finish();
+        } catch (Exception e) {
+            Log.e("TAG", "Exception in onPaymentSuccess", e);
+        }
+    }
+
+    @Override
+    public void onPaymentError(int code, String response) {
+        try {
+            Toast.makeText(this, "Payment failed: " + code + " " + response, Toast.LENGTH_SHORT).show();
+        } catch (Exception e) {
+            Log.e("TAG", "Exception in onPaymentError", e);
+        }
+    }
+
+    @Override
+    public void onPointerCaptureChanged(boolean hasCapture) {
+
     }
 }

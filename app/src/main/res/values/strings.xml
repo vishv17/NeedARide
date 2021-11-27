@@ -53,6 +53,7 @@
     <string name="err_vehicle">Please enter vehicle number.</string>
     <string name="err_number_seat">Please enter number of seat available.</string>
     <string name="chat">Chat</string>
+    <string name="pay">Pay</string>
     <string name="ride_start">Ride Start</string>
     <string name="enter_phone_no">Enter Phone No.</string>
     <string name="today">Today</string>

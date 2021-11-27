@@ -119,8 +119,11 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()) {
                     if (task.getResult().getDocuments().size() > 0) {
-                        if(isEdit){
+                        if (isEdit) {
                             updateDataBase();
+                        } else {
+                            Intent intent = new Intent(ProfileActivity.this, DashboardActivity.class);
+                            startActivity(intent);
                         }
                         Toast.makeText(ProfileActivity.this, "data already added", Toast.LENGTH_LONG).show();
                         globals.showHideProgress(ProfileActivity.this, false);
@@ -181,12 +184,12 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
     private void updateDataBase() {
         String randomName = FieldValue.serverTimestamp().toString();
 
-        if(profileImage.equals(globals.getUserDetails(this).getProfilePic())){
+        if (profileImage.equals(globals.getUserDetails(this).getProfilePic())) {
             HashMap<String, String> data = new HashMap<>();
             data.put(Constant.RIDE_Firebase_Uid, globals.getFireBaseId());
             data.put(Constant.RIDE_Firebase_FirstName, etName.getText().toString().trim());
             data.put(Constant.RIDE_Firebase_LastName, etLastName.getText().toString().trim());
-            data.put(Constant.RIDE_Firebase_ProfilePic,profileImage);
+            data.put(Constant.RIDE_Firebase_ProfilePic, profileImage);
             UserModel userModel = new UserModel();
             userModel.setUid(globals.getFireBaseId());
             userModel.setFirstName(Globals.getEditTextValue(etName));
@@ -200,7 +203,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
             globals.showHideProgress(ProfileActivity.this, false);
             Intent intent = new Intent(ProfileActivity.this, DashboardActivity.class);
             startActivity(intent);
-        }else {
+        } else {
 
             //upload image
             StorageReference filepath = FirebaseStorage.getInstance().getReference()
