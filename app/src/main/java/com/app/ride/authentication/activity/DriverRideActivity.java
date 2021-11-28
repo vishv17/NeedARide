@@ -72,6 +72,7 @@ public class DriverRideActivity extends AppCompatActivity implements View.OnClic
     String NOTIFICATION_TITLE;
     String NOTIFICATION_MESSAGE;
     String TOPIC;
+    private String requestId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -192,14 +193,19 @@ public class DriverRideActivity extends AppCompatActivity implements View.OnClic
         }
         else
         {
-            if(model.isRideStarted())
+            if(model.isRideStarted() && model.getUid().equals(globals.getFireBaseId()))
             {
                 btnRideStart.setVisibility(View.GONE);
                 btnRideEnd.setVisibility(View.VISIBLE);
             }
-            else
+            else if(model.getUid().equals(globals.getFireBaseId()))
             {
                 btnRideStart.setVisibility(View.VISIBLE);
+                btnRideEnd.setVisibility(View.GONE);
+            }
+            else
+            {
+                btnRideStart.setVisibility(View.GONE);
                 btnRideEnd.setVisibility(View.GONE);
             }
         }
@@ -249,6 +255,11 @@ public class DriverRideActivity extends AppCompatActivity implements View.OnClic
             btnConfirm.setVisibility(View.GONE);
             btnRideStart.setVisibility(View.GONE);
             enableDisableViews(true);
+        }
+        if(intent.hasExtra(Constant.RIDE_REQUEST_ID))
+        {
+            requestId = intent.getStringExtra(Constant.RIDE_REQUEST_ID);
+            Log.e(TAG, "setStatEndPlace: requestId-->"+requestId);
         }
     }
 
@@ -438,6 +449,7 @@ public class DriverRideActivity extends AppCompatActivity implements View.OnClic
                 notifcationBody.put("message", NOTIFICATION_MESSAGE);
                 notifcationBody.put("end", String.valueOf(true));
                 notifcationBody.put(Constant.RIDE_USER_ID, globals.getFireBaseId());
+                notifcationBody.put(Constant.RIDE_REQUEST_ID,requestId);
                 notification.put("to",
                         s);
                 notification.put("data", notifcationBody);
@@ -502,6 +514,7 @@ public class DriverRideActivity extends AppCompatActivity implements View.OnClic
                 notifcationBody.put("message", NOTIFICATION_MESSAGE);
                 notifcationBody.put("end", String.valueOf(false));
                 notifcationBody.put(Constant.RIDE_USER_ID, globals.getFireBaseId());
+                notifcationBody.put(Constant.RIDE_REQUEST_ID,requestId);
             /*notification.put("to",
                     "rvcFda6QMvOH4Gsw8MS83Qq6d9e2");*/
                 notification.put("to",

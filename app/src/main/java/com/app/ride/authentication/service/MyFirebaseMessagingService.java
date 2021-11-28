@@ -56,8 +56,10 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         if(remoteMessage.getData().get("end").equals("true"))
         {
             String riderId = remoteMessage.getData().get(Constant.RIDE_USER_ID);
+            String requestId = remoteMessage.getData().get(Constant.RIDE_REQUEST_ID);
             Intent intent1 = new Intent(this, RatingActivity.class);
             intent1.putExtra(Constant.RIDE_USER_ID,riderId);
+            intent1.putExtra(Constant.RIDE_REQUEST_ID,requestId);
             pendingIntent = PendingIntent.getActivity(this,0,intent1,PendingIntent.FLAG_ONE_SHOT);
         }
         else

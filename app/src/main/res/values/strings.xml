@@ -65,5 +65,6 @@
     <string name="request_list">Request List</string>
     <string name="confirm">Confirm</string>
     <string name="ride_end">Ride End</string>
+    <string name="something_went_wrong">Something Went Wrong, Please Try again later</string>
 
 </resources>

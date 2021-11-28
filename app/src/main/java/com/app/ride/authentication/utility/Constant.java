@@ -32,6 +32,7 @@ public class Constant {
     public static String ACCEPTED_ID = "acceptedId";
     public static String RIDE_STARTED = "rideStarted";
     public static String RIDE_COMPLETED = "rideCompleted";
+    public static String RATING_LIST = "ratingList";
 
     public static String FD_OPPONENT_UID = "OpponentFbId";
 

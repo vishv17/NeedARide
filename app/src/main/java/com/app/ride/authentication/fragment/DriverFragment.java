@@ -21,6 +21,7 @@ import com.app.ride.authentication.adapter.DriverRideListAdapter;
 import com.app.ride.authentication.model.DriverRequestModel;
 import com.app.ride.authentication.utility.Constant;
 import com.app.ride.authentication.utility.Globals;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
@@ -70,11 +71,21 @@ public class DriverFragment extends Fragment {
 
                         return;
                     } else {
-                        List<DriverRequestModel> downloadInfoList = value.toObjects(DriverRequestModel.class);
+                        // TODO: 11/28/2021 Commented for adding RequestID also in the datamodel
+                        /*List<DriverRequestModel> downloadInfoList = value.toObjects(DriverRequestModel.class);
                         // Add all to your list
                         dataList = new ArrayList<DriverRequestModel>();
                         for (int i = 0; i < downloadInfoList.size(); i++) {
                             dataList.add(downloadInfoList.get(i));
+                        }*/
+
+                        List<DocumentSnapshot> documentSnapshotList = value.getDocuments();
+                        dataList = new ArrayList<DriverRequestModel>();
+                        for(DocumentSnapshot d : documentSnapshotList)
+                        {
+                            DriverRequestModel driverRequestModel = d.toObject(DriverRequestModel.class);
+                            driverRequestModel.setRequestId(d.getId());
+                            dataList.add(driverRequestModel);
                         }
 
 //                    dataList.addAll(downloadInfoList);
@@ -83,6 +94,7 @@ public class DriverFragment extends Fragment {
                             public void onEditClick(DriverRequestModel model) {
                                 Intent intent = new Intent(context, DriverRideActivity.class);
                                 intent.putExtra("DATA", model);
+                                intent.putExtra(Constant.RIDE_REQUEST_ID,model.getRequestId());
                                 startActivity(intent);
                             }
                         });

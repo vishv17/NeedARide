@@ -1,14 +1,35 @@
 package com.app.ride.authentication.model;
 
+import com.google.firebase.firestore.IgnoreExtraProperties;
+
 import java.io.Serializable;
 import java.util.List;
 
+@IgnoreExtraProperties
 public class DriverRequestModel implements Serializable {
     String LuggageAllow,PetsAllow,Uid,costPerSeat,dateOfJourney,endPlace,startPlace,
             vehicleNumber,driverId,name;
     int    seatAvailable;
     boolean rideCompleted,rideStarted;
     List<String> acceptedId;
+    List<RatingModel> ratingList;
+    private String requestId;
+
+    public String getRequestId() {
+        return requestId;
+    }
+
+    public void setRequestId(String requestId) {
+        this.requestId = requestId;
+    }
+
+    public List<RatingModel> getRatingList() {
+        return ratingList;
+    }
+
+    public void setRatingList(List<RatingModel> ratingList) {
+        this.ratingList = ratingList;
+    }
 
     public boolean isRideCompleted() {
         return rideCompleted;
