@@ -62,6 +62,7 @@ public class PassengerActivity extends AppCompatActivity implements View.OnClick
     private AppCompatImageView ivBack;
     int PAYPAL_REQUEST_CODE = 123;
     PayPalConfiguration config;
+    private AppCompatButton btnConfirm;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,6 +86,7 @@ public class PassengerActivity extends AppCompatActivity implements View.OnClick
         btnChat = findViewById(R.id.btnChat);
         btnPay = findViewById(R.id.btnPay);
         ivBack = findViewById(R.id.ivBack);
+        btnConfirm = findViewById(R.id.btnConfirm);
         ivBack.setVisibility(View.VISIBLE);
 
         tvDateOfJourney.setOnClickListener(this);
@@ -92,11 +94,11 @@ public class PassengerActivity extends AppCompatActivity implements View.OnClick
         ivBack.setOnClickListener(this);
         btnChat.setOnClickListener(this);
         btnPay.setOnClickListener(this);
+        btnConfirm.setOnClickListener(this);
         /*config = new PayPalConfiguration().environment(PayPalConfiguration.ENVIRONMENT_SANDBOX).acceptCreditCards(true).
                 clientId("AaTa8QSjo4-22iYzx60thgiqSvlCu0qPmX-H51M9QCpFIu9Rqak1J9S7IJtN2FxzExWoIyRGC0yzB2og");*/
         config = new PayPalConfiguration().environment(PayPalConfiguration.ENVIRONMENT_SANDBOX).
                 clientId("AaTa8QSjo4-22iYzx60thgiqSvlCu0qPmX-H51M9QCpFIu9Rqak1J9S7IJtN2FxzExWoIyRGC0yzB2og");
-
     }
 
     private void setStatEndPlace() {
@@ -138,12 +140,19 @@ public class PassengerActivity extends AppCompatActivity implements View.OnClick
         if (intent.hasExtra("DATA")) {
             model = (PassengerRequestModel) intent.getSerializableExtra("DATA");
             setDataIntoView(model);
+            if (!model.getUid().equals(globals.getFireBaseId())) {
+                btnConfirm.setVisibility(View.VISIBLE);
+            } else {
+                btnConfirm.setVisibility(View.GONE);
+            }
         } else {
             btnSubmit.setVisibility(View.VISIBLE);
             btnChat.setVisibility(View.GONE);
             btnDelete.setVisibility(View.GONE);
+            btnConfirm.setVisibility(View.GONE);
             enableDisableViews(true);
         }
+        btnConfirm.setVisibility(View.GONE);
     }
 
     private void enableDisableViews(boolean enable) {
@@ -309,7 +318,10 @@ public class PassengerActivity extends AppCompatActivity implements View.OnClick
 //                onInitPayPal();
 
                 break;
-
+            case R.id.btnConfirm:
+                Intent intent = new Intent(PassengerActivity.this,RideListActivity.class);
+                startActivity(intent);
+                break;
         }
 
     }

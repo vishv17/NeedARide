@@ -17,6 +17,7 @@
         <entry key="..\:/Freelance/Android/Ride_22_10/Ride_13_0/app/src/main/res/layout/activity_profile.xml" value="0.21927083333333333" />
         <entry key="..\:/Freelance/Android/Ride_22_10/Ride_13_0/app/src/main/res/layout/activity_profile_details.xml" value="0.21510416666666668" />
         <entry key="..\:/Freelance/Android/Ride_22_10/Ride_13_0/app/src/main/res/layout/activity_rating.xml" value="0.21510416666666668" />
+        <entry key="..\:/Freelance/Android/Ride_22_10/Ride_13_0/app/src/main/res/layout/activity_ride_list.xml" value="0.21510416666666668" />
         <entry key="..\:/Freelance/Android/Ride_22_10/Ride_13_0/app/src/main/res/layout/activity_sign_up.xml" value="0.21927083333333333" />
         <entry key="..\:/Freelance/Android/Ride_22_10/Ride_13_0/app/src/main/res/layout/activity_splash.xml" value="0.21927083333333333" />
         <entry key="..\:/Freelance/Android/Ride_22_10/Ride_13_0/app/src/main/res/layout/activity_upload_driver_doc.xml" value="0.21927083333333333" />
@@ -42,7 +43,7 @@
       </map>
     </option>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" project-jdk-name="1.8" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="1.8" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/build/classes" />
   </component>
   <component name="ProjectType">

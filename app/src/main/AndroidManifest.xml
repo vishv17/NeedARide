@@ -19,6 +19,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SplashActivity">
         <activity
+            android:name=".authentication.activity.RideListActivity"
+            android:exported="true" />
+        <activity
             android:name=".authentication.activity.RatingActivity"
             android:exported="true" />
         <activity
@@ -74,7 +77,7 @@
         </activity>
         <activity
             android:name=".authentication.activity.MessageListActivity"
-            android:exported="true"></activity>
+            android:exported="true" />
 
         <meta-data
             android:name="preloaded_fonts"
@@ -98,13 +101,10 @@
 
         <activity android:name="com.paypal.android.sdk.payments.LoginActivity" />
         <activity android:name="com.paypal.android.sdk.payments.PaymentMethodActivity" />
-        <activity android:name="com.paypal.android.sdk.payments.PaymentConfirmActivity" />
-
-        <!-- Add your API key here -->
+        <activity android:name="com.paypal.android.sdk.payments.PaymentConfirmActivity" /> <!-- Add your API key here -->
         <meta-data
             android:name="com.razorpay.ApiKey"
-            android:value="rzp_test_FoZg0lpxBLKRgF"
-            />
+            android:value="rzp_test_FoZg0lpxBLKRgF" />
         <meta-data
             android:name="com.google.android.gms.wallet.api.enabled"
             android:value="true" />

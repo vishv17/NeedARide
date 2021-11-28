@@ -66,5 +66,6 @@
     <string name="confirm">Confirm</string>
     <string name="ride_end">Ride End</string>
     <string name="something_went_wrong">Something Went Wrong, Please Try again later</string>
+    <string name="no_records_to_display">No Records to Display</string>
 
 </resources>
