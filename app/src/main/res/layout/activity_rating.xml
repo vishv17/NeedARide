@@ -46,14 +46,12 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:layout_margin="@dimen/_10sdp"
-            >
+            android:layout_margin="@dimen/_10sdp">
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Rating"
-                />
+                android:text="Rating" />
 
             <RatingBar
                 android:id="@+id/rating"
@@ -73,8 +71,7 @@
             android:textSize="@dimen/_15ssp"
             android:layout_marginTop="@dimen/_10sdp"
             android:layout_marginStart="@dimen/_10sdp"
-            android:layout_marginEnd="@dimen/_10sdp"
-            />
+            android:layout_marginEnd="@dimen/_10sdp" />
     </androidx.appcompat.widget.LinearLayoutCompat>
 
 </androidx.appcompat.widget.LinearLayoutCompat>

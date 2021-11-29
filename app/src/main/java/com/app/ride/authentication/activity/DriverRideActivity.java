@@ -132,6 +132,9 @@ public class DriverRideActivity extends AppCompatActivity implements View.OnClic
         btnDelete.setOnClickListener(this);
         btnChat.setOnClickListener(this);
         ivBack.setOnClickListener(this);
+
+
+
     }
 
     private void setDataIntoView(DriverRequestModel model) {
@@ -249,6 +252,7 @@ public class DriverRideActivity extends AppCompatActivity implements View.OnClic
         if (intent.hasExtra("DATA")) {
             model = (DriverRequestModel) intent.getSerializableExtra("DATA");
             setDataIntoView(model);
+            enableDisableViews(!(model.isRideStarted()));
         } else {
             btnDelete.setVisibility(View.GONE);
             btnChat.setVisibility(View.GONE);
@@ -262,6 +266,7 @@ public class DriverRideActivity extends AppCompatActivity implements View.OnClic
             Log.e(TAG, "setStatEndPlace: requestId-->"+requestId);
         }
     }
+
 
     private void enableDisableViews(boolean enable) {
         tvDateOfJourney.setEnabled(enable);

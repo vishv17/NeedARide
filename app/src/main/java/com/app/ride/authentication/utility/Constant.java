@@ -37,7 +37,9 @@ public class Constant {
     public static String FD_OPPONENT_UID = "OpponentFbId";
 
     public static String RISE_CONVERSATION_TABLE = "Conversation";
+    public static String RISE_PAYMENT = "Payment";
     public static String RISE_MESSAGE_TABLE = "Messages";
+    public static String RISE_Payment_info = "PaymentInfo";
 
     public static String RISE_CREATED_AT = "createdAt";
     public static String DATE_FORMAT_yyyy_MM_dd_hh_mm_ss_a = "yyyy-MM-dd hh:mm:ss a";
@@ -51,6 +53,7 @@ public class Constant {
     public static String RIDE_USER_ID = "userIds";
     public static String RIDE_CONVERSATION_KEY = "conversationKey";
     public static String RIDE_LAST_MESSAGE = "lastMessage";
+    public static String RIDE_rent = "Rent";
 
 
     public static String RIDE_EDIT = "EDIT";

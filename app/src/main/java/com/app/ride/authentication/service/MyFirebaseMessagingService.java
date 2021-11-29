@@ -62,8 +62,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             intent1.putExtra(Constant.RIDE_REQUEST_ID,requestId);
             pendingIntent = PendingIntent.getActivity(this,0,intent1,PendingIntent.FLAG_ONE_SHOT);
         }
-        else
-        {
+        else {
             pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_ONE_SHOT);
         }
         Bitmap largeIcon = BitmapFactory.decodeResource(getResources(), R.drawable.ic_notification);

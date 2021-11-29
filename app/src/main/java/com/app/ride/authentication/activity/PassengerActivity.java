@@ -145,6 +145,7 @@ public class PassengerActivity extends AppCompatActivity implements View.OnClick
             } else {
                 btnConfirm.setVisibility(View.GONE);
             }
+            enableDisableViews(!(model.getRideStarted()));
         } else {
             btnSubmit.setVisibility(View.VISIBLE);
             btnChat.setVisibility(View.GONE);
@@ -241,7 +242,7 @@ public class PassengerActivity extends AppCompatActivity implements View.OnClick
             case R.id.btnSubmit: {
                 if (valid()) {
                     globals.showHideProgress(PassengerActivity.this, true);
-                    HashMap<String, String> data = new HashMap<>();
+                    HashMap<String, Object> data = new HashMap<>();
                     data.put(Constant.RIDE_Firebase_Uid, globals.getFireBaseId());
                     data.put(Constant.RIDE_DATE_OF_JOURNEY, selectedDate);
                     data.put(Constant.RIDE_START_PLACE, selectedStartPlace);
@@ -260,6 +261,7 @@ public class PassengerActivity extends AppCompatActivity implements View.OnClick
                     // find the radiobutton by returned id
                     selectLuggage = (RadioButton) findViewById(selectedIdLuggage);
                     data.put(Constant.RIDE_luggage_allow, selectLuggage.getText().toString());
+                    data.put(Constant.RIDE_STARTED,false);
 
                     if (model != null && btnSubmit.getText().toString().equals(getResources().getString(R.string.text_update))) {
                         FirebaseFirestore.getInstance().collection(Constant.RIDE_passenger_request).whereEqualTo(Constant.RIDE_passenger_Uid, model.getPassengerId()).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -274,7 +276,6 @@ public class PassengerActivity extends AppCompatActivity implements View.OnClick
                                         finish();
                                     }
                                 }
-
                             }
                         });
                     } else {
@@ -300,8 +301,6 @@ public class PassengerActivity extends AppCompatActivity implements View.OnClick
 
             case R.id.btnDelete:
                 deletePassengerRequest();
-
-
                 break;
 
             case R.id.btnPay:
@@ -314,8 +313,7 @@ public class PassengerActivity extends AppCompatActivity implements View.OnClick
                 } else {
                     redirectToChatScreen();
                 }
-
-//                onInitPayPal();
+                // onInitPayPal();
 
                 break;
             case R.id.btnConfirm:
@@ -323,7 +321,6 @@ public class PassengerActivity extends AppCompatActivity implements View.OnClick
                 startActivity(intent);
                 break;
         }
-
     }
 
 

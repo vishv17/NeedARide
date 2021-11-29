@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 public class PassengerRequestModel implements Serializable {
     String LuggageAllow,PetsAllow,Uid,dateOfJourney,endPlace,startPlace,passengerId,name;
+    Boolean rideStarted;
 
     public String getName() {
         return name;
@@ -13,7 +14,7 @@ public class PassengerRequestModel implements Serializable {
         this.name = name;
     }
 
-    public PassengerRequestModel(String luggageAllow, String petsAllow, String uid, String dateOfJourney, String endPlace, String startPlace, String passengerId, String name) {
+    public PassengerRequestModel(String luggageAllow, String petsAllow, String uid, String dateOfJourney, String endPlace, String startPlace, String passengerId, String name,Boolean rideStarted) {
         LuggageAllow = luggageAllow;
         PetsAllow = petsAllow;
         Uid = uid;
@@ -22,6 +23,15 @@ public class PassengerRequestModel implements Serializable {
         this.startPlace = startPlace;
         this.passengerId = passengerId;
         this.name = name;
+        this.rideStarted = rideStarted;
+    }
+
+    public Boolean getRideStarted() {
+        return rideStarted;
+    }
+
+    public void setRideStarted(Boolean rideStarted) {
+        this.rideStarted = rideStarted;
     }
 
     public String getPassengerId() {
