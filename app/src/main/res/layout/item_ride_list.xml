@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:cardCornerRadius="@dimen/_3sdp"
+    android:layout_margin="@dimen/_5sdp"
+    app:cardElevation="@dimen/_3sdp"
+    >
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="@dimen/_5sdp"
+        >
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/txtStartPlace"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Start Place"
+            android:textColor="@color/black"
+            android:textSize="@dimen/_14ssp"
+            />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/txtEndPlace"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="End Place"
+            android:textColor="@color/black"
+            android:textSize="@dimen/_14ssp"
+            android:layout_marginTop="@dimen/_3sdp"
+            />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/txtAvailableSeat"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Available Seat"
+            android:textColor="@color/black"
+            android:textSize="@dimen/_14ssp"
+            android:layout_marginTop="@dimen/_3sdp"
+            />
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/txtPrice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Price"
+            android:textColor="@color/black"
+            android:textSize="@dimen/_14ssp"
+            android:layout_marginTop="@dimen/_3sdp"
+            />
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+</androidx.cardview.widget.CardView>

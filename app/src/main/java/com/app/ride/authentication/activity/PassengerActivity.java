@@ -153,7 +153,7 @@ public class PassengerActivity extends AppCompatActivity implements View.OnClick
             btnConfirm.setVisibility(View.GONE);
             enableDisableViews(true);
         }
-        btnConfirm.setVisibility(View.GONE);
+//        btnConfirm.setVisibility(View.GONE);
     }
 
     private void enableDisableViews(boolean enable) {
@@ -318,6 +318,8 @@ public class PassengerActivity extends AppCompatActivity implements View.OnClick
                 break;
             case R.id.btnConfirm:
                 Intent intent = new Intent(PassengerActivity.this,RideListActivity.class);
+                intent.putExtra(Constant.RIDE_Firebase_Uid,globals.getFireBaseId());
+                intent.putExtra(Constant.RIDE_passenger_Uid,model.getPassengerId());
                 startActivity(intent);
                 break;
         }

@@ -34,10 +34,12 @@ import com.app.ride.authentication.utility.MySingleton;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.SetOptions;
+import com.google.firebase.ktx.Firebase;
 import com.google.firebase.messaging.FirebaseMessaging;
 
 import org.json.JSONObject;
@@ -433,6 +435,36 @@ public class DriverRideActivity extends AppCompatActivity implements View.OnClic
                                     sendNotificationforEndRide();
                                 }
                             }
+
+                            HashMap<String,Object> hashMap = new HashMap<>();
+//                            hashMap.put(Constant.RIDE_ID,requestId);
+                            if(status)
+                            {
+                                hashMap.put(Constant.RIDE_STARTED,true);
+                            }
+                            else {
+                                hashMap.put(Constant.RIDE_STARTED,false);
+                            }
+
+                            FirebaseFirestore.getInstance()
+                                    .collection(Constant.RIDE_passenger_request)
+                                    .whereEqualTo(Constant.RIDE_ID,requestId)
+                                    .get()
+                                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                            if(task.isSuccessful())
+                                            {
+                                                for(QueryDocumentSnapshot documentSnapshot : task.getResult())
+                                                {
+                                                    FirebaseFirestore.getInstance()
+                                                            .collection(Constant.RIDE_passenger_request)
+                                                            .document(documentSnapshot.getId())
+                                                            .set(hashMap);
+                                                }
+                                            }
+                                        }
+                                    });
                         } else {
                             globals.showHideProgress(DriverRideActivity.this, false);
                             Toast.makeText(DriverRideActivity.this, "Error Occured while Updating Data", Toast.LENGTH_SHORT).show();
