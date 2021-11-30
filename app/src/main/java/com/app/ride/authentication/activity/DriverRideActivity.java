@@ -61,8 +61,7 @@ public class DriverRideActivity extends AppCompatActivity implements View.OnClic
     String selectedStartPlace, selectedEndPlace, selectedDate = "";
     RadioButton selectPet, selectLuggage;
     AppCompatButton btnSubmit, btnDelete, btnChat, btnRideStart, btnConfirm, btnRideEnd;
-    Spinner spStartPlace, spEndPlace;
-    String[] country = {"India", "USA", "China", "Japan", "Other"};
+    AppCompatEditText spStartPlace, spEndPlace;
     Globals globals;
     DriverRequestModel model;
     private static final String TAG = "DriverRideActivity";
@@ -148,20 +147,10 @@ public class DriverRideActivity extends AppCompatActivity implements View.OnClic
         etCostPerSeat.setText(model.getCostPerSeat());
         selectedStartPlace = model.getStartPlace();
 
-        for (int i = 0; i < spStartPlace.getCount(); i++) {
-            if (spStartPlace.getItemAtPosition(i).equals(selectedStartPlace)) {
-                spStartPlace.setSelection(i);
-                break;
-            }
-        }
-
+        spStartPlace.setText(selectedStartPlace);
         selectedEndPlace = model.getEndPlace();
-        for (int i = 0; i < spEndPlace.getCount(); i++) {
-            if (spEndPlace.getItemAtPosition(i).equals(selectedEndPlace)) {
-                spEndPlace.setSelection(i);
-                break;
-            }
-        }
+
+        spEndPlace.setText(selectedEndPlace);
 
         radioGrpLuggage.check(model.getLuggageAllow().equals(getResources().getString(R.string.text_yes)) ? R.id.radioYesLuggage : R.id.radioNoLuggage);
         radioGrpPets.check(model.getPetsAllow().equals(getResources().getString(R.string.text_yes)) ? R.id.radioYes : R.id.radioNo);
@@ -217,38 +206,11 @@ public class DriverRideActivity extends AppCompatActivity implements View.OnClic
     }
 
     private void setStatEndPlace() {
-        spStartPlace = (Spinner) findViewById(R.id.spStartPlace);
-        spStartPlace.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
-                selectedStartPlace = adapterView.getSelectedItem().toString();
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-
-            }
-        });
-        ArrayAdapter<? extends String> aa = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, country);
-        aa.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spStartPlace.setAdapter(aa);
+        spStartPlace = (AppCompatEditText) findViewById(R.id.spStartPlace);
 
 
-        spEndPlace = (Spinner) findViewById(R.id.spEndPlace);
-        spEndPlace.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
-                selectedEndPlace = adapterView.getSelectedItem().toString();
-            }
 
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-
-            }
-        });
-        ArrayAdapter<? extends String> endAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, country);
-        endAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spEndPlace.setAdapter(endAdapter);
+        spEndPlace = (AppCompatEditText) findViewById(R.id.spEndPlace);
 
         Intent intent = getIntent();
         if (intent.hasExtra("DATA")) {
@@ -317,8 +279,8 @@ public class DriverRideActivity extends AppCompatActivity implements View.OnClic
                     HashMap<String, Object> data = new HashMap<>();
                     data.put(Constant.RIDE_Firebase_Uid, globals.getFireBaseId());
                     data.put(Constant.RIDE_DATE_OF_JOURNEY, selectedDate);
-                    data.put(Constant.RIDE_START_PLACE, selectedStartPlace);
-                    data.put(Constant.RIDE_END_PLACE, selectedEndPlace);
+                    data.put(Constant.RIDE_START_PLACE, spStartPlace.getText().toString());
+                    data.put(Constant.RIDE_END_PLACE, spEndPlace.getText().toString());
                     data.put(Constant.RIDE_vehicle_number, etVehicleNumber.getText().toString());
                     data.put(Constant.RIDE_seat_available, etNumberOfSeatAvailable.getText().toString());
                     data.put(Constant.RIDE_cost_per_seat, etCostPerSeat.getText().toString());

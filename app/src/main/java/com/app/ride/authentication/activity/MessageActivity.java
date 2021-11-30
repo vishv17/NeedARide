@@ -5,7 +5,6 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 import android.view.View;
-import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -13,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatEditText;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.appcompat.widget.AppCompatTextView;
+import androidx.appcompat.widget.LinearLayoutCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -22,7 +22,6 @@ import com.app.ride.authentication.model.MessageModel;
 import com.app.ride.authentication.utility.Constant;
 import com.app.ride.authentication.utility.DateTimeUtil;
 import com.app.ride.authentication.utility.Globals;
-import com.app.ride.authentication.utility.PaginationProgressBarAdapter;
 import com.app.ride.authentication.utility.VerticalSpaceChatItemDecoration;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -47,7 +46,7 @@ public class MessageActivity extends AppCompatActivity {
     AppCompatEditText etMessage;
     AppCompatTextView tvTitle;
     AppCompatImageView ivSend;
-    ProgressBar progressbar;
+    LinearLayoutCompat liProgress;
 
     private ChatListAdapter adapter;
 
@@ -83,7 +82,7 @@ public class MessageActivity extends AppCompatActivity {
         etMessage = findViewById(R.id.etMessage);
         ivSend = findViewById(R.id.ivSend);
         tvTitle = findViewById(R.id.tvTitle);
-        progressbar = findViewById(R.id.progressbar);
+//        liProgress = (LinearLayoutCompat) findViewById(R.id.liProgress);
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
 
         //opponent Firebase id
@@ -157,7 +156,7 @@ public class MessageActivity extends AppCompatActivity {
         })
                 .setLoadingTriggerThreshold(1)
                 .addLoadingListItem(true)
-                .setLoadingListItemCreator(new PaginationProgressBarAdapter())
+//                .setLoadingListItemCreator(new PaginationProgressBarAdapter())
                 .setLoadingListItemSpanSizeLookup(new LoadingListItemSpanLookup() {
                     @Override
                     public int getSpanSize() {
@@ -171,7 +170,9 @@ public class MessageActivity extends AppCompatActivity {
         if (adapter != null && count <= PAGE_COUNT_ITEMS) {
             adapter.cleanup();
         }
-        progressbar.setVisibility(View.VISIBLE);
+//        progressbar.setVisibility(View.VISIBLE);
+        globals.showHideProgress(MessageActivity.this, true);
+
 
         FirebaseFirestore.getInstance()
                 .collection(Constant.RISE_CONVERSATION_TABLE).document(requestId)
@@ -180,8 +181,16 @@ public class MessageActivity extends AppCompatActivity {
             @Override
             public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
                 loading = false;
-                progressbar.setVisibility(View.GONE);
+                globals.showHideProgress(MessageActivity.this, false);
 
+//                runOnUiThread(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        if(progressbar.getVisibility() == View.VISIBLE) {
+//                progressbar.setVisibility(View.INVISIBLE);
+//                        }
+//                    }
+//                });
                 if (value != null && value.getDocuments().size() > 0) {
                     messagesArrayList = new ArrayList<MessageModel>();
                     for (DocumentSnapshot snapshot : value.getDocuments()) {
@@ -217,15 +226,15 @@ public class MessageActivity extends AppCompatActivity {
             }
         });
 
-        progressbar.setVisibility(View.GONE);
+//        progressbar.setVisibility(View.GONE);
     }
 
 
     private void loadNextMessages() {
         loading = true;
         if (lastVisible != null) {
-            progressbar.setVisibility(View.VISIBLE);
-
+//            liProgress.setVisibility(View.VISIBLE);
+            globals.showHideProgress(MessageActivity.this, true);
             Query query = FirebaseFirestore.getInstance()
                     .collection(Constant.RISE_CONVERSATION_TABLE)
                     .document(requestId)
@@ -236,6 +245,19 @@ public class MessageActivity extends AppCompatActivity {
                 @Override
                 public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
                     loading = false;
+                    globals.showHideProgress(MessageActivity.this, false);
+/*
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                liProgress.setVisibility(View.INVISIBLE);
+
+                            }catch (Exception e){
+                                Log.e("TAG","EXCEPTION IS ---> "+e.getMessage());
+                            }
+                        }
+                    });*/
                     if (value != null) {
                         messagesArrayList = new ArrayList<MessageModel>();
                         for (DocumentSnapshot snapshot : value.getDocuments()) {
@@ -260,7 +282,9 @@ public class MessageActivity extends AppCompatActivity {
                     adapter.doRefresh(messagesArrayList);
                 }
             });
-            progressbar.setVisibility(View.GONE);
+
+
+//  progressbar.setVisibility(View.GONE);
 
         }
     }
@@ -275,7 +299,7 @@ public class MessageActivity extends AppCompatActivity {
 
         HashMap<String, Object> mapConversation = new HashMap<String, Object>();
         mapConversation.put(Constant.RIDE_UPDATED_AT, String.valueOf(new DateTimeUtil().getCurrentUTCTimeStampForChat()));
-        if(receiverName == null){
+        if (receiverName == null) {
             receiverName = "";
         }
         mapConversation.put(Constant.RIDE_USER_NAME, receiverName);

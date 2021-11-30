@@ -62,10 +62,10 @@
                 android:textSize="@dimen/_12sdp"
                 app:layout_constraintTop_toBottomOf="@+id/tvDateOfJourney" />
 
-            <androidx.appcompat.widget.AppCompatSpinner
+            <androidx.appcompat.widget.AppCompatEditText
                 android:id="@+id/spStartPlace"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/_30sdp"
+                android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/_20sdp"
                 android:layout_marginTop="@dimen/_10sdp"
                 android:layout_marginEnd="@dimen/_20sdp"
@@ -83,10 +83,10 @@
                 android:textSize="@dimen/_12sdp"
                 app:layout_constraintTop_toBottomOf="@+id/spStartPlace" />
 
-            <androidx.appcompat.widget.AppCompatSpinner
+            <androidx.appcompat.widget.AppCompatEditText
                 android:id="@+id/spEndPlace"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/_30sdp"
+                android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/_20sdp"
                 android:layout_marginTop="@dimen/_10sdp"
                 android:layout_marginEnd="@dimen/_20sdp"

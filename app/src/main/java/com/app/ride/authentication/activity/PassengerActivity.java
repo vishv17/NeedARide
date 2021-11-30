@@ -6,18 +6,15 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
+import androidx.appcompat.widget.AppCompatEditText;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.appcompat.widget.AppCompatTextView;
 
@@ -32,17 +29,11 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.SetOptions;
-import com.paypal.android.sdk.payments.PayPalConfiguration;
-import com.paypal.android.sdk.payments.PayPalPayment;
-import com.paypal.android.sdk.payments.PayPalService;
-import com.paypal.android.sdk.payments.PaymentActivity;
-import com.paypal.android.sdk.payments.PaymentConfirmation;
 import com.razorpay.Checkout;
 import com.razorpay.PaymentResultListener;
 
 import org.json.JSONObject;
 
-import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -55,13 +46,11 @@ public class PassengerActivity extends AppCompatActivity implements View.OnClick
     String selectedStartPlace, selectedEndPlace, selectedDate = "";
     RadioButton selectPet, selectLuggage;
     AppCompatButton btnSubmit, btnDelete, btnChat, btnPay;
-    String[] country = {"India", "USA", "China", "Japan", "Other"};
     Globals globals;
     PassengerRequestModel model;
-    Spinner spStartPlace, spEndPlace;
+    AppCompatEditText spStartPlace, spEndPlace;
     private AppCompatImageView ivBack;
     int PAYPAL_REQUEST_CODE = 123;
-    PayPalConfiguration config;
     private AppCompatButton btnConfirm;
 
     @Override
@@ -95,45 +84,12 @@ public class PassengerActivity extends AppCompatActivity implements View.OnClick
         btnChat.setOnClickListener(this);
         btnPay.setOnClickListener(this);
         btnConfirm.setOnClickListener(this);
-        /*config = new PayPalConfiguration().environment(PayPalConfiguration.ENVIRONMENT_SANDBOX).acceptCreditCards(true).
-                clientId("AaTa8QSjo4-22iYzx60thgiqSvlCu0qPmX-H51M9QCpFIu9Rqak1J9S7IJtN2FxzExWoIyRGC0yzB2og");*/
-        config = new PayPalConfiguration().environment(PayPalConfiguration.ENVIRONMENT_SANDBOX).
-                clientId("AaTa8QSjo4-22iYzx60thgiqSvlCu0qPmX-H51M9QCpFIu9Rqak1J9S7IJtN2FxzExWoIyRGC0yzB2og");
+
     }
 
     private void setStatEndPlace() {
-        spStartPlace = (Spinner) findViewById(R.id.spStartPlace);
-        spStartPlace.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
-                selectedStartPlace = adapterView.getSelectedItem().toString();
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-
-            }
-        });
-        ArrayAdapter<? extends String> aa = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, country);
-        aa.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spStartPlace.setAdapter(aa);
-
-
-        spEndPlace = (Spinner) findViewById(R.id.spEndPlace);
-        spEndPlace.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
-                selectedEndPlace = adapterView.getSelectedItem().toString();
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-
-            }
-        });
-        ArrayAdapter<? extends String> endAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, country);
-        endAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spEndPlace.setAdapter(endAdapter);
+        spStartPlace = (AppCompatEditText) findViewById(R.id.spStartPlace);
+        spEndPlace = (AppCompatEditText) findViewById(R.id.spEndPlace);
 
 
         Intent intent = getIntent();
@@ -175,21 +131,11 @@ public class PassengerActivity extends AppCompatActivity implements View.OnClick
         selectedDate = model.getDateOfJourney();
         selectedStartPlace = model.getStartPlace();
 
-        for (int i = 0; i < spStartPlace.getCount(); i++) {
-            if (spStartPlace.getItemAtPosition(i).equals(selectedStartPlace)) {
-                spStartPlace.setSelection(i);
-                break;
-            }
-        }
+        spStartPlace.setText(selectedStartPlace);
 
         selectedEndPlace = model.getEndPlace();
-        for (int i = 0; i < spEndPlace.getCount(); i++) {
-            if (spEndPlace.getItemAtPosition(i).equals(selectedEndPlace)) {
-                spEndPlace.setSelection(i);
-                break;
-            }
-        }
 
+        spEndPlace.setText(selectedEndPlace);
 
         if (model.getLuggageAllow().equals(getResources().getString(R.string.text_yes))) {
             radioGrpLuggage.check(R.id.radioYesLuggage);
@@ -245,8 +191,8 @@ public class PassengerActivity extends AppCompatActivity implements View.OnClick
                     HashMap<String, Object> data = new HashMap<>();
                     data.put(Constant.RIDE_Firebase_Uid, globals.getFireBaseId());
                     data.put(Constant.RIDE_DATE_OF_JOURNEY, selectedDate);
-                    data.put(Constant.RIDE_START_PLACE, selectedStartPlace);
-                    data.put(Constant.RIDE_END_PLACE, selectedEndPlace);
+                    data.put(Constant.RIDE_START_PLACE, spStartPlace.getText().toString());
+                    data.put(Constant.RIDE_END_PLACE, spEndPlace.getText().toString());
                     data.put(Constant.RIDE_name, globals.getUserDetails(PassengerActivity.this).getFirstName() + " " +
                             globals.getUserDetails(PassengerActivity.this).getLastName());
 
@@ -313,7 +259,6 @@ public class PassengerActivity extends AppCompatActivity implements View.OnClick
                 } else {
                     redirectToChatScreen();
                 }
-                // onInitPayPal();
 
                 break;
             case R.id.btnConfirm:
@@ -353,49 +298,13 @@ public class PassengerActivity extends AppCompatActivity implements View.OnClick
 
             co.open(activity, options);
         } catch (Exception e) {
-            Toast.makeText(activity, "Error in payment: " + e.getMessage(), Toast.LENGTH_SHORT)
+            Toast.makeText(activity, "Error in Gratuity: " + e.getMessage(), Toast.LENGTH_SHORT)
                     .show();
             e.printStackTrace();
         }
     }
 
 
-    private void onInitPayPal() {
-        Intent intent = new Intent(this, PayPalService.class);
-        intent.putExtra(PayPalService.EXTRA_PAYPAL_CONFIGURATION, config);
-        startService(intent);
-        PayPalPayment payment = new PayPalPayment(new BigDecimal(1), "USD", "Test", PayPalPayment.PAYMENT_INTENT_SALE);
-        Intent paymentIntent = new Intent(this, PaymentActivity.class);
-        paymentIntent.putExtra(PayPalService.EXTRA_PAYPAL_CONFIGURATION, config);
-        paymentIntent.putExtra(PaymentActivity.EXTRA_PAYMENT, payment);
-        startActivityForResult(paymentIntent, PAYPAL_REQUEST_CODE);
-
-    }
-
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == PAYPAL_REQUEST_CODE) {
-
-            switch (resultCode) {
-                case Activity.RESULT_OK: {
-                    PaymentConfirmation confirm = data.getParcelableExtra(PaymentActivity.EXTRA_RESULT_CONFIRMATION);
-                    if (confirm != null) {
-                        Toast.makeText(this, "payment success...", Toast.LENGTH_LONG).show();
-
-                    }
-
-                }
-                break;
-                case Activity.RESULT_CANCELED: {
-                    Toast.makeText(this, "payment fail...", Toast.LENGTH_LONG).show();
-                }
-                break;
-
-            }
-        }
-    }
 
     private void redirectToChatListScreen() {
         Intent intent = new Intent(PassengerActivity.this, MessageListActivity.class);
@@ -451,7 +360,7 @@ public class PassengerActivity extends AppCompatActivity implements View.OnClick
     @Override
     public void onPaymentSuccess(String razorpayPaymentID) {
         try {
-            Toast.makeText(this, "Payment Successful: " + razorpayPaymentID, Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Gratuity Successful: " + razorpayPaymentID, Toast.LENGTH_SHORT).show();
             finish();
         } catch (Exception e) {
             Log.e("TAG", "Exception in onPaymentSuccess", e);
@@ -461,7 +370,7 @@ public class PassengerActivity extends AppCompatActivity implements View.OnClick
     @Override
     public void onPaymentError(int code, String response) {
         try {
-            Toast.makeText(this, "Payment failed: " + code + " " + response, Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Gratuity failed: " + code + " " + response, Toast.LENGTH_SHORT).show();
         } catch (Exception e) {
             Log.e("TAG", "Exception in onPaymentError", e);
         }

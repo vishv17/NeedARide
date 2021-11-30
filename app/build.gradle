@@ -91,10 +91,6 @@ dependencies {
     //pagination
     implementation 'com.github.markomilos:paginate:1.0.0'
 
-    //PayPal Integration
-    implementation 'com.paypal.sdk:paypal-android-sdk:2.16.0' /*exclude group: 'io.card'*/
-    implementation 'io.card:android-sdk:5.5.1'
-
 
     //Firebase text extraction
     implementation 'com.google.android.gms:play-services-mlkit-text-recognition:17.0.0'

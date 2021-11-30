@@ -221,7 +221,7 @@ public class RatingActivity extends AppCompatActivity implements View.OnClickLis
 
             co.open(activity, options);
         } catch (Exception e) {
-            Toast.makeText(activity, "Error in payment: " + e.getMessage(), Toast.LENGTH_SHORT)
+            Toast.makeText(activity, "Error in Gratuity: " + e.getMessage(), Toast.LENGTH_SHORT)
                     .show();
             e.printStackTrace();
         }
@@ -258,7 +258,7 @@ public class RatingActivity extends AppCompatActivity implements View.OnClickLis
     @Override
     public void onPaymentError(int code, String response) {
         try {
-            Toast.makeText(this, "Payment failed: " + code + " " + response, Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Gratuity failed: " + code + " " + response, Toast.LENGTH_SHORT).show();
         } catch (Exception e) {
             Log.e("TAG", "Exception in onPaymentError", e);
         }
