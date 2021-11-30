@@ -22,6 +22,7 @@ import com.app.ride.authentication.model.MessageModel;
 import com.app.ride.authentication.utility.Constant;
 import com.app.ride.authentication.utility.DateTimeUtil;
 import com.app.ride.authentication.utility.Globals;
+import com.app.ride.authentication.utility.PaginationProgressBarAdapter;
 import com.app.ride.authentication.utility.VerticalSpaceChatItemDecoration;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -71,7 +72,6 @@ public class MessageActivity extends AppCompatActivity {
         setContentView(R.layout.activity_message);
         initView();
         setUpRecycleView();
-        setPagination();
         loadFirstPageItems(PAGE_COUNT_ITEMS);
     }
 
@@ -146,6 +146,11 @@ public class MessageActivity extends AppCompatActivity {
 
             @Override
             public boolean isLoading() {
+                if(messagesArrayList.size()==0){
+                    loading = true;
+                }else {
+                    loading = false;
+                }
                 return loading;
             }
 
@@ -154,15 +159,10 @@ public class MessageActivity extends AppCompatActivity {
                 return hasLoaded;
             }
         })
-                .setLoadingTriggerThreshold(1)
+                .setLoadingTriggerThreshold(2)
                 .addLoadingListItem(true)
-//                .setLoadingListItemCreator(new PaginationProgressBarAdapter())
-                .setLoadingListItemSpanSizeLookup(new LoadingListItemSpanLookup() {
-                    @Override
-                    public int getSpanSize() {
-                        return 1;
-                    }
-                }).build();
+                .setLoadingListItemCreator(new PaginationProgressBarAdapter())
+               .build();
 
     }
 
@@ -170,7 +170,6 @@ public class MessageActivity extends AppCompatActivity {
         if (adapter != null && count <= PAGE_COUNT_ITEMS) {
             adapter.cleanup();
         }
-//        progressbar.setVisibility(View.VISIBLE);
         globals.showHideProgress(MessageActivity.this, true);
 
 
@@ -181,22 +180,20 @@ public class MessageActivity extends AppCompatActivity {
             @Override
             public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
                 loading = false;
+
                 globals.showHideProgress(MessageActivity.this, false);
 
-//                runOnUiThread(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        if(progressbar.getVisibility() == View.VISIBLE) {
-//                progressbar.setVisibility(View.INVISIBLE);
-//                        }
-//                    }
-//                });
                 if (value != null && value.getDocuments().size() > 0) {
                     messagesArrayList = new ArrayList<MessageModel>();
                     for (DocumentSnapshot snapshot : value.getDocuments()) {
                         MessageModel message = snapshot.toObject(MessageModel.class);
                         messagesArrayList.add(message);
                     }
+                    if(messagesArrayList.size()==pagePerCount){
+                        setPagination();
+
+                    }
+
                     if (value.getDocuments() != null) {
                         lastVisible = value.getDocuments().get((value.getDocuments().size()) - 1);
 
@@ -233,7 +230,6 @@ public class MessageActivity extends AppCompatActivity {
     private void loadNextMessages() {
         loading = true;
         if (lastVisible != null) {
-//            liProgress.setVisibility(View.VISIBLE);
             globals.showHideProgress(MessageActivity.this, true);
             Query query = FirebaseFirestore.getInstance()
                     .collection(Constant.RISE_CONVERSATION_TABLE)
@@ -246,18 +242,6 @@ public class MessageActivity extends AppCompatActivity {
                 public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
                     loading = false;
                     globals.showHideProgress(MessageActivity.this, false);
-/*
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            try {
-                                liProgress.setVisibility(View.INVISIBLE);
-
-                            }catch (Exception e){
-                                Log.e("TAG","EXCEPTION IS ---> "+e.getMessage());
-                            }
-                        }
-                    });*/
                     if (value != null) {
                         messagesArrayList = new ArrayList<MessageModel>();
                         for (DocumentSnapshot snapshot : value.getDocuments()) {

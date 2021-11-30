@@ -140,8 +140,6 @@ public class VerifyPhoneActivity extends AppCompatActivity implements View.OnCli
                                                 startActivity(intent);
                                                 finish();
                                             }
-
-
                                         } else {
                                             /*Intent intent = new Intent(VerifyPhoneActivity.this, ProfileActivity.class);
                                             startActivity(intent);
