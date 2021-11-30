@@ -422,7 +422,17 @@ public class DriverRideActivity extends AppCompatActivity implements View.OnClic
                                                     FirebaseFirestore.getInstance()
                                                             .collection(Constant.RIDE_passenger_request)
                                                             .document(documentSnapshot.getId())
-                                                            .set(hashMap);
+                                                            .update(data)
+                                                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                                @Override
+                                                                public void onComplete(@NonNull Task<Void> task) {
+
+                                                                }
+                                                            });
+                                                    /*FirebaseFirestore.getInstance()
+                                                            .collection(Constant.RIDE_passenger_request)
+                                                            .document(documentSnapshot.getId())
+                                                            .set(hashMap);*/
                                                 }
                                             }
                                         }
