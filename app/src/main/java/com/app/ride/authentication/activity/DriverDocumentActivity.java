@@ -109,21 +109,24 @@ public class DriverDocumentActivity extends AppCompatActivity implements ExpandC
                 collection(Constant.RIDE_DOC).whereEqualTo(Constant.RIDE_Firebase_Uid, globals.getFireBaseId()).
                 get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
-                DocumentSnapshot documentSnapshot = task.getResult().getDocuments().get(0);
-                if (documentSnapshot.get(Constant.RIDE_DRIVING) != null && !documentSnapshot.get(Constant.RIDE_DRIVING).equals("")) {
-                    drivingLicenseUrl = documentSnapshot.get(Constant.RIDE_DRIVING, String.class);
-                    Glide.with(activity)
-                            .load(documentSnapshot.get(Constant.RIDE_DRIVING))
-                            .placeholder(R.drawable.ic_document)
-                            .into(ivDriving);
-                }
+                if(task.getResult().getDocuments().size()>0) {
+                    DocumentSnapshot documentSnapshot = task.getResult().getDocuments().get(0);
+                    if (documentSnapshot.get(Constant.RIDE_DRIVING) != null && !documentSnapshot.get(Constant.RIDE_DRIVING).equals("")) {
+                        drivingLicenseUrl = documentSnapshot.get(Constant.RIDE_DRIVING, String.class);
+                        Glide.with(activity)
+                                .load(documentSnapshot.get(Constant.RIDE_DRIVING))
+                                .placeholder(R.drawable.ic_document)
+                                .into(ivDriving);
+                    }
 
-                if (documentSnapshot.get(Constant.RIDE_NOC) != null && !documentSnapshot.get(Constant.RIDE_NOC).equals("")) {
-                    nocUrl = documentSnapshot.get(Constant.RIDE_NOC, String.class);
-                    Glide.with(activity)
-                            .load(documentSnapshot.get(Constant.RIDE_NOC))
-                            .placeholder(R.drawable.ic_document)
-                            .into(ivNoc);
+
+                    if (documentSnapshot.get(Constant.RIDE_NOC) != null && !documentSnapshot.get(Constant.RIDE_NOC).equals("")) {
+                        nocUrl = documentSnapshot.get(Constant.RIDE_NOC, String.class);
+                        Glide.with(activity)
+                                .load(documentSnapshot.get(Constant.RIDE_NOC))
+                                .placeholder(R.drawable.ic_document)
+                                .into(ivNoc);
+                    }
                 }
             }
         });

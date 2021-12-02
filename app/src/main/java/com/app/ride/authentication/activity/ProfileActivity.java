@@ -184,7 +184,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
     private void updateDataBase() {
         String randomName = FieldValue.serverTimestamp().toString();
 
-        if (profileImage.equals(globals.getUserDetails(this).getProfilePic())) {
+        if (photoUploadUrl.equals(globals.getUserDetails(this).getProfilePic())) {
             HashMap<String, String> data = new HashMap<>();
             data.put(Constant.RIDE_Firebase_Uid, globals.getFireBaseId());
             data.put(Constant.RIDE_Firebase_FirstName, etName.getText().toString().trim());
@@ -194,7 +194,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
             userModel.setUid(globals.getFireBaseId());
             userModel.setFirstName(Globals.getEditTextValue(etName));
             userModel.setLastName(Globals.getEditTextValue(etLastName));
-            userModel.setProfilePic(profileImage);
+            userModel.setProfilePic(photoUploadUrl);
             globals.setuserDetails(activity, userModel);
 
             FirebaseFirestore.getInstance().collection(Constant.RIDE_USERS)
