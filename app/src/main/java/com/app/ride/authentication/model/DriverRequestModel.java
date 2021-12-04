@@ -13,7 +13,16 @@ public class DriverRequestModel implements Serializable {
     boolean rideCompleted,rideStarted;
     List<String> acceptedId;
     List<RatingModel> ratingList;
+    List<String> acceptedUser;
     private String requestId;
+
+    public List<String> getAcceptedUser() {
+        return acceptedUser;
+    }
+
+    public void setAcceptedUser(List<String> acceptedUser) {
+        this.acceptedUser = acceptedUser;
+    }
 
     public String getRequestId() {
         return requestId;

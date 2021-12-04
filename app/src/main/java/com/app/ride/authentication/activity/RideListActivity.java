@@ -134,6 +134,12 @@ public class RideListActivity extends AppCompatActivity implements RideListAdapt
         if (driverRequestModel.getSeatAvailable() > 0) {
             globals.showHideProgress(activity, true);
             Map<String, Object> data = new HashMap<>();
+            ArrayList<String> acceptedUserList = new ArrayList<>();
+            ArrayList<String> fcmList = new ArrayList<>();
+            acceptedUserList.add(globals.getFireBaseId());
+            fcmList.add(globals.getFCMToken(activity));
+            data.put(Constant.ACCEPTED_USER,acceptedUserList);
+            data.put("acceptedId",fcmList);
             data.put(Constant.RIDE_seat_available, (driverRequestModel.getSeatAvailable() - 1));
             FirebaseFirestore.getInstance()
                     .collection(Constant.RIDE_Driver_request)

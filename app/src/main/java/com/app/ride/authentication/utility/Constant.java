@@ -30,6 +30,7 @@ public class Constant {
     public static String USER = "User";
     public static String TOKEN = "Token";
     public static String ACCEPTED_ID = "acceptedId";
+    public static String ACCEPTED_USER = "acceptedUser";
     public static String RIDE_STARTED = "rideStarted";
     public static String RIDE_COMPLETED = "rideCompleted";
     public static String RATING_LIST = "ratingList";

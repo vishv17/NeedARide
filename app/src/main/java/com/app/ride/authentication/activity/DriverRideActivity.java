@@ -4,11 +4,13 @@ import static com.app.ride.authentication.utility.Constant.ACCEPTED_ID;
 
 import android.app.DatePickerDialog;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.DatePicker;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -17,6 +19,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.AppCompatAutoCompleteTextView;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.AppCompatEditText;
 import androidx.appcompat.widget.AppCompatImageView;
@@ -62,6 +65,7 @@ public class DriverRideActivity extends AppCompatActivity implements View.OnClic
     RadioButton selectPet, selectLuggage;
     AppCompatButton btnSubmit, btnDelete, btnChat, btnRideStart, btnConfirm, btnRideEnd;
     AppCompatEditText spStartPlace, spEndPlace;
+    private AppCompatAutoCompleteTextView autoCompleteStartPlace,autoCompleteEndPlace;
     Globals globals;
     DriverRequestModel model;
     private static final String TAG = "DriverRideActivity";
@@ -74,6 +78,14 @@ public class DriverRideActivity extends AppCompatActivity implements View.OnClic
     String NOTIFICATION_MESSAGE;
     String TOPIC;
     private String requestId;
+    private String[] places = {"Barrie","Belleville","Brampton","Brant","Brantford","Brockville",
+        "Burlington","Cambridge","Clarence-Rockland","Cornwall","Dryden","Elliot Lake","Greater Sudbury",
+        "Guelph","Haldimand County","Hamilton","Kawartha Lakes","Kenora","Kingston","Kitchener","London",
+        "Markham","Mississauga","Niagara Falls","Norfolk County","North Bay","Orillia","Oshawa","Ottawa",
+        "Owen Sound","Pembroke","Peterborough","Pickering","Port Colborne","Prince Edward County",
+        "Quinte West","Richmond Hill","Sarnia","Sault Ste. Marie","St. Catharines","St. Thomas","Stratford",
+        "Temiskaming Shores","Thorold","Thunder Bay","Timmins","Toronto","Vaughan","Waterloo","Welland","Windsor","Woodstock"};
+    private ArrayAdapter<String> startAdaper,endAdaper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -127,6 +139,8 @@ public class DriverRideActivity extends AppCompatActivity implements View.OnClic
         btnRideEnd = findViewById(R.id.btnRideEnd);
         ivBack = findViewById(R.id.ivBack);
         ivBack.setVisibility(View.VISIBLE);
+        autoCompleteStartPlace = findViewById(R.id.autoCompleteStartPlace);
+        autoCompleteEndPlace = findViewById(R.id.autoCompleteEndPlace);
 
         tvDateOfJourney.setOnClickListener(this);
         btnSubmit.setOnClickListener(this);
@@ -147,10 +161,10 @@ public class DriverRideActivity extends AppCompatActivity implements View.OnClic
         etCostPerSeat.setText(model.getCostPerSeat());
         selectedStartPlace = model.getStartPlace();
 
-        spStartPlace.setText(selectedStartPlace);
+        autoCompleteStartPlace.setText(selectedStartPlace);
         selectedEndPlace = model.getEndPlace();
 
-        spEndPlace.setText(selectedEndPlace);
+        autoCompleteEndPlace.setText(selectedEndPlace);
 
         radioGrpLuggage.check(model.getLuggageAllow().equals(getResources().getString(R.string.text_yes)) ? R.id.radioYesLuggage : R.id.radioNoLuggage);
         radioGrpPets.check(model.getPetsAllow().equals(getResources().getString(R.string.text_yes)) ? R.id.radioYes : R.id.radioNo);
@@ -165,12 +179,12 @@ public class DriverRideActivity extends AppCompatActivity implements View.OnClic
             btnSubmit.setVisibility(View.VISIBLE);
             btnDelete.setVisibility(View.VISIBLE);
             btnChat.setVisibility(View.VISIBLE);
-            btnConfirm.setVisibility(View.VISIBLE);
+            btnConfirm.setVisibility(View.GONE);
             btnChat.setText(getResources().getString(R.string.request_list));
             enableDisableViews(true);
         }
         if (model.getAcceptedId() != null) {
-            if (model.getAcceptedId().contains(globals.getFCMToken(DriverRideActivity.this))) {
+            if (model.getAcceptedUser().contains(globals.getFireBaseId())) {
                 btnConfirm.setVisibility(View.GONE);
             } else {
                 btnConfirm.setVisibility(View.VISIBLE);
@@ -207,10 +221,17 @@ public class DriverRideActivity extends AppCompatActivity implements View.OnClic
 
     private void setStatEndPlace() {
         spStartPlace = (AppCompatEditText) findViewById(R.id.spStartPlace);
-
-
-
         spEndPlace = (AppCompatEditText) findViewById(R.id.spEndPlace);
+
+        startAdaper = new ArrayAdapter<>(this, android.R.layout.select_dialog_item,places);
+        autoCompleteStartPlace.setThreshold(2);
+        autoCompleteStartPlace.setAdapter(startAdaper);
+//        autoCompleteStartPlace.setTextColor(Color.RED);
+
+        endAdaper = new ArrayAdapter<>(this, android.R.layout.select_dialog_item,places);
+        autoCompleteEndPlace.setThreshold(2);
+        autoCompleteEndPlace.setAdapter(endAdaper);
+//        autoCompleteEndPlace.setTextColor(Color.RED);
 
         Intent intent = getIntent();
         if (intent.hasExtra("DATA")) {
@@ -279,8 +300,8 @@ public class DriverRideActivity extends AppCompatActivity implements View.OnClic
                     HashMap<String, Object> data = new HashMap<>();
                     data.put(Constant.RIDE_Firebase_Uid, globals.getFireBaseId());
                     data.put(Constant.RIDE_DATE_OF_JOURNEY, selectedDate);
-                    data.put(Constant.RIDE_START_PLACE, spStartPlace.getText().toString());
-                    data.put(Constant.RIDE_END_PLACE, spEndPlace.getText().toString());
+                    data.put(Constant.RIDE_START_PLACE, autoCompleteStartPlace.getText().toString());
+                    data.put(Constant.RIDE_END_PLACE, autoCompleteEndPlace.getText().toString());
                     data.put(Constant.RIDE_vehicle_number, etVehicleNumber.getText().toString());
                     data.put(Constant.RIDE_seat_available, etNumberOfSeatAvailable.getText().toString());
                     data.put(Constant.RIDE_cost_per_seat, etCostPerSeat.getText().toString());
@@ -477,9 +498,12 @@ public class DriverRideActivity extends AppCompatActivity implements View.OnClic
         globals.showHideProgress(DriverRideActivity.this, true);
         HashMap<String, Object> data = new HashMap<>();
         ArrayList<String> fcmList = new ArrayList<>();
+        ArrayList<String> acceptedUserList = new ArrayList<>();
         fcmList.add(globals.getFCMToken(DriverRideActivity.this));
         data.put(Constant.RIDE_seat_available, (model.getSeatAvailable() - 1));
         data.put("acceptedId", fcmList);
+        acceptedUserList.add(globals.getFireBaseId());
+        data.put(Constant.ACCEPTED_USER,acceptedUserList);
 
         FirebaseFirestore.getInstance().collection(Constant.RIDE_Driver_request).
                 whereEqualTo(Constant.RIDE_driver_Uid, model.getDriverId()).get().
