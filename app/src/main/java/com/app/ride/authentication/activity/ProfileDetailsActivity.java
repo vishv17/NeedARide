@@ -92,7 +92,7 @@ public class ProfileDetailsActivity extends AppCompatActivity implements View.On
                 Intent intent2 = new Intent(ProfileDetailsActivity.this,SignUpActivity.class);
                 intent2.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent2);
-                finish();
+                finishAffinity();
                 break;
         }
     }

@@ -25,6 +25,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.app.ride.R;
+import com.app.ride.authentication.model.UserModel;
 import com.app.ride.authentication.utility.Constant;
 import com.app.ride.authentication.utility.Globals;
 import com.bumptech.glide.Glide;
@@ -109,7 +110,7 @@ public class DriverDocumentActivity extends AppCompatActivity implements ExpandC
                 collection(Constant.RIDE_DOC).whereEqualTo(Constant.RIDE_Firebase_Uid, globals.getFireBaseId()).
                 get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
-                if(task.getResult().getDocuments().size()>0) {
+                if (task.getResult().getDocuments().size() > 0) {
                     DocumentSnapshot documentSnapshot = task.getResult().getDocuments().get(0);
                     if (documentSnapshot.get(Constant.RIDE_DRIVING) != null && !documentSnapshot.get(Constant.RIDE_DRIVING).equals("")) {
                         drivingLicenseUrl = documentSnapshot.get(Constant.RIDE_DRIVING, String.class);
@@ -126,6 +127,14 @@ public class DriverDocumentActivity extends AppCompatActivity implements ExpandC
                                 .load(documentSnapshot.get(Constant.RIDE_NOC))
                                 .placeholder(R.drawable.ic_document)
                                 .into(ivNoc);
+                        if(globals.getUserDetails(activity)!=null)
+                        {
+                            UserModel userModel = globals.getUserDetails(activity);
+                            if(userModel.getFirstName()!=null)
+                            {
+                                txtFileName.setText(userModel.getFirstName()+"_NOC");
+                            }
+                        }
                     }
                 }
             }
@@ -539,18 +548,25 @@ public class DriverDocumentActivity extends AppCompatActivity implements ExpandC
                                 @Override
                                 public void onComplete(@NonNull Task<QuerySnapshot> task) {
                                     if (task.isSuccessful()) {
-                                        DocumentSnapshot documentSnapshot = task.getResult().getDocuments().get(0);
-                                        Log.e(TAG, "onComplete: documentSnapShot id-->" + documentSnapshot.getId());
-                                        FirebaseFirestore.getInstance().collection(Constant.RIDE_DRIVER_DOC_DATA).
-                                                document(globals.getFireBaseId()).collection(Constant.RIDE_DOC).
-                                                document(documentSnapshot.getId()).
-                                                update(data).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                            @Override
-                                            public void onSuccess(@NonNull Void unused) {
-                                                Toast.makeText(activity, "Document Updated Successfully", Toast.LENGTH_LONG).show();
-                                                globals.showHideProgress(activity, false);
-                                            }
-                                        });
+                                        if(task.getResult().getDocuments()!=null && task.getResult().getDocuments().size() > 0) {
+                                            DocumentSnapshot documentSnapshot = task.getResult().getDocuments().get(0);
+                                            Log.e(TAG, "onComplete: documentSnapShot id-->" + documentSnapshot.getId());
+                                            FirebaseFirestore.getInstance().collection(Constant.RIDE_DRIVER_DOC_DATA).
+                                                    document(globals.getFireBaseId()).collection(Constant.RIDE_DOC).
+                                                    document(documentSnapshot.getId()).
+                                                    update(data).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                @Override
+                                                public void onSuccess(@NonNull Void unused) {
+                                                    Toast.makeText(activity, "Document Updated Successfully", Toast.LENGTH_LONG).show();
+                                                    globals.showHideProgress(activity, false);
+                                                }
+                                            });
+                                        }
+                                        else
+                                        {
+                                            Toast.makeText(activity, "Document Updated Successfully", Toast.LENGTH_LONG).show();
+                                            globals.showHideProgress(activity, false);
+                                        }
                                     }
                                 }
                             });
@@ -648,14 +664,16 @@ public class DriverDocumentActivity extends AppCompatActivity implements ExpandC
     }
 
     private void replaceDriverLicense() {
-        FirebaseStorage firebaseStorage = FirebaseStorage.getInstance();
-        StorageReference sRef = firebaseStorage.getReferenceFromUrl(drivingLicenseUrl);
-        sRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-            @Override
-            public void onSuccess(@NonNull Void unused) {
-                uploadNewImage();
-            }
-        });
+        if (drivingLicenseUrl != null) {
+            FirebaseStorage firebaseStorage = FirebaseStorage.getInstance();
+            StorageReference sRef = firebaseStorage.getReferenceFromUrl(drivingLicenseUrl);
+            sRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(@NonNull Void unused) {
+                    uploadNewImage();
+                }
+            });
+        }
     }
 
     private void uploadNewImage() {

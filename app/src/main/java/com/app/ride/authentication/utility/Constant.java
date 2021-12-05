@@ -62,4 +62,13 @@ public class Constant {
     public static String RIDE_firstName = "firstName";
     public static String RIDE_lastName = "lastName";
     public static String RIDE_profileImage = "profileImage";
+
+    //list of places
+    public static String[] places = {"Barrie","Belleville","Brampton","Brant","Brantford","Brockville",
+            "Burlington","Cambridge","Clarence-Rockland","Cornwall","Dryden","Elliot Lake","Greater Sudbury",
+            "Guelph","Haldimand County","Hamilton","Kawartha Lakes","Kenora","Kingston","Kitchener","London",
+            "Markham","Mississauga","Niagara Falls","Norfolk County","North Bay","Orillia","Oshawa","Ottawa",
+            "Owen Sound","Pembroke","Peterborough","Pickering","Port Colborne","Prince Edward County",
+            "Quinte West","Richmond Hill","Sarnia","Sault Ste. Marie","St. Catharines","St. Thomas","Stratford",
+            "Temiskaming Shores","Thorold","Thunder Bay","Timmins","Toronto","Vaughan","Waterloo","Welland","Windsor","Woodstock"};
 }

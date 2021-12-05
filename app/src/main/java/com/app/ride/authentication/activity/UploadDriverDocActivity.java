@@ -69,6 +69,7 @@ public class UploadDriverDocActivity extends AppCompatActivity implements View.O
     private static final String TAG = "UploadDriverDocActivity";
     private final int PICK_PDF_CODE = 101;
     private String PATH_FILE = "";
+    private Uri nocUri;
 
     private TextRecognizer textRecognizer;
     private InputImage licenseInputImage;
@@ -182,7 +183,7 @@ public class UploadDriverDocActivity extends AppCompatActivity implements View.O
                                     FirebaseStorage.getInstance().getReference().child(Constant.RIDE_Firebase_DOCUMENT).
                                             child(randomName + ".pdf");
 
-                            filePath.putFile(Uri.fromFile(new File(nocImage))).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                            filePath.putFile(nocUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
                                 @Override
                                 public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
                                     if (task.isSuccessful()) {
@@ -233,8 +234,8 @@ public class UploadDriverDocActivity extends AppCompatActivity implements View.O
     }
 
     private boolean checkDataForLicense() {
-        boolean isValidData = true;
-        Text extractedText = null;
+        final boolean[] isValidData = {true};
+        final Text[] extractedText = {null};
         if (drivingImage != null) {
             Uri licenseImageUri = Uri.fromFile(new File(drivingImage));
             Log.e(TAG, "licenseImageUri: " + licenseImageUri.toString());
@@ -246,6 +247,12 @@ public class UploadDriverDocActivity extends AppCompatActivity implements View.O
                             public void onSuccess(@NonNull Text text) {
                                 Log.e(TAG, "onSuccess: Success->" + text.getText());
 //                                extractedText[0] = text;
+                                if (text!=null) {
+                                    extractedText[0] = text;
+                                    isValidData[0] = validateData(extractedText[0]);
+                                } else {
+                                    isValidData[0] = false;
+                                }
                             }
                         }).addOnFailureListener(new OnFailureListener() {
                             @Override
@@ -261,20 +268,14 @@ public class UploadDriverDocActivity extends AppCompatActivity implements View.O
                                 }*/
                             }
                         });
-                if (result.isSuccessful()) {
-                    extractedText = result.getResult();
-                    isValidData = validateData(extractedText);
-                } else {
-                    isValidData = false;
-                }
             } catch (IOException e) {
                 Log.e(TAG, "checkData: Convert Image to text Error->" + e.getMessage());
                 e.printStackTrace();
             }
 
         }
-        Log.e(TAG, "checkDataForLicense: isValidate->" + String.valueOf(isValidData));
-        return isValidData;
+        Log.e(TAG, "checkDataForLicense: isValidate->" + String.valueOf(isValidData[0]));
+        return isValidData[0];
     }
 
     private boolean validateData(Text text) {
@@ -292,13 +293,6 @@ public class UploadDriverDocActivity extends AppCompatActivity implements View.O
             if (blockCount == 13) {
                 licenseCategory = blockText;
             }
-//            Log.e(TAG, "validateData: License Category -> "+licenseCategory);
-            /*if (licenseCategory.trim().toLowerCase().equals("g1") || licenseCategory.trim().toLowerCase().isEmpty()) {
-                Toast.makeText(UploadDriverDocActivity.this, "Your License is not valid, Please upload a valid License", Toast.LENGTH_SHORT).show();
-                return false;
-            } else {
-                Log.e(TAG, "validateData: license Category->" + licenseCategory.toLowerCase());
-            }*/
             for (Text.Line line : block.getLines()) {
                 String lineText = line.getText();
                 Log.e(TAG, "onSuccess: LineText--->" + lineText);
@@ -307,11 +301,6 @@ public class UploadDriverDocActivity extends AppCompatActivity implements View.O
                 if (lineText.contains("EXPI EXP")) {
                     int elementsSize = line.getElements().size();
                     expDate = line.getElements().get((elementsSize - 1)).getText().toString();
-                    /*boolean dateResult = compareDate(expDate);
-                    if (!dateResult) {
-                        returnResult = false;
-                        break;
-                    }*/
                 }
                 for (Text.Element element : line.getElements()) {
                     String elementText = element.getText();
@@ -320,11 +309,6 @@ public class UploadDriverDocActivity extends AppCompatActivity implements View.O
                     Rect elementFrame = element.getBoundingBox();
                 }
             }
-
-            /*if(!returnResult)
-            {
-                break;
-            }*/
         }
         Log.e(TAG, "License Category:->" + licenseCategory.toLowerCase().trim().toString());
         //If License Category is G1 or Not fetched properly then return as false
@@ -395,6 +379,7 @@ public class UploadDriverDocActivity extends AppCompatActivity implements View.O
                 tvNoc.setVisibility(View.GONE);
                 ivNoc.setVisibility(View.VISIBLE);
                 Uri uri = data.getData();
+                nocUri = data.getData();
                 if(uri != null)
                 {
                     Log.e(TAG, "onActivityResult: URI-->"+uri.toString());

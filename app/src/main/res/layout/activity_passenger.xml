@@ -70,7 +70,19 @@
                 android:layout_marginTop="@dimen/_10sdp"
                 android:layout_marginEnd="@dimen/_20sdp"
                 android:spinnerMode="dropdown"
-                app:layout_constraintTop_toBottomOf="@+id/tvStartPlace" />
+                app:layout_constraintTop_toBottomOf="@+id/tvStartPlace"
+                android:visibility="gone"
+                />
+
+            <androidx.appcompat.widget.AppCompatAutoCompleteTextView
+                android:id="@+id/autoCompleteStartPlace"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@+id/tvStartPlace"
+                android:layout_marginStart="@dimen/_20sdp"
+                android:layout_marginTop="@dimen/_10sdp"
+                android:layout_marginEnd="@dimen/_20sdp"
+                />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/tvEndPlace"
@@ -81,7 +93,7 @@
                 android:layout_marginEnd="@dimen/_20sdp"
                 android:text="@string/text_end_place"
                 android:textSize="@dimen/_12sdp"
-                app:layout_constraintTop_toBottomOf="@+id/spStartPlace" />
+                app:layout_constraintTop_toBottomOf="@+id/autoCompleteStartPlace" />
 
             <androidx.appcompat.widget.AppCompatEditText
                 android:id="@+id/spEndPlace"
@@ -91,7 +103,19 @@
                 android:layout_marginTop="@dimen/_10sdp"
                 android:layout_marginEnd="@dimen/_20sdp"
                 android:spinnerMode="dropdown"
-                app:layout_constraintTop_toBottomOf="@+id/tvEndPlace" />
+                app:layout_constraintTop_toBottomOf="@+id/tvEndPlace"
+                android:visibility="gone"
+                />
+
+            <androidx.appcompat.widget.AppCompatAutoCompleteTextView
+                android:id="@+id/autoCompleteEndPlace"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@+id/tvEndPlace"
+                android:layout_marginStart="@dimen/_20sdp"
+                android:layout_marginTop="@dimen/_10sdp"
+                android:layout_marginEnd="@dimen/_20sdp"
+                />
 
 
             <androidx.appcompat.widget.AppCompatTextView
@@ -103,7 +127,7 @@
                 android:layout_marginEnd="@dimen/_20sdp"
                 android:text="@string/text_pets_carry"
                 android:textSize="@dimen/_12sdp"
-                app:layout_constraintTop_toBottomOf="@+id/spEndPlace" />
+                app:layout_constraintTop_toBottomOf="@+id/autoCompleteEndPlace" />
 
             <RadioGroup
                 android:id="@+id/radioGrpPets"

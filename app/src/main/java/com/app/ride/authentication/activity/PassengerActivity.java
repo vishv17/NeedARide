@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -13,6 +14,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.AppCompatAutoCompleteTextView;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.AppCompatEditText;
 import androidx.appcompat.widget.AppCompatImageView;
@@ -52,6 +54,8 @@ public class PassengerActivity extends AppCompatActivity implements View.OnClick
     private AppCompatImageView ivBack;
     int PAYPAL_REQUEST_CODE = 123;
     private AppCompatButton btnConfirm;
+    private AppCompatAutoCompleteTextView autoCompleteStartPlace,autoCompleteEndPlace;
+    private ArrayAdapter<String> startAdaper,endAdaper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,6 +80,8 @@ public class PassengerActivity extends AppCompatActivity implements View.OnClick
         btnPay = findViewById(R.id.btnPay);
         ivBack = findViewById(R.id.ivBack);
         btnConfirm = findViewById(R.id.btnConfirm);
+        autoCompleteStartPlace = findViewById(R.id.autoCompleteStartPlace);
+        autoCompleteEndPlace = findViewById(R.id.autoCompleteEndPlace);
         ivBack.setVisibility(View.VISIBLE);
 
         tvDateOfJourney.setOnClickListener(this);
@@ -91,6 +97,15 @@ public class PassengerActivity extends AppCompatActivity implements View.OnClick
         spStartPlace = (AppCompatEditText) findViewById(R.id.spStartPlace);
         spEndPlace = (AppCompatEditText) findViewById(R.id.spEndPlace);
 
+
+        startAdaper = new ArrayAdapter<>(this, android.R.layout.select_dialog_item, Constant.places);
+        autoCompleteStartPlace.setThreshold(2);
+        autoCompleteStartPlace.setAdapter(startAdaper);
+//        autoCompleteStartPlace.setTextColor(Color.RED);
+
+        endAdaper = new ArrayAdapter<>(this, android.R.layout.select_dialog_item,Constant.places);
+        autoCompleteEndPlace.setThreshold(2);
+        autoCompleteEndPlace.setAdapter(endAdaper);
 
         Intent intent = getIntent();
         if (intent.hasExtra("DATA")) {
@@ -131,11 +146,11 @@ public class PassengerActivity extends AppCompatActivity implements View.OnClick
         selectedDate = model.getDateOfJourney();
         selectedStartPlace = model.getStartPlace();
 
-        spStartPlace.setText(selectedStartPlace);
+        autoCompleteStartPlace.setText(selectedStartPlace);
 
         selectedEndPlace = model.getEndPlace();
 
-        spEndPlace.setText(selectedEndPlace);
+        autoCompleteEndPlace.setText(selectedEndPlace);
 
         if (model.getLuggageAllow().equals(getResources().getString(R.string.text_yes))) {
             radioGrpLuggage.check(R.id.radioYesLuggage);
@@ -191,8 +206,8 @@ public class PassengerActivity extends AppCompatActivity implements View.OnClick
                     HashMap<String, Object> data = new HashMap<>();
                     data.put(Constant.RIDE_Firebase_Uid, globals.getFireBaseId());
                     data.put(Constant.RIDE_DATE_OF_JOURNEY, selectedDate);
-                    data.put(Constant.RIDE_START_PLACE, spStartPlace.getText().toString());
-                    data.put(Constant.RIDE_END_PLACE, spEndPlace.getText().toString());
+                    data.put(Constant.RIDE_START_PLACE, autoCompleteStartPlace.getText().toString());
+                    data.put(Constant.RIDE_END_PLACE, autoCompleteEndPlace.getText().toString());
                     data.put(Constant.RIDE_name, globals.getUserDetails(PassengerActivity.this).getFirstName() + " " +
                             globals.getUserDetails(PassengerActivity.this).getLastName());
 

@@ -2,7 +2,9 @@ package com.app.ride.authentication.activity;
 
 import static com.app.ride.authentication.utility.Constant.ACCEPTED_ID;
 
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -78,13 +80,6 @@ public class DriverRideActivity extends AppCompatActivity implements View.OnClic
     String NOTIFICATION_MESSAGE;
     String TOPIC;
     private String requestId;
-    private String[] places = {"Barrie","Belleville","Brampton","Brant","Brantford","Brockville",
-        "Burlington","Cambridge","Clarence-Rockland","Cornwall","Dryden","Elliot Lake","Greater Sudbury",
-        "Guelph","Haldimand County","Hamilton","Kawartha Lakes","Kenora","Kingston","Kitchener","London",
-        "Markham","Mississauga","Niagara Falls","Norfolk County","North Bay","Orillia","Oshawa","Ottawa",
-        "Owen Sound","Pembroke","Peterborough","Pickering","Port Colborne","Prince Edward County",
-        "Quinte West","Richmond Hill","Sarnia","Sault Ste. Marie","St. Catharines","St. Thomas","Stratford",
-        "Temiskaming Shores","Thorold","Thunder Bay","Timmins","Toronto","Vaughan","Waterloo","Welland","Windsor","Woodstock"};
     private ArrayAdapter<String> startAdaper,endAdaper;
 
     @Override
@@ -158,7 +153,7 @@ public class DriverRideActivity extends AppCompatActivity implements View.OnClic
         selectedDate = model.getDateOfJourney();
         etVehicleNumber.setText(model.getVehicleNumber());
         etNumberOfSeatAvailable.setText(String.valueOf(model.getSeatAvailable()));
-        etCostPerSeat.setText(model.getCostPerSeat());
+        etCostPerSeat.setText(String.valueOf(model.getCostPerSeat()));
         selectedStartPlace = model.getStartPlace();
 
         autoCompleteStartPlace.setText(selectedStartPlace);
@@ -223,12 +218,12 @@ public class DriverRideActivity extends AppCompatActivity implements View.OnClic
         spStartPlace = (AppCompatEditText) findViewById(R.id.spStartPlace);
         spEndPlace = (AppCompatEditText) findViewById(R.id.spEndPlace);
 
-        startAdaper = new ArrayAdapter<>(this, android.R.layout.select_dialog_item,places);
+        startAdaper = new ArrayAdapter<>(this, android.R.layout.select_dialog_item, Constant.places);
         autoCompleteStartPlace.setThreshold(2);
         autoCompleteStartPlace.setAdapter(startAdaper);
 //        autoCompleteStartPlace.setTextColor(Color.RED);
 
-        endAdaper = new ArrayAdapter<>(this, android.R.layout.select_dialog_item,places);
+        endAdaper = new ArrayAdapter<>(this, android.R.layout.select_dialog_item,Constant.places);
         autoCompleteEndPlace.setThreshold(2);
         autoCompleteEndPlace.setAdapter(endAdaper);
 //        autoCompleteEndPlace.setTextColor(Color.RED);
@@ -303,8 +298,8 @@ public class DriverRideActivity extends AppCompatActivity implements View.OnClic
                     data.put(Constant.RIDE_START_PLACE, autoCompleteStartPlace.getText().toString());
                     data.put(Constant.RIDE_END_PLACE, autoCompleteEndPlace.getText().toString());
                     data.put(Constant.RIDE_vehicle_number, etVehicleNumber.getText().toString());
-                    data.put(Constant.RIDE_seat_available, etNumberOfSeatAvailable.getText().toString());
-                    data.put(Constant.RIDE_cost_per_seat, etCostPerSeat.getText().toString());
+                    data.put(Constant.RIDE_seat_available, Integer.parseInt(etNumberOfSeatAvailable.getText().toString()));
+                    data.put(Constant.RIDE_cost_per_seat, Integer.parseInt(etCostPerSeat.getText().toString()));
                     data.put(Constant.RIDE_name, globals.getUserDetails(DriverRideActivity.this).getFirstName() + " " +
                             globals.getUserDetails(DriverRideActivity.this).getLastName());
 
@@ -322,6 +317,7 @@ public class DriverRideActivity extends AppCompatActivity implements View.OnClic
                     ArrayList<String> fcmList = new ArrayList<>();
 //                    fcmList.add(globals.getFCMToken(DriverRideActivity.this));
                     data.put(ACCEPTED_ID, fcmList);
+                    data.put(Constant.ACCEPTED_USER,new ArrayList<>());
                     data.put(Constant.RIDE_STARTED,false);
                     data.put(Constant.RIDE_COMPLETED,false);
                     if (model != null && btnSubmit.getText().toString().equals(getResources().getString(R.string.text_update))) {
@@ -376,7 +372,42 @@ public class DriverRideActivity extends AppCompatActivity implements View.OnClic
                 }
                 break;
             case R.id.btnRideStart:
-                updateRideStatus(true);
+                if(model.getSeatAvailable() > 0)
+                {
+                    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(DriverRideActivity.this);
+
+                    // set title
+                    alertDialogBuilder.setTitle(getResources().getString(R.string.app_name));
+
+                    // set dialog message
+                    alertDialogBuilder
+                            .setMessage("Are you sure want to start the ride ? as there is still seat available1")
+                            .setCancelable(false)
+                            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    // if this button is clicked, close
+                                    // current activity
+                                    updateRideStatus(true);
+                                    dialog.dismiss();
+//                                finish();
+                                }
+                            })
+                    .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+
+                    AlertDialog alertDialog = alertDialogBuilder.create();
+
+                    // show it
+                    alertDialog.show();
+                }
+                else
+                {
+                    updateRideStatus(true);
+                }
                 break;
             case R.id.btnRideEnd:
                 updateRideStatus(false);

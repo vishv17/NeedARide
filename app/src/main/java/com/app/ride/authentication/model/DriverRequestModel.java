@@ -7,9 +7,10 @@ import java.util.List;
 
 @IgnoreExtraProperties
 public class DriverRequestModel implements Serializable {
-    String LuggageAllow,PetsAllow,Uid,costPerSeat,dateOfJourney,endPlace,startPlace,
+    String LuggageAllow,PetsAllow,Uid,dateOfJourney,endPlace,startPlace,
             vehicleNumber,driverId,name;
     int    seatAvailable;
+    double costPerSeat;
     boolean rideCompleted,rideStarted;
     List<String> acceptedId;
     List<RatingModel> ratingList;
@@ -72,7 +73,7 @@ public class DriverRequestModel implements Serializable {
         this.name = name;
     }
 
-    public DriverRequestModel(String luggageAllow, String petsAllow, String uid, String costPerSeat, String dateOfJourney, String endPlace, int seatAvailable, String startPlace, String vehicleNumber, String driverId, String name) {
+    public DriverRequestModel(String luggageAllow, String petsAllow, String uid, double costPerSeat, String dateOfJourney, String endPlace, int seatAvailable, String startPlace, String vehicleNumber, String driverId, String name) {
         LuggageAllow = luggageAllow;
         PetsAllow = petsAllow;
         Uid = uid;
@@ -123,11 +124,11 @@ public class DriverRequestModel implements Serializable {
         Uid = uid;
     }
 
-    public String getCostPerSeat() {
+    public double getCostPerSeat() {
         return costPerSeat;
     }
 
-    public void setCostPerSeat(String costPerSeat) {
+    public void setCostPerSeat(double costPerSeat) {
         this.costPerSeat = costPerSeat;
     }
 
