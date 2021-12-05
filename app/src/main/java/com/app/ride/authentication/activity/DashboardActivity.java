@@ -7,6 +7,7 @@ import androidx.viewpager.widget.ViewPager;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Toast;
 
 import com.app.ride.R;
 import com.app.ride.authentication.adapter.MyAdapter;
@@ -48,8 +49,7 @@ public class DashboardActivity extends AppCompatActivity {
         floatingBtn = (FloatingActionButton) findViewById(R.id.floatingBtn);
         ivProfile = findViewById(R.id.ivProfile);
         ivProfile.setVisibility(View.VISIBLE);
-        if(globals.getUserDetails(activity)!=null)
-        {
+        if (globals.getUserDetails(activity) != null) {
             Glide.with(activity)
                     .load(globals.getUserDetails(activity).getProfilePic())
                     .into(ivProfile);
@@ -96,31 +96,51 @@ public class DashboardActivity extends AppCompatActivity {
         });
 
         ivProfile.setOnClickListener(view -> {
-            Intent intent = new Intent(activity,ProfileDetailsActivity.class);
+            Intent intent = new Intent(activity, ProfileDetailsActivity.class);
             startActivity(intent);
         });
 
     }
 
     private void checkForDocuments() {
-        globals.showHideProgress(DashboardActivity.this,true);
+        globals.showHideProgress(DashboardActivity.this, true);
         FirebaseFirestore.getInstance().collection(Constant.RIDE_DRIVER_DOC_DATA)
                 .document(globals.getFireBaseId()).
-                collection(Constant.RIDE_DOC).whereEqualTo(Constant.RIDE_Firebase_Uid,globals.getFireBaseId()).
+                collection(Constant.RIDE_DOC).whereEqualTo(Constant.RIDE_Firebase_Uid, globals.getFireBaseId()).
                 get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()) {
                     if (Objects.requireNonNull(task.getResult()).getDocuments().size() > 0) {
-                        Intent intent = new Intent(DashboardActivity.this, DriverRideActivity.class);
-                        startActivity(intent);
-                    }else {
+                        if (
+                                (task.getResult().getDocuments().get(0).get(Constant.RIDE_DRIVING, String.class) != null) &&
+                                (task.getResult().getDocuments().get(0).get(Constant.RIDE_NOC, String.class) != null)) {
+                            if(checkForApprovalDoc())
+                            {
+                                Intent intent = new Intent(DashboardActivity.this, DriverRideActivity.class);
+                                startActivity(intent);
+                            }
+                            else
+                            {
+                                Toast.makeText(activity, "Please wait, Documents are pending for approval", Toast.LENGTH_SHORT).show();
+                            }
+                        } else {
+                            Intent intent = new Intent(DashboardActivity.this, UploadDriverDocActivity.class);
+                            startActivity(intent);
+                        }
+                    } else {
                         Intent intent = new Intent(DashboardActivity.this, UploadDriverDocActivity.class);
                         startActivity(intent);
                     }
-                    globals.showHideProgress(DashboardActivity.this,false);
+                    globals.showHideProgress(DashboardActivity.this, false);
                 }
             }
         });
+    }
+
+    private boolean checkForApprovalDoc()
+    {
+
+        return false;
     }
 }

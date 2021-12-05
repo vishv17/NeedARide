@@ -23,6 +23,7 @@ import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.app.ride.R;
+import com.app.ride.authentication.model.DocumentApprovalModel;
 import com.app.ride.authentication.utility.Constant;
 import com.app.ride.authentication.utility.Globals;
 import com.bumptech.glide.Glide;
@@ -32,6 +33,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.ml.vision.common.FirebaseVisionImage;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -156,7 +158,7 @@ public class UploadDriverDocActivity extends AppCompatActivity implements View.O
         Intent intentPDF = new Intent(Intent.ACTION_GET_CONTENT);
         intentPDF.setType("application/pdf");
         intentPDF.addCategory(Intent.CATEGORY_OPENABLE);
-        startActivityForResult(Intent.createChooser(intentPDF,"Select PDF"),PICK_PDF_CODE);
+        startActivityForResult(Intent.createChooser(intentPDF, "Select PDF"), PICK_PDF_CODE);
     }
 
     private void uploadImagesToDatabase() {
@@ -196,13 +198,46 @@ public class UploadDriverDocActivity extends AppCompatActivity implements View.O
                                                 data.put(Constant.RIDE_DRIVING, drivingImageDownload);
                                                 data.put(Constant.RIDE_NOC, nocImageDownload);
                                                 FirebaseFirestore.getInstance().collection(Constant.RIDE_DRIVER_DOC_DATA).
-                                                        document(globals.getFireBaseId()).collection(Constant.RIDE_DOC).add(data).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                                                    @Override
-                                                    public void onSuccess(DocumentReference documentReference) {
-                                                        Toast.makeText(UploadDriverDocActivity.this, "data added", Toast.LENGTH_LONG).show();
-                                                        globals.showHideProgress(UploadDriverDocActivity.this, false);
-                                                    }
-                                                });
+                                                        document(globals.getFireBaseId()).collection(Constant.RIDE_DOC)
+                                                        .add(data)
+                                                        .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                                                            @Override
+                                                            public void onSuccess(DocumentReference documentReference) {
+                                                                FirebaseFirestore.getInstance().collection(Constant.RIDE_DRIVER_DOC_APPROVAL)
+                                                                        .document(globals.getFireBaseId())
+                                                                        .collection(Constant.RIDE_DOC)
+                                                                        .whereEqualTo(Constant.RIDE_Firebase_Uid, globals.getFireBaseId())
+                                                                        .get()
+                                                                        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                                                            @Override
+                                                                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                                                                if ((task.getResult().getDocuments() == null) || (task.getResult().getDocuments().size() == 0)) {
+                                                                                    HashMap<String, Object> data = new HashMap<>();
+                                                                                    DocumentApprovalModel drivingModel = new DocumentApprovalModel();
+                                                                                    drivingModel.setDocUrl(drivingImageDownload);
+                                                                                    drivingModel.setApproval(false);
+                                                                                    DocumentApprovalModel nocModel = new DocumentApprovalModel();
+                                                                                    nocModel.setDocUrl(nocImageDownload);
+                                                                                    nocModel.setApproval(false);
+                                                                                    data.put(Constant.RIDE_Firebase_Uid, globals.getFireBaseId());
+                                                                                    data.put(Constant.RIDE_DRIVING, drivingModel);
+                                                                                    data.put(Constant.RIDE_NOC, nocModel);
+                                                                                    FirebaseFirestore.getInstance().collection(Constant.RIDE_DRIVER_DOC_APPROVAL)
+                                                                                            .document(globals.getFireBaseId())
+                                                                                            .collection(Constant.RIDE_DOC)
+                                                                                            .add(data)
+                                                                                            .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
+                                                                                                @Override
+                                                                                                public void onComplete(@NonNull Task<DocumentReference> task) {
+                                                                                                    globals.showHideProgress(UploadDriverDocActivity.this, false);
+                                                                                                    Toast.makeText(UploadDriverDocActivity.this, "Data Added Successfully", Toast.LENGTH_LONG).show();
+                                                                                                }
+                                                                                            });
+                                                                                }
+                                                                            }
+                                                                        });
+                                                            }
+                                                        });
                                             }
                                         });
                                     }
@@ -247,7 +282,7 @@ public class UploadDriverDocActivity extends AppCompatActivity implements View.O
                             public void onSuccess(@NonNull Text text) {
                                 Log.e(TAG, "onSuccess: Success->" + text.getText());
 //                                extractedText[0] = text;
-                                if (text!=null) {
+                                if (text != null) {
                                     extractedText[0] = text;
                                     isValidData[0] = validateData(extractedText[0]);
                                 } else {
@@ -372,21 +407,17 @@ public class UploadDriverDocActivity extends AppCompatActivity implements View.O
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == PICK_PDF_CODE)
-        {
-            if(resultCode == RESULT_OK)
-            {
+        if (requestCode == PICK_PDF_CODE) {
+            if (resultCode == RESULT_OK) {
                 tvNoc.setVisibility(View.GONE);
                 ivNoc.setVisibility(View.VISIBLE);
                 Uri uri = data.getData();
                 nocUri = data.getData();
-                if(uri != null)
-                {
-                    Log.e(TAG, "onActivityResult: URI-->"+uri.toString());
+                if (uri != null) {
+                    Log.e(TAG, "onActivityResult: URI-->" + uri.toString());
                     String uriString = uri.toString();
                     File myFile = new File(uriString);
-                    if(myFile != null)
-                    {
+                    if (myFile != null) {
                         nocImage = myFile.getAbsolutePath();
                     }
 
@@ -395,8 +426,7 @@ public class UploadDriverDocActivity extends AppCompatActivity implements View.O
                             .into(ivNoc);
                 }
             }
-        }
-        else {
+        } else {
             EasyImage.handleActivityResult(requestCode, resultCode, data, UploadDriverDocActivity.this, new DefaultCallback() {
                 @Override
                 public void onImagesPicked(@NonNull List<File> imageFiles, EasyImage.ImageSource source, int type) {

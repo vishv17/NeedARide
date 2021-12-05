@@ -699,6 +699,17 @@ public class DriverDocumentActivity extends AppCompatActivity implements ExpandC
                                     document(globals.getFireBaseId()).collection(Constant.RIDE_DOC).add(data).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                                 @Override
                                 public void onSuccess(DocumentReference documentReference) {
+                                    FirebaseFirestore.getInstance().collection(Constant.RIDE_DRIVER_DOC_APPROVAL)
+                                            .document(globals.getFireBaseId())
+                                            .collection(Constant.RIDE_DOC)
+                                            .whereEqualTo(Constant.RIDE_Firebase_Uid, globals.getFireBaseId())
+                                            .get()
+                                            .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                                @Override
+                                                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+
+                                                }
+                                            });
                                     Toast.makeText(activity, "Document Updated Successfully", Toast.LENGTH_LONG).show();
                                     globals.showHideProgress(activity, false);
                                 }

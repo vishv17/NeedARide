@@ -13,6 +13,7 @@ public class Constant {
     public static String RIDE_Firebase_ProfilePic = "ProfilePic";
     public static String RIDE_Firebase_DOCUMENT = "DriverDoc";
     public static String RIDE_DRIVER_DOC_DATA = "DriverDocData";
+    public static String RIDE_DRIVER_DOC_APPROVAL = "DriverDocumentApproval";
     public static String RIDE_DOC = "Documents";
     public static String RIDE_DRIVING = "drivingDocImage";
     public static String RIDE_NOC = "nocDocImage";
