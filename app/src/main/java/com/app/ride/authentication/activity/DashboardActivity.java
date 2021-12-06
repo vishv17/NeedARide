@@ -18,6 +18,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 
@@ -140,7 +141,55 @@ public class DashboardActivity extends AppCompatActivity {
 
     private boolean checkForApprovalDoc()
     {
-
-        return false;
+        final String[] status = {"false"};
+        FirebaseFirestore.getInstance()
+                .collection(Constant.RIDE_DRIVER_LICENSE_APPROVAL)
+                .document(globals.getFireBaseId())
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if(task.isSuccessful())
+                        {
+                            DocumentSnapshot documentSnapshot = task.getResult();
+                            if(documentSnapshot.exists())
+                            {
+                                Boolean approval = documentSnapshot.get(Constant.APPROVAL,Boolean.class);
+                                if(approval)
+                                {
+                                    FirebaseFirestore.getInstance()
+                                            .collection(Constant.RIDE_DRIVER_NOC_APPROVAL)
+                                            .document(globals.getFireBaseId())
+                                            .get()
+                                            .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                                @Override
+                                                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                                    if(task.isSuccessful())
+                                                    {
+                                                        DocumentSnapshot documentSnapshot1 = task.getResult();
+                                                        if(documentSnapshot1.exists())
+                                                        {
+                                                            Boolean approval1 = documentSnapshot1.get(Constant.APPROVAL,Boolean.class);
+                                                            if(approval1)
+                                                            {
+                                                                status[0] = "true";
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            });
+                                }
+                            }
+                        }
+                    }
+                });
+        if(status[0].equals("true"))
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 }

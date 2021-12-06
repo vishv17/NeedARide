@@ -13,7 +13,8 @@ public class Constant {
     public static String RIDE_Firebase_ProfilePic = "ProfilePic";
     public static String RIDE_Firebase_DOCUMENT = "DriverDoc";
     public static String RIDE_DRIVER_DOC_DATA = "DriverDocData";
-    public static String RIDE_DRIVER_DOC_APPROVAL = "DriverDocumentApproval";
+    public static String RIDE_DRIVER_LICENSE_APPROVAL = "DriverLicenseApproval";
+    public static String RIDE_DRIVER_NOC_APPROVAL = "DriverNocApproval";
     public static String RIDE_DOC = "Documents";
     public static String RIDE_DRIVING = "drivingDocImage";
     public static String RIDE_NOC = "nocDocImage";
@@ -63,6 +64,9 @@ public class Constant {
     public static String RIDE_firstName = "firstName";
     public static String RIDE_lastName = "lastName";
     public static String RIDE_profileImage = "profileImage";
+    public static String DRIVING = "driving";
+    public static String NOC = "noc";
+    public static String APPROVAL = "approval";
 
     //list of places
     public static String[] places = {"Barrie","Belleville","Brampton","Brant","Brantford","Brockville",

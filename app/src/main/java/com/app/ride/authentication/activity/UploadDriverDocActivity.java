@@ -20,7 +20,6 @@ import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.appcompat.widget.AppCompatTextView;
 import androidx.cardview.widget.CardView;
-import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.app.ride.R;
 import com.app.ride.authentication.model.DocumentApprovalModel;
@@ -34,7 +33,6 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.google.firebase.ml.vision.common.FirebaseVisionImage;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -50,7 +48,6 @@ import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -203,7 +200,7 @@ public class UploadDriverDocActivity extends AppCompatActivity implements View.O
                                                         .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                                                             @Override
                                                             public void onSuccess(DocumentReference documentReference) {
-                                                                FirebaseFirestore.getInstance().collection(Constant.RIDE_DRIVER_DOC_APPROVAL)
+                                                                FirebaseFirestore.getInstance().collection(Constant.RIDE_DRIVER_LICENSE_APPROVAL)
                                                                         .document(globals.getFireBaseId())
                                                                         .collection(Constant.RIDE_DOC)
                                                                         .whereEqualTo(Constant.RIDE_Firebase_Uid, globals.getFireBaseId())
@@ -214,23 +211,46 @@ public class UploadDriverDocActivity extends AppCompatActivity implements View.O
                                                                                 if ((task.getResult().getDocuments() == null) || (task.getResult().getDocuments().size() == 0)) {
                                                                                     HashMap<String, Object> data = new HashMap<>();
                                                                                     DocumentApprovalModel drivingModel = new DocumentApprovalModel();
+                                                                                    drivingModel.setModel(Constant.DRIVING);
                                                                                     drivingModel.setDocUrl(drivingImageDownload);
                                                                                     drivingModel.setApproval(false);
-                                                                                    DocumentApprovalModel nocModel = new DocumentApprovalModel();
-                                                                                    nocModel.setDocUrl(nocImageDownload);
-                                                                                    nocModel.setApproval(false);
-                                                                                    data.put(Constant.RIDE_Firebase_Uid, globals.getFireBaseId());
-                                                                                    data.put(Constant.RIDE_DRIVING, drivingModel);
-                                                                                    data.put(Constant.RIDE_NOC, nocModel);
-                                                                                    FirebaseFirestore.getInstance().collection(Constant.RIDE_DRIVER_DOC_APPROVAL)
+                                                                                    drivingModel.setUserId(globals.getFireBaseId());
+                                                                                    FirebaseFirestore.getInstance().collection(Constant.RIDE_DRIVER_LICENSE_APPROVAL)
                                                                                             .document(globals.getFireBaseId())
-                                                                                            .collection(Constant.RIDE_DOC)
-                                                                                            .add(data)
-                                                                                            .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
+                                                                                            .set(drivingModel)
+                                                                                            .addOnCompleteListener(new OnCompleteListener<Void>() {
                                                                                                 @Override
-                                                                                                public void onComplete(@NonNull Task<DocumentReference> task) {
-                                                                                                    globals.showHideProgress(UploadDriverDocActivity.this, false);
-                                                                                                    Toast.makeText(UploadDriverDocActivity.this, "Data Added Successfully", Toast.LENGTH_LONG).show();
+                                                                                                public void onComplete(@NonNull Task<Void> task) {
+                                                                                                    if(task.isSuccessful())
+                                                                                                    {
+                                                                                                        DocumentApprovalModel nocModel = new DocumentApprovalModel();
+                                                                                                        nocModel.setModel(Constant.NOC);
+                                                                                                        nocModel.setDocUrl(nocImageDownload);
+                                                                                                        nocModel.setApproval(false);
+                                                                                                        nocModel.setUserId(globals.getFireBaseId());
+                                                                                                        FirebaseFirestore.getInstance().collection(Constant.RIDE_DRIVER_NOC_APPROVAL)
+                                                                                                                .document(globals.getFireBaseId())
+                                                                                                                .set(nocModel)
+                                                                                                                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                                                                                    @Override
+                                                                                                                    public void onComplete(@NonNull Task<Void> task) {
+                                                                                                                        if(task.isSuccessful())
+                                                                                                                        {
+                                                                                                                            globals.showHideProgress(UploadDriverDocActivity.this,false);
+                                                                                                                            Toast.makeText(activity, "Data Uploaded Successfully", Toast.LENGTH_SHORT).show();
+                                                                                                                        }
+                                                                                                                        else
+                                                                                                                        {
+                                                                                                                            globals.showHideProgress(UploadDriverDocActivity.this,false);
+                                                                                                                        }
+                                                                                                                    }
+                                                                                                                });
+                                                                                                    }
+                                                                                                    else
+                                                                                                    {
+                                                                                                        globals.showHideProgress(UploadDriverDocActivity.this,false);
+                                                                                                        Toast.makeText(UploadDriverDocActivity.this, getString(R.string.something_went_wrong), Toast.LENGTH_SHORT).show();
+                                                                                                    }
                                                                                                 }
                                                                                             });
                                                                                 }
@@ -347,7 +367,7 @@ public class UploadDriverDocActivity extends AppCompatActivity implements View.O
         }
         Log.e(TAG, "License Category:->" + licenseCategory.toLowerCase().trim().toString());
         //If License Category is G1 or Not fetched properly then return as false
-        if (licenseCategory.toLowerCase().trim().toString().equals("g2") || (licenseCategory.toLowerCase().trim().toString().isEmpty())) {
+        if (licenseCategory.toLowerCase().trim().toString().equals("g1") || (licenseCategory.toLowerCase().trim().toString().isEmpty())) {
             returnResult = false;
         } else {
             //If License is expired then return as false

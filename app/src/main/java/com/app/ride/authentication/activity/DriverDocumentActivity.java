@@ -25,11 +25,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.app.ride.R;
+import com.app.ride.authentication.model.DocumentApprovalModel;
 import com.app.ride.authentication.model.UserModel;
 import com.app.ride.authentication.utility.Constant;
 import com.app.ride.authentication.utility.Globals;
 import com.bumptech.glide.Glide;
-import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -38,6 +38,7 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.ktx.Firebase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -435,7 +436,7 @@ public class DriverDocumentActivity extends AppCompatActivity implements ExpandC
         }
         Log.e(TAG, "License Category:->" + licenseCategory.toLowerCase().trim().toString());
         //If License Category is G1 or Not fetched properly then return as false
-        if (licenseCategory.toLowerCase().trim().toString().equals("g2") || (licenseCategory.toLowerCase().trim().toString().isEmpty())) {
+        if (licenseCategory.toLowerCase().trim().toString().equals("g1") || (licenseCategory.toLowerCase().trim().toString().isEmpty())) {
             returnResult = false;
         } else {
             //If License is expired then return as false
@@ -551,16 +552,37 @@ public class DriverDocumentActivity extends AppCompatActivity implements ExpandC
                                         if(task.getResult().getDocuments()!=null && task.getResult().getDocuments().size() > 0) {
                                             DocumentSnapshot documentSnapshot = task.getResult().getDocuments().get(0);
                                             Log.e(TAG, "onComplete: documentSnapShot id-->" + documentSnapshot.getId());
-                                            FirebaseFirestore.getInstance().collection(Constant.RIDE_DRIVER_DOC_DATA).
-                                                    document(globals.getFireBaseId()).collection(Constant.RIDE_DOC).
-                                                    document(documentSnapshot.getId()).
-                                                    update(data).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                @Override
-                                                public void onSuccess(@NonNull Void unused) {
-                                                    Toast.makeText(activity, "Document Updated Successfully", Toast.LENGTH_LONG).show();
-                                                    globals.showHideProgress(activity, false);
-                                                }
-                                            });
+                                            DocumentApprovalModel nocModel = new DocumentApprovalModel();
+                                            nocModel.setModel(Constant.NOC);
+                                            nocModel.setDocUrl(nocImageDownload);
+                                            nocModel.setApproval(false);
+                                            nocModel.setUserId(globals.getFireBaseId());
+                                            FirebaseFirestore.getInstance().collection(Constant.RIDE_DRIVER_NOC_APPROVAL)
+                                                    .document(globals.getFireBaseId())
+                                                    .set(nocModel)
+                                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                        @Override
+                                                        public void onComplete(@NonNull Task<Void> task) {
+                                                            if(task.isSuccessful())
+                                                            {
+                                                                FirebaseFirestore.getInstance().collection(Constant.RIDE_DRIVER_DOC_DATA).
+                                                                        document(globals.getFireBaseId()).collection(Constant.RIDE_DOC).
+                                                                        document(documentSnapshot.getId()).
+                                                                        update(data).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                    @Override
+                                                                    public void onSuccess(@NonNull Void unused) {
+                                                                        Toast.makeText(activity, "Document Updated Successfully", Toast.LENGTH_LONG).show();
+                                                                        globals.showHideProgress(activity, false);
+                                                                    }
+                                                                });
+                                                            }
+                                                            else
+                                                            {
+                                                                globals.showHideProgress(activity,false);
+                                                                Toast.makeText(activity, getString(R.string.something_went_wrong), Toast.LENGTH_SHORT).show();
+                                                            }
+                                                        }
+                                                    });
                                         }
                                         else
                                         {
@@ -699,19 +721,27 @@ public class DriverDocumentActivity extends AppCompatActivity implements ExpandC
                                     document(globals.getFireBaseId()).collection(Constant.RIDE_DOC).add(data).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                                 @Override
                                 public void onSuccess(DocumentReference documentReference) {
-                                    FirebaseFirestore.getInstance().collection(Constant.RIDE_DRIVER_DOC_APPROVAL)
+                                    DocumentApprovalModel drivingModel = new DocumentApprovalModel();
+                                    drivingModel.setModel(Constant.DRIVING);
+                                    drivingModel.setDocUrl(drivingImageDownload);
+                                    drivingModel.setApproval(false);
+                                    drivingModel.setUserId(globals.getFireBaseId());
+                                    FirebaseFirestore.getInstance().collection(Constant.RIDE_DRIVER_LICENSE_APPROVAL)
                                             .document(globals.getFireBaseId())
-                                            .collection(Constant.RIDE_DOC)
-                                            .whereEqualTo(Constant.RIDE_Firebase_Uid, globals.getFireBaseId())
-                                            .get()
-                                            .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                            .set(drivingModel)
+                                            .addOnCompleteListener(new OnCompleteListener<Void>() {
                                                 @Override
-                                                public void onComplete(@NonNull Task<QuerySnapshot> task) {
-
+                                                public void onComplete(@NonNull Task<Void> task) {
+                                                    globals.showHideProgress(activity, false);
+                                                    if(task.isSuccessful())
+                                                    {
+                                                        Toast.makeText(activity, "Document Updated Successfully", Toast.LENGTH_LONG).show();
+                                                    }
+                                                    else {
+                                                        Toast.makeText(activity, getString(R.string.something_went_wrong), Toast.LENGTH_SHORT).show();
+                                                    }
                                                 }
                                             });
-                                    Toast.makeText(activity, "Document Updated Successfully", Toast.LENGTH_LONG).show();
-                                    globals.showHideProgress(activity, false);
                                 }
                             });
                         }
