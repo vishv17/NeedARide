@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.appcompat.widget.AppCompatTextView;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -47,6 +48,8 @@ import com.google.mlkit.vision.text.Text;
 import com.google.mlkit.vision.text.TextRecognition;
 import com.google.mlkit.vision.text.TextRecognizer;
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions;
+import com.gun0912.tedpermission.PermissionListener;
+import com.gun0912.tedpermission.TedPermission;
 import com.skyhope.expandcollapsecardview.ExpandCollapseCard;
 import com.skyhope.expandcollapsecardview.ExpandCollapseListener;
 
@@ -151,7 +154,19 @@ public class DriverDocumentActivity extends AppCompatActivity implements ExpandC
         ivDriving.setOnClickListener(view -> {
 //            Toast.makeText(activity, "Coming Soon!", Toast.LENGTH_SHORT).show();
             typeImage = getResources().getString(R.string.text_driving_license);
-            showDialog(typeImage);
+            TedPermission.with(activity).setPermissionListener(new PermissionListener() {
+                @Override
+                public void onPermissionGranted() {
+                    showDialog(typeImage);
+                }
+
+                @Override
+                public void onPermissionDenied(List<String> deniedPermissions) {
+
+                }
+            }).setDeniedMessage(getString(R.string.on_denied_permission))
+                    .setPermissions(Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE)
+                    .check();
         });
         ivNoc.setOnClickListener(view -> {
             typeImage = getResources().getString(R.string.text_noc);
@@ -405,7 +420,7 @@ public class DriverDocumentActivity extends AppCompatActivity implements ExpandC
         Log.e(TAG, "validateLicenseData: Inside this function");
         String result = text.getText();
         String expDate = "";
-        boolean returnResult = true;
+        boolean returnResult = false;
         int blockCount = 0;
         for (Text.TextBlock block : text.getTextBlocks()) {
             String blockText = block.getText();
@@ -442,6 +457,10 @@ public class DriverDocumentActivity extends AppCompatActivity implements ExpandC
             //If License is expired then return as false
             if (!compareDate(expDate)) {
                 returnResult = false;
+            }
+            else
+            {
+                returnResult = true;
             }
         }
         return returnResult;
