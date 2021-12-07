@@ -1,7 +1,9 @@
 package com.app.ride.authentication.activity;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -56,6 +58,7 @@ public class PassengerActivity extends AppCompatActivity implements View.OnClick
     private AppCompatButton btnConfirm;
     private AppCompatAutoCompleteTextView autoCompleteStartPlace,autoCompleteEndPlace;
     private ArrayAdapter<String> startAdaper,endAdaper;
+    private static final String TAG = "PassengerActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,7 +93,7 @@ public class PassengerActivity extends AppCompatActivity implements View.OnClick
         btnChat.setOnClickListener(this);
         btnPay.setOnClickListener(this);
         btnConfirm.setOnClickListener(this);
-
+        btnDelete.setOnClickListener(this);
     }
 
     private void setStatEndPlace() {
@@ -306,8 +309,9 @@ public class PassengerActivity extends AppCompatActivity implements View.OnClick
             options.put("amount", "100");
 
             JSONObject preFill = new JSONObject();
-            preFill.put("email", "test@razorpay.com");
-            preFill.put("contact", "9924204267");
+//            preFill.put("email", "test@razorpay.com");
+            preFill.put("email", "rkaur1756@conestogac.on.ca");
+            preFill.put("contact", "+14165599762");
 
             options.put("prefill", preFill);
 
@@ -341,7 +345,11 @@ public class PassengerActivity extends AppCompatActivity implements View.OnClick
 
     private void deletePassengerRequest() {
         globals.showHideProgress(PassengerActivity.this, true);
-        FirebaseFirestore.getInstance().collection(Constant.RIDE_passenger_request).whereEqualTo(Constant.RIDE_passenger_Uid, model.getPassengerId()).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+        Log.e(TAG, "deletePassengerRequest: ID-->"+model.getPassengerId());
+        FirebaseFirestore.getInstance()
+                .collection(Constant.RIDE_passenger_request)
+                .whereEqualTo(Constant.RIDE_passenger_Uid, model.getPassengerId())
+                .get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()) {

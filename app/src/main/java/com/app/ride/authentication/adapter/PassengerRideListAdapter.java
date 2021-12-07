@@ -30,7 +30,7 @@ public class PassengerRideListAdapter extends RecyclerView.Adapter<PassengerRide
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        AppCompatTextView tvDateOfJourney,tvStartPlace,tvEndPlace,tvEdit;
+        AppCompatTextView tvDateOfJourney,tvStartPlace,tvEndPlace,tvEdit,tvPassengerName;
         CardView cdPassenger;
 
         public ViewHolder(@NonNull View itemView) {
@@ -40,6 +40,7 @@ public class PassengerRideListAdapter extends RecyclerView.Adapter<PassengerRide
             tvEndPlace= itemView.findViewById(R.id.tvEndPlace);
             tvEdit= itemView.findViewById(R.id.tvEdit);
             cdPassenger = itemView.findViewById(R.id.cdPassenger);
+            tvPassengerName = itemView.findViewById(R.id.tvPassengerName);
         }
     }
 
@@ -58,6 +59,7 @@ public class PassengerRideListAdapter extends RecyclerView.Adapter<PassengerRide
         holder.tvDateOfJourney.setText(context.getString(R.string.text_dis_date)+" - "+model.getDateOfJourney());
         holder.tvStartPlace.setText(context.getString(R.string.text_start__dis_place)+" - "+model.getStartPlace());
         holder.tvEndPlace.setText(context.getString(R.string.text_end_dis_place)+" - "+model.getEndPlace());
+        holder.tvPassengerName.setText(context.getString(R.string.passenger_name)+" - "+model.getName());
         /*holder.tvEdit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

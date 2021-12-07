@@ -16,6 +16,15 @@
         >
 
         <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/txtDriverName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Driver Name"
+            android:textColor="@color/black"
+            android:textSize="@dimen/_14ssp"
+            />
+
+        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/txtStartPlace"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

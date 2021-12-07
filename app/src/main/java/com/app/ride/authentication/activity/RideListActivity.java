@@ -98,6 +98,9 @@ public class RideListActivity extends AppCompatActivity implements RideListAdapt
                         }
                     });
         }
+        else {
+            Log.e(TAG, "initView: userID is null");
+        }
     }
 
     private void setAdapter(ArrayList<DriverRequestModel> driverRequestList) {

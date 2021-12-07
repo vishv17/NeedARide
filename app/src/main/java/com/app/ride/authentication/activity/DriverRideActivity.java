@@ -302,6 +302,7 @@ public class DriverRideActivity extends AppCompatActivity implements View.OnClic
                     data.put(Constant.RIDE_cost_per_seat, Integer.parseInt(etCostPerSeat.getText().toString()));
                     data.put(Constant.RIDE_name, globals.getUserDetails(DriverRideActivity.this).getFirstName() + " " +
                             globals.getUserDetails(DriverRideActivity.this).getLastName());
+//                    data.put(Constant.DRIVER_NAME,globals.getUserDetails(DriverRideActivity.this).getFirstName());
 
                     // get selected radio button from radioGroup
                     int selectedId = radioGrpPets.getCheckedRadioButtonId();

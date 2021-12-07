@@ -31,7 +31,7 @@ public class DriverRideListAdapter extends RecyclerView.Adapter<DriverRideListAd
 
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        AppCompatTextView tvDateOfJourney,tvStartPlace,tvEndPlace,tvSeatAvailable,tvCostPerSeat,tvEdit;
+        AppCompatTextView tvDateOfJourney,tvStartPlace,tvEndPlace,tvSeatAvailable,tvCostPerSeat,tvEdit,tvRiderName;
         CardView cdDriver;
 
 
@@ -43,6 +43,7 @@ public class DriverRideListAdapter extends RecyclerView.Adapter<DriverRideListAd
             tvSeatAvailable= itemView.findViewById(R.id.tvSeatAvailable);
             tvCostPerSeat= itemView.findViewById(R.id.tvCostPerSeat);
             tvEdit= itemView.findViewById(R.id.tvEdit);
+            tvRiderName = itemView.findViewById(R.id.tvRiderName);
             cdDriver = itemView.findViewById(R.id.cdDriver);
         }
     }
@@ -65,7 +66,8 @@ public class DriverRideListAdapter extends RecyclerView.Adapter<DriverRideListAd
         holder.tvStartPlace.setText(context.getString(R.string.text_start__dis_place)+" - "+model.getStartPlace());
         holder.tvEndPlace.setText(context.getString(R.string.text_end_dis_place)+" - "+model.getEndPlace());
         holder.tvSeatAvailable.setText(context.getString(R.string.text_number_of_seat_available_dis)+" - "+String.valueOf(model.getSeatAvailable()));
-        holder.tvCostPerSeat.setText(context.getString(R.string.text_cost_per_seat_dis)+" - "+model.getCostPerSeat());
+        holder.tvCostPerSeat.setText(context.getString(R.string.text_cost_per_seat_dis)+" - "+"$ "+model.getCostPerSeat());
+        holder.tvRiderName.setText(context.getString(R.string.driver_name)+"-"+model.getName());
 
         /*holder.tvEdit.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -48,10 +48,11 @@ public class RideListAdapter extends RecyclerView.Adapter<RideListAdapter.RideVi
         int pos = holder.getAdapterPosition();
 
         DriverRequestModel driverRequestModel = driverRequestList.get(pos);
+        holder.txtDriverName.setText("Driver Name : "+String.valueOf(driverRequestModel.getName()));
         holder.txtAvailableSeat.setText("Available Seat : "+String.valueOf(driverRequestModel.getSeatAvailable()));
         holder.txtStartPlace.setText("Start Place : " + driverRequestModel.getStartPlace());
         holder.txtEndPlace.setText("End Place : "+driverRequestModel.getEndPlace());
-        holder.txtPrice.setText("Price : "+String.valueOf(driverRequestModel.getCostPerSeat()));
+        holder.txtPrice.setText("Price : "+"$ "+String.valueOf(driverRequestModel.getCostPerSeat()));
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -70,7 +71,7 @@ public class RideListAdapter extends RecyclerView.Adapter<RideListAdapter.RideVi
 
     public class RideViewHolder extends RecyclerView.ViewHolder {
 
-        private AppCompatTextView txtStartPlace,txtEndPlace,txtAvailableSeat,txtPrice;
+        private AppCompatTextView txtStartPlace,txtEndPlace,txtAvailableSeat,txtPrice,txtDriverName;
 
         public RideViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -78,6 +79,7 @@ public class RideListAdapter extends RecyclerView.Adapter<RideListAdapter.RideVi
             txtEndPlace = itemView.findViewById(R.id.txtEndPlace);
             txtAvailableSeat = itemView.findViewById(R.id.txtAvailableSeat);
             txtPrice = itemView.findViewById(R.id.txtPrice);
+            txtDriverName = itemView.findViewById(R.id.txtDriverName);
         }
     }
 
