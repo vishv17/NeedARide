@@ -116,15 +116,62 @@ public class DashboardActivity extends AppCompatActivity {
                         if (
                                 (task.getResult().getDocuments().get(0).get(Constant.RIDE_DRIVING, String.class) != null) &&
                                 (task.getResult().getDocuments().get(0).get(Constant.RIDE_NOC, String.class) != null)) {
-                            if(checkForApprovalDoc())
+                            /*if(checkForApprovalDoc())
                             {
-                                Intent intent = new Intent(DashboardActivity.this, DriverRideActivity.class);
-                                startActivity(intent);
+
                             }
                             else
                             {
-                                Toast.makeText(activity, "Please wait, Documents are pending for approval", Toast.LENGTH_SHORT).show();
-                            }
+                                Toast.makeText(activity, "It usually approve by 5-7 business days", Toast.LENGTH_SHORT).show();
+                            }*/
+                            FirebaseFirestore.getInstance()
+                                    .collection(Constant.RIDE_DRIVER_LICENSE_APPROVAL)
+                                    .document(globals.getFireBaseId())
+                                    .get()
+                                    .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                            if(task.isSuccessful())
+                                            {
+                                                DocumentSnapshot documentSnapshot = task.getResult();
+                                                if(documentSnapshot.exists())
+                                                {
+                                                    Boolean approval = documentSnapshot.get(Constant.APPROVAL,Boolean.class);
+                                                    if(approval.booleanValue())
+                                                    {
+                                                        FirebaseFirestore.getInstance()
+                                                                .collection(Constant.RIDE_DRIVER_NOC_APPROVAL)
+                                                                .document(globals.getFireBaseId())
+                                                                .get()
+                                                                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                                                    @Override
+                                                                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                                                        if(task.isSuccessful())
+                                                                        {
+                                                                            DocumentSnapshot documentSnapshot1 = task.getResult();
+                                                                            if(documentSnapshot1.exists())
+                                                                            {
+                                                                                Boolean approval1 = documentSnapshot1.get(Constant.APPROVAL,Boolean.class);
+                                                                                if(approval1.booleanValue())
+                                                                                {
+                                                                                    Intent intent = new Intent(DashboardActivity.this, DriverRideActivity.class);
+                                                                                    startActivity(intent);
+                                                                                }
+                                                                            }
+                                                                            else {
+                                                                                Toast.makeText(activity, "It usually approve by 5-7 business days", Toast.LENGTH_SHORT).show();
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                });
+                                                    }
+                                                    else {
+                                                        Toast.makeText(activity, "It usually approve by 5-7 business days", Toast.LENGTH_SHORT).show();
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    });
                         } else {
                             Intent intent = new Intent(DashboardActivity.this, UploadDriverDocActivity.class);
                             startActivity(intent);
@@ -142,47 +189,7 @@ public class DashboardActivity extends AppCompatActivity {
     private boolean checkForApprovalDoc()
     {
         final String[] status = {"false"};
-        FirebaseFirestore.getInstance()
-                .collection(Constant.RIDE_DRIVER_LICENSE_APPROVAL)
-                .document(globals.getFireBaseId())
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        if(task.isSuccessful())
-                        {
-                            DocumentSnapshot documentSnapshot = task.getResult();
-                            if(documentSnapshot.exists())
-                            {
-                                Boolean approval = documentSnapshot.get(Constant.APPROVAL,Boolean.class);
-                                if(approval)
-                                {
-                                    FirebaseFirestore.getInstance()
-                                            .collection(Constant.RIDE_DRIVER_NOC_APPROVAL)
-                                            .document(globals.getFireBaseId())
-                                            .get()
-                                            .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                                                @Override
-                                                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                                                    if(task.isSuccessful())
-                                                    {
-                                                        DocumentSnapshot documentSnapshot1 = task.getResult();
-                                                        if(documentSnapshot1.exists())
-                                                        {
-                                                            Boolean approval1 = documentSnapshot1.get(Constant.APPROVAL,Boolean.class);
-                                                            if(approval1)
-                                                            {
-                                                                status[0] = "true";
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            });
-                                }
-                            }
-                        }
-                    }
-                });
+
         if(status[0].equals("true"))
         {
             return true;
