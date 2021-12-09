@@ -327,6 +327,7 @@ public class PassengerActivity extends AppCompatActivity implements View.OnClick
 
     private void redirectToChatListScreen() {
         Intent intent = new Intent(PassengerActivity.this, MessageListActivity.class);
+        intent.putExtra("ReqId",model.getPassengerId());
         startActivity(intent);
     }
 

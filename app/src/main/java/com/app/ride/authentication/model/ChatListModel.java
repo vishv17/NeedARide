@@ -6,17 +6,26 @@ import java.util.HashMap;
 
 public class ChatListModel implements Serializable {
     ArrayList<String> userIds;
-    String  conversationKey,username;
+    String  conversationKey,username,senderusername;
     String  lastMessage,updatedAt,requestId;
     public ChatListModel() { }
 
-    public ChatListModel(String username, ArrayList<String> userIds, String conversationKey, String lastMessage, String updatedAt, String requestId) {
+    public ChatListModel(String username, ArrayList<String> userIds, String conversationKey, String lastMessage, String updatedAt, String requestId, String senderusername) {
         this.username = username;
         this.userIds = userIds;
         this.conversationKey = conversationKey;
         this.lastMessage = lastMessage;
         this.updatedAt = updatedAt;
         this.requestId = requestId;
+        this.senderusername = senderusername;
+    }
+
+    public String getSenderusername() {
+        return senderusername;
+    }
+
+    public void setSenderusername(String senderusername) {
+        this.senderusername = senderusername;
     }
 
     public String getRequestId() {

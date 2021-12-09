@@ -175,6 +175,7 @@ public class MessageActivity extends AppCompatActivity {
 
         FirebaseFirestore.getInstance()
                 .collection(Constant.RISE_CONVERSATION_TABLE).document(requestId)
+                .collection("Data").document(conversationKey)
                 .collection(Constant.RISE_MESSAGE_TABLE)
                 .orderBy(Constant.RISE_CREATED_AT, Query.Direction.DESCENDING).limit(pagePerCount).addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
@@ -234,6 +235,7 @@ public class MessageActivity extends AppCompatActivity {
             Query query = FirebaseFirestore.getInstance()
                     .collection(Constant.RISE_CONVERSATION_TABLE)
                     .document(requestId)
+                    .collection("Data").document(conversationKey)
                     .collection(Constant.RISE_MESSAGE_TABLE)
                     .orderBy(Constant.RISE_CREATED_AT, Query.Direction.DESCENDING).startAfter(lastVisible).limit(pagePerCount);
 
@@ -287,6 +289,7 @@ public class MessageActivity extends AppCompatActivity {
             receiverName = "";
         }
         mapConversation.put(Constant.RIDE_USER_NAME, receiverName);
+        mapConversation.put(Constant.RIDE_SENDER_USER_NAME, globals.getUserDetails(this).getFirstName()+ " "+globals.getUserDetails(this).getLastName());
         mapConversation.put(Constant.RIDE_USER_ID, userIds);
         mapConversation.put(Constant.RIDE_LAST_MESSAGE, message);
         mapConversation.put(Constant.RIDE_CONVERSATION_KEY, conversationKey);
@@ -294,11 +297,12 @@ public class MessageActivity extends AppCompatActivity {
 
         // Set Last Conversation
         FirebaseFirestore.getInstance().collection(Constant.RISE_CONVERSATION_TABLE)
-                .document(requestId).set(mapConversation, SetOptions.merge());
+                .document(requestId).collection("Data").document(conversationKey).set(mapConversation, SetOptions.merge());
 
         //Send message
         FirebaseFirestore.getInstance().collection(Constant.RISE_CONVERSATION_TABLE)
                 .document(requestId)
+                .collection("Data").document(conversationKey)
                 .collection(Constant.RISE_MESSAGE_TABLE)
                 .add(chatData).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
             @Override

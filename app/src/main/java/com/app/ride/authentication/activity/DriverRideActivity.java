@@ -563,6 +563,7 @@ public class DriverRideActivity extends AppCompatActivity implements View.OnClic
 
     private void redirectToChatListScreen() {
         Intent intent = new Intent(DriverRideActivity.this, MessageListActivity.class);
+        intent.putExtra("ReqId",model.getRequestId());
         startActivity(intent);
     }
 

@@ -33,7 +33,6 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
 
     }
 
-
     public static class ViewHolder extends RecyclerView.ViewHolder {
         AppCompatTextView tvName;
 
@@ -58,7 +57,12 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         ChatListModel model = dataList.get(position);
-        holder.tvName.setText(model.getRequestId().toString());
+        if(model.getSenderusername()!=null) {
+            holder.tvName.setText(model.getSenderusername().toString());
+        }else {
+            holder.tvName.setText(model.getRequestId().toString());
+
+        }
         holder.tvName.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
