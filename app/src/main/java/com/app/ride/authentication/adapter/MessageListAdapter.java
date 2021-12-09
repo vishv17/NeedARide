@@ -33,7 +33,6 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
 
     }
 
-
     public static class ViewHolder extends RecyclerView.ViewHolder {
         AppCompatTextView tvName;
 

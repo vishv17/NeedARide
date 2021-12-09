@@ -69,6 +69,8 @@ public class Constant {
     public static String DRIVING = "driving";
     public static String NOC = "noc";
     public static String APPROVAL = "approval";
+    public static String RIDE_SENDER_USER_NAME = "senderusername";
+
 
     //list of places
     public static String[] places = {"Barrie","Belleville","Brampton","Brant","Brantford","Brockville",

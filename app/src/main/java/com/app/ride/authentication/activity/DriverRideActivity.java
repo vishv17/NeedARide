@@ -142,6 +142,9 @@ public class DriverRideActivity extends AppCompatActivity implements View.OnClic
         btnDelete.setOnClickListener(this);
         btnChat.setOnClickListener(this);
         ivBack.setOnClickListener(this);
+
+
+
     }
 
     private void setDataIntoView(DriverRequestModel model) {
