@@ -112,6 +112,7 @@ public class DashboardActivity extends AppCompatActivity {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()) {
+                    globals.showHideProgress(DashboardActivity.this, false);
                     if (Objects.requireNonNull(task.getResult()).getDocuments().size() > 0) {
                         if (
                                 (task.getResult().getDocuments().get(0).get(Constant.RIDE_DRIVING, String.class) != null) &&

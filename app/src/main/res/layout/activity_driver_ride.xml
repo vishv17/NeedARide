@@ -177,7 +177,7 @@
                 android:ellipsize="end"
                 android:hint="@string/text_cost_per_seat"
                 android:imeOptions="actionNext"
-                android:inputType="number"
+                android:inputType="numberDecimal"
                 android:maxLines="1"
                 android:minHeight="@dimen/_35sdp"
                 android:paddingStart="@dimen/_15sdp"

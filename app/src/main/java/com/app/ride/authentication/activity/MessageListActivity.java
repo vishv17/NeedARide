@@ -4,7 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
-import androidx.annotation.Nullable;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatTextView;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -16,21 +16,21 @@ import com.app.ride.authentication.model.ChatListModel;
 import com.app.ride.authentication.utility.Constant;
 import com.app.ride.authentication.utility.Globals;
 import com.app.ride.authentication.utility.VerticalSpaceChatItemDecoration;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public class MessageListActivity extends AppCompatActivity implements MessageListAdapter.OnViewClick {
     RecyclerView rvMessageList;
     MessageListAdapter adapter;
     AppCompatTextView tvNoMsg;
     Globals globals;
+    String reqId;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,14 +44,40 @@ public class MessageListActivity extends AppCompatActivity implements MessageLis
 
         rvMessageList = findViewById(R.id.rvMessageList);
         tvNoMsg = findViewById(R.id.tvNoMsg);
-        getFirebaseData();
+        reqId = getIntent().getStringExtra("ReqId");
+
+        getFirebaseData(reqId);
 
     }
 
-    private void getFirebaseData() {
-        FirebaseFirestore.getInstance().collection(Constant.RISE_CONVERSATION_TABLE)
-                .whereArrayContains(Constant.RIDE_USER_ID, globals.getFireBaseId())
-                .orderBy(Constant.RIDE_UPDATED_AT, Query.Direction.DESCENDING)
+    private void getFirebaseData(String reqId) {
+
+        FirebaseFirestore.getInstance().collection(Constant.RISE_CONVERSATION_TABLE).document(reqId).collection("Data").orderBy(Constant.RIDE_UPDATED_AT, Query.Direction.DESCENDING).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+            @Override
+            public void onSuccess(@NonNull QuerySnapshot value) {
+                ArrayList<ChatListModel> list = new ArrayList<ChatListModel>();
+                if (value != null) {
+                    for (DocumentSnapshot snapshot : value.getDocuments()) {
+                        ChatListModel message = snapshot.toObject(ChatListModel.class);
+                        list.add(message);
+                    }
+                    if (list.size() > 0) {
+                        tvNoMsg.setVisibility(View.GONE);
+                        rvMessageList.setVisibility(View.VISIBLE);
+                        setAdapter(list);
+                    } else {
+                        tvNoMsg.setVisibility(View.VISIBLE);
+                        rvMessageList.setVisibility(View.GONE);
+                    }
+                }
+            }
+        });
+    }
+
+
+    /* FirebaseFirestore.getInstance().collection(Constant.RISE_CONVERSATION_TABLE).document().collection("Data")
+     *//* .whereArrayContains(Constant.RIDE_USER_ID, globals.getFireBaseId())
+                .orderBy(Constant.RIDE_UPDATED_AT, Query.Direction.DESCENDING)*//*
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
@@ -73,8 +99,8 @@ public class MessageListActivity extends AppCompatActivity implements MessageLis
                         }
 
                     }
-                });
-    }
+                });*/
+
 
     private void setAdapter(ArrayList<ChatListModel> list) {
         if (rvMessageList.getAdapter() == null) {

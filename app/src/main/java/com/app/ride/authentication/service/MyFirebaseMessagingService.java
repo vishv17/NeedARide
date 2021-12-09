@@ -19,6 +19,7 @@ import androidx.core.app.NotificationCompat;
 
 import com.app.ride.R;
 import com.app.ride.authentication.activity.DashboardActivity;
+import com.app.ride.authentication.activity.MessageActivity;
 import com.app.ride.authentication.activity.RatingActivity;
 import com.app.ride.authentication.utility.Constant;
 import com.google.firebase.iid.FirebaseInstanceIdReceiver;
@@ -42,7 +43,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     public void onMessageReceived(@NonNull RemoteMessage remoteMessage) {
         super.onMessageReceived(remoteMessage);
         Log.e(TAG, "onMessageReceived: Remote Message-->"+remoteMessage.getData().toString());
-        final Intent intent = new Intent(this, DashboardActivity.class);
+        Intent intent = new Intent(this, DashboardActivity.class);
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         int notificationID = new Random().nextInt(3000);
 
@@ -53,17 +54,27 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pendingIntent = null;
-        if(remoteMessage.getData().get("end").equals("true"))
+        if(remoteMessage.getData().containsKey("conversationKey"))
         {
-            String riderId = remoteMessage.getData().get(Constant.RIDE_USER_ID);
-            String requestId = remoteMessage.getData().get(Constant.RIDE_REQUEST_ID);
-            Intent intent1 = new Intent(this, RatingActivity.class);
-            intent1.putExtra(Constant.RIDE_USER_ID,riderId);
-            intent1.putExtra(Constant.RIDE_REQUEST_ID,requestId);
-            pendingIntent = PendingIntent.getActivity(this,0,intent1,PendingIntent.FLAG_ONE_SHOT);
+            intent = new Intent(this, MessageActivity.class);
+            intent.putExtra(Constant.FD_OPPONENT_UID,remoteMessage.getData().get(Constant.FD_OPPONENT_UID));
+            intent.putExtra(Constant.RIDE_name,remoteMessage.getData().get(Constant.RIDE_name));
+            intent.putExtra(Constant.RIDE_REQUEST_ID,remoteMessage.getData().get(Constant.RIDE_REQUEST_ID));
+            intent.putExtra(Constant.RIDE_CONVERSATION_KEY,remoteMessage.getData().get(Constant.RIDE_CONVERSATION_KEY));
+            intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            pendingIntent = PendingIntent.getActivity(this,0,intent,PendingIntent.FLAG_ONE_SHOT);
         }
         else {
-            pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_ONE_SHOT);
+            if (remoteMessage.getData().get("end").equals("true")) {
+                String riderId = remoteMessage.getData().get(Constant.RIDE_USER_ID);
+                String requestId = remoteMessage.getData().get(Constant.RIDE_REQUEST_ID);
+                Intent intent1 = new Intent(this, RatingActivity.class);
+                intent1.putExtra(Constant.RIDE_USER_ID, riderId);
+                intent1.putExtra(Constant.RIDE_REQUEST_ID, requestId);
+                pendingIntent = PendingIntent.getActivity(this, 0, intent1, PendingIntent.FLAG_ONE_SHOT);
+            } else {
+                pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_ONE_SHOT);
+            }
         }
         Bitmap largeIcon = BitmapFactory.decodeResource(getResources(), R.drawable.ic_notification);
         Uri notificationSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);

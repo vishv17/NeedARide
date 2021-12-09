@@ -55,6 +55,7 @@ public class Constant {
 
     public static String RIDE_UPDATED_AT = "updatedAt";
     public static String RIDE_USER_NAME = "username";
+    public static String RIDE_SENDER_USER_NAME = "senderusername";
     public static String RIDE_USER_ID = "userIds";
     public static String RIDE_CONVERSATION_KEY = "conversationKey";
     public static String RIDE_LAST_MESSAGE = "lastMessage";

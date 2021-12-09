@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatEditText;
@@ -16,15 +17,22 @@ import androidx.appcompat.widget.LinearLayoutCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.app.ride.R;
 import com.app.ride.authentication.adapter.ChatListAdapter;
 import com.app.ride.authentication.model.MessageModel;
 import com.app.ride.authentication.utility.Constant;
 import com.app.ride.authentication.utility.DateTimeUtil;
 import com.app.ride.authentication.utility.Globals;
+import com.app.ride.authentication.utility.MySingleton;
 import com.app.ride.authentication.utility.PaginationProgressBarAdapter;
 import com.app.ride.authentication.utility.VerticalSpaceChatItemDecoration;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
@@ -35,11 +43,15 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.SetOptions;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.paginate.Paginate;
 import com.paginate.recycler.LoadingListItemSpanLookup;
 
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 public class MessageActivity extends AppCompatActivity {
 
@@ -65,12 +77,17 @@ public class MessageActivity extends AppCompatActivity {
     private boolean hasLoaded;
     public static final int PAGE_COUNT_ITEMS = 20;
     Globals globals;
+    private static final String TAG = "MessageActivity";
+    final private String FCM_API = "https://fcm.googleapis.com/fcm/send";
+    final private String contentType = "application/json";
+    private final String serverKey = "key=AAAAvgzBmsk:APA91bG2rz5lOW0WL78U_p-944xIXwnulUU-gEIxwGyTlB-_bX35e2SKTeDNU1jRlh5qmkrfAHHvc00WW66jFb50M6rJ5qsm0CuBxYs6XokBK1nFcGR93gBpFpOfWTnEz8mB1GOXBpSf";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_message);
         initView();
+        updateToken();
         setUpRecycleView();
         loadFirstPageItems(PAGE_COUNT_ITEMS);
     }
@@ -175,6 +192,7 @@ public class MessageActivity extends AppCompatActivity {
 
         FirebaseFirestore.getInstance()
                 .collection(Constant.RISE_CONVERSATION_TABLE).document(requestId)
+                .collection("Data").document(conversationKey)
                 .collection(Constant.RISE_MESSAGE_TABLE)
                 .orderBy(Constant.RISE_CREATED_AT, Query.Direction.DESCENDING).limit(pagePerCount).addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
@@ -234,6 +252,7 @@ public class MessageActivity extends AppCompatActivity {
             Query query = FirebaseFirestore.getInstance()
                     .collection(Constant.RISE_CONVERSATION_TABLE)
                     .document(requestId)
+                    .collection("Data").document(conversationKey)
                     .collection(Constant.RISE_MESSAGE_TABLE)
                     .orderBy(Constant.RISE_CREATED_AT, Query.Direction.DESCENDING).startAfter(lastVisible).limit(pagePerCount);
 
@@ -287,6 +306,7 @@ public class MessageActivity extends AppCompatActivity {
             receiverName = "";
         }
         mapConversation.put(Constant.RIDE_USER_NAME, receiverName);
+        mapConversation.put(Constant.RIDE_SENDER_USER_NAME, globals.getUserDetails(this).getFirstName()+ " "+globals.getUserDetails(this).getLastName());
         mapConversation.put(Constant.RIDE_USER_ID, userIds);
         mapConversation.put(Constant.RIDE_LAST_MESSAGE, message);
         mapConversation.put(Constant.RIDE_CONVERSATION_KEY, conversationKey);
@@ -294,19 +314,69 @@ public class MessageActivity extends AppCompatActivity {
 
         // Set Last Conversation
         FirebaseFirestore.getInstance().collection(Constant.RISE_CONVERSATION_TABLE)
-                .document(requestId).set(mapConversation, SetOptions.merge());
+                .document(requestId).collection("Data").document(conversationKey).set(mapConversation, SetOptions.merge());
 
         //Send message
         FirebaseFirestore.getInstance().collection(Constant.RISE_CONVERSATION_TABLE)
                 .document(requestId)
+                .collection("Data").document(conversationKey)
                 .collection(Constant.RISE_MESSAGE_TABLE)
                 .add(chatData).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
             @Override
             public void onSuccess(DocumentReference documentReference) {
                 rvMessageList.scrollToPosition(0);
                 etMessage.setText("");
+                sendNotification(opponentId,receiverName,requestId,conversationKey);
             }
         });
+    }
+
+    private void sendNotification(String opponentId, String receiverName, String requestId, String conversationKey) {
+        String NOTIFICATION_TITLE = getString(R.string.app_name);
+        String NOTIFICATION_MESSAGE = "Message Notification";
+
+        JSONObject notification = new JSONObject();
+        JSONObject notifcationBody = new JSONObject();
+
+        try {
+            notifcationBody.put("title", NOTIFICATION_TITLE);
+            notifcationBody.put("message", NOTIFICATION_MESSAGE);
+            notifcationBody.put(Constant.FD_OPPONENT_UID, opponentId);
+            notifcationBody.put(Constant.RIDE_name,receiverName);
+//            notifcationBody.put(Constant.RIDE_REQUEST_ID,Constant.RISE_CONVERSATION_TABLE+"/"+requestId);
+            notifcationBody.put(Constant.RIDE_REQUEST_ID,requestId);
+            notifcationBody.put(Constant.RIDE_CONVERSATION_KEY,conversationKey);
+            notification.put("to",
+                    opponentId);
+            /*notification.put("to",
+                    globals.getFCMToken(MessageActivity.this));*/
+            notification.put("data", notifcationBody);
+
+            JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(FCM_API, notification, new Response.Listener<JSONObject>() {
+                @Override
+                public void onResponse(JSONObject response) {
+                    Log.e(TAG, "onResponse: -->"+response.toString());
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Log.e(TAG, "onErrorResponse: -->"+error.getMessage());
+                }
+            }){
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    Map<String, String> params = new HashMap<>();
+                    params.put("Authorization", serverKey);
+                    params.put("Content-Type", contentType);
+                    return params;
+                }
+            };
+
+            MySingleton.getInstance(getApplicationContext()).addToRequestQueue(jsonObjectRequest);
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.e(TAG, "sendNotification: " + e.getMessage());
+        }
     }
 
     private String generateConversationId(String userId1, String userId2) {
@@ -317,6 +387,23 @@ public class MessageActivity extends AppCompatActivity {
             key = userId2 + "_" + userId1;
         }
         return key;
+    }
+
+    private void updateToken() {
+        Log.e(TAG, "updateToken: " + globals.getFireBaseId());
+        FirebaseMessaging.getInstance().getToken().addOnCompleteListener(new OnCompleteListener<String>() {
+            @Override
+            public void onComplete(@NonNull Task<String> task) {
+                if (!task.isSuccessful()) {
+                    return;
+                }
+
+                String token = task.getResult();
+                globals.setFCMToken(MessageActivity.this, token);
+                Log.e(TAG, "onComplete: Toke is-->" + token);
+            }
+        });
+//        FirebaseDatabase.getInstance().getReference("Tokens").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).setValue(token);
     }
 
 }

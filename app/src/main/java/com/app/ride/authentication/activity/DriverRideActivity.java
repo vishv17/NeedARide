@@ -142,9 +142,6 @@ public class DriverRideActivity extends AppCompatActivity implements View.OnClic
         btnDelete.setOnClickListener(this);
         btnChat.setOnClickListener(this);
         ivBack.setOnClickListener(this);
-
-
-
     }
 
     private void setDataIntoView(DriverRequestModel model) {
@@ -169,6 +166,13 @@ public class DriverRideActivity extends AppCompatActivity implements View.OnClic
             btnDelete.setVisibility(View.GONE);
             btnChat.setVisibility(View.VISIBLE);
             btnConfirm.setVisibility(View.VISIBLE);
+            if (model.getAcceptedId() != null) {
+                if (model.getAcceptedUser().contains(globals.getFireBaseId())) {
+                    btnConfirm.setVisibility(View.GONE);
+                } else {
+                    btnConfirm.setVisibility(View.VISIBLE);
+                }
+            }
             enableDisableViews(false);
         } else {
             btnSubmit.setVisibility(View.VISIBLE);
@@ -177,13 +181,6 @@ public class DriverRideActivity extends AppCompatActivity implements View.OnClic
             btnConfirm.setVisibility(View.GONE);
             btnChat.setText(getResources().getString(R.string.request_list));
             enableDisableViews(true);
-        }
-        if (model.getAcceptedId() != null) {
-            if (model.getAcceptedUser().contains(globals.getFireBaseId())) {
-                btnConfirm.setVisibility(View.GONE);
-            } else {
-                btnConfirm.setVisibility(View.VISIBLE);
-            }
         }
         hideVisibleRideStartEnd(model);
     }
@@ -299,7 +296,7 @@ public class DriverRideActivity extends AppCompatActivity implements View.OnClic
                     data.put(Constant.RIDE_END_PLACE, autoCompleteEndPlace.getText().toString());
                     data.put(Constant.RIDE_vehicle_number, etVehicleNumber.getText().toString());
                     data.put(Constant.RIDE_seat_available, Integer.parseInt(etNumberOfSeatAvailable.getText().toString()));
-                    data.put(Constant.RIDE_cost_per_seat, Integer.parseInt(etCostPerSeat.getText().toString()));
+                    data.put(Constant.RIDE_cost_per_seat, Double.parseDouble(etCostPerSeat.getText().toString()));
                     data.put(Constant.RIDE_name, globals.getUserDetails(DriverRideActivity.this).getFirstName() + " " +
                             globals.getUserDetails(DriverRideActivity.this).getLastName());
 //                    data.put(Constant.DRIVER_NAME,globals.getUserDetails(DriverRideActivity.this).getFirstName());
@@ -563,6 +560,7 @@ public class DriverRideActivity extends AppCompatActivity implements View.OnClic
 
     private void redirectToChatListScreen() {
         Intent intent = new Intent(DriverRideActivity.this, MessageListActivity.class);
+        intent.putExtra("ReqId",model.getDriverId());
         startActivity(intent);
     }
 
